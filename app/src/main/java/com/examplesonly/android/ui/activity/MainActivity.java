@@ -4,9 +4,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ActivityMainBinding;
+import com.examplesonly.android.ui.fragment.ExploreFragment;
+import com.examplesonly.android.ui.fragment.HomeFragment;
 import com.examplesonly.android.ui.fragment.NewEoSheetFragment;
+import com.examplesonly.android.ui.fragment.NotificationFragment;
+import com.examplesonly.android.ui.fragment.ProfileFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,29 +29,31 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
             Log.e(TAG, item.getTitle().toString());
 
-            switch (item.getItemId()) {
-                case R.id.home:
-                    break;
-                case R.id.explore:
-                    break;
-                case R.id.add:
-                    NewEoSheetFragment bottomSheet = new NewEoSheetFragment();
-                    bottomSheet.show(getSupportFragmentManager(),
-                            "ModalBottomSheet");
-                    break;
-                case R.id.notification:
-                    break;
-                case R.id.profile:
-                    break;
+            int itemId = item.getItemId();
+            if (itemId == R.id.home) {
+                setFragment(new HomeFragment(), R.id.frame_container);
+            } else if (itemId == R.id.explore) {
+                setFragment(new ExploreFragment(), R.id.frame_container);
+            } else if (itemId == R.id.add) {
+                NewEoSheetFragment bottomSheet = new NewEoSheetFragment();
+                bottomSheet.show(getSupportFragmentManager(),
+                        "ModalBottomSheet");
+            } else if (itemId == R.id.notification) {
+                setFragment(new NotificationFragment(), R.id.frame_container);
+            } else if (itemId == R.id.profile) {
+                setFragment(new ProfileFragment(), R.id.frame_container);
             }
 
             return item.getItemId() != R.id.add;
         });
 
-//        binding.newVideoBtn.setOnClickListener(view1 -> {
-//            Intent newVideo = new Intent(this, NewEoActivity.class);
-//            startActivity(newVideo);
-//
-//        });
+        setFragment(new HomeFragment(), R.id.frame_container);
+
+    }
+
+    public void setFragment(Fragment frag, int parentView) {
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction().replace(parentView, frag).commit();
+
     }
 }
