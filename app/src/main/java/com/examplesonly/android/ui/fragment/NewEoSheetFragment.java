@@ -27,7 +27,7 @@ public class NewEoSheetFragment extends BottomSheetDialogFragment {
             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        binding = FragmentNewEoSheetBinding.inflate(getLayoutInflater());
+        binding = FragmentNewEoSheetBinding.inflate(getLayoutInflater(), container, false);
         View view = binding.getRoot();
 
         init();
@@ -37,8 +37,19 @@ public class NewEoSheetFragment extends BottomSheetDialogFragment {
 
     void init() {
         binding.galleryCard.setOnClickListener(view -> {
-            startActivity(new Intent(getActivity(), NewEoActivity.class));
-            dismiss();
+            launchNewEo(0);
         });
+        binding.cameraCard.setOnClickListener(view -> {
+            launchNewEo(1);
+        });
+    }
+
+    void launchNewEo(int mode) {
+        Intent intent = new Intent(getActivity(), NewEoActivity.class);
+        Bundle b = new Bundle();
+        b.putInt("mode", mode);
+        intent.putExtras(b);
+        startActivity(intent);
+        dismiss();
     }
 }

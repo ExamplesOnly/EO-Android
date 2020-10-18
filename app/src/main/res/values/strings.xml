@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Examples Only</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="create_account_policy">By creating an account, you accept ExamplesOnly\'s <a href="http://hello.com">Terms of Service</a> and <a href="http://hello.com">Privacy Policy.</a></string>
 </resources>

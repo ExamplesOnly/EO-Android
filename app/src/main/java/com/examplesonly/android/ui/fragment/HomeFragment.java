@@ -61,6 +61,36 @@ public class HomeFragment extends Fragment {
                 new User().setProfilePhoto(
                         "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
 
+        mExampleListList.add(new Example("123", "a.com",
+                "https://images.pexels.com/photos/3568520/pexels-photo-3568520.jpeg?cs=srgb&dl=pexels-drew-williams-3568520.jpg&fm=jpg",
+                "Creating a wake up word recognizer model using PyTorch.",
+                new User().setProfilePhoto(
+                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
+
+        mExampleListList.add(new Example("123", "a.com",
+                "https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?cs=srgb&dl=pexels-thisisengineering-3861958.jpg&fm=jpg",
+                "Creating a wake up word recognizer model using PyTorch.",
+                new User().setProfilePhoto(
+                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
+
+        mExampleListList.add(new Example("123", "a.com",
+                "https://images.pexels.com/photos/3862634/pexels-photo-3862634.jpeg?cs=srgb&dl=pexels-thisisengineering-3862634.jpg&fm=jpg",
+                "Creating a wake up word recognizer model using PyTorch.",
+                new User().setProfilePhoto(
+                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
+
+        mExampleListList.add(new Example("123", "a.com",
+                "https://images.pexels.com/photos/3862618/pexels-photo-3862618.jpeg?cs=srgb&dl=pexels-thisisengineering-3862618.jpg&fm=jpg",
+                "Creating a wake up word recognizer model using PyTorch.",
+                new User().setProfilePhoto(
+                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
+
+        mExampleListList.add(new Example("123", "a.com",
+                "https://images.pexels.com/photos/3912474/pexels-photo-3912474.jpeg?cs=srgb&dl=pexels-thisisengineering-3912474.jpg&fm=jpg",
+                "Creating a wake up word recognizer model using PyTorch.",
+                new User().setProfilePhoto(
+                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
+
         mHomeAdapter.notifyDataSetChanged();
     }
 

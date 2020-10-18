@@ -1,3 +1,3 @@
-include ':gallerypicker'
+include ':mediapicker'
 include ':app'
 rootProject.name = "Examples Only"

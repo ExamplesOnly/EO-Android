@@ -49,6 +49,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    public void signUp(android.view.View view) {
+        Intent mailSignIn = new Intent(this, SignupActivity.class);
+        startActivity(mailSignIn);
+    }
+
     public void emailSignIn(android.view.View view) {
         Log.e(TAG, "emailsignin");
         Intent mailSignIn = new Intent(this, EmailLoginActivity.class);
