@@ -2,4 +2,12 @@
     <string name="app_name">Examples Only</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="create_account_policy">By creating an account, you accept ExamplesOnly\'s <a href="http://hello.com">Terms of Service</a> and <a href="http://hello.com">Privacy Policy.</a></string>
+    <string name="verify_email_title">You are missing out a lot of excitement!</string>
+    <string name="verify_email">Verify your email to continue</string>
+    <string name="login_with_google">Continue with Google</string>
+    <string name="login_with_linkedin">Continue with LinkedIn</string>
+
+    <string name="user_full_name">%s %s</string>
+<!--    <string name="video_meta_data">%s %s</string>-->
+    <string name="choose_category">Voilà! I\'m interested in…</string>
 </resources>

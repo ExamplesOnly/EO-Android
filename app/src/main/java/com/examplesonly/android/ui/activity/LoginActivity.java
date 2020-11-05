@@ -33,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        binding.googleLogin.setOnClickListener(view1 -> googleSignIn());
+//        binding.googleLogin.setOnClickListener(view1 -> googleSignIn());
     }
 
     @Override
@@ -55,7 +55,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void emailSignIn(android.view.View view) {
-        Log.e(TAG, "emailsignin");
         Intent mailSignIn = new Intent(this, EmailLoginActivity.class);
         startActivity(mailSignIn);
     }

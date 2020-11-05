@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:fillViewport="true">
 
-    <RelativeLayout
+    <com.examplesonly.android.ui.view.KeyboardSensitiveRelativeLayout
+        android:id="@+id/signup_realtive_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -101,7 +102,7 @@
             android:id="@+id/linearLayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/socialButtons"
+            android:layout_alignParentBottom="true"
             android:orientation="vertical">
 
             <LinearLayout
@@ -110,7 +111,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/firstnameTextField"
+                    android:id="@+id/first_name_text_field"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -121,15 +122,15 @@
                     android:hint="First Name">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/fNameTxt"
+                        android:id="@+id/first_name_txt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress" />
+                        android:inputType="textPersonName" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/lastNameTextField"
+                    android:id="@+id/last_name_text_field"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -140,10 +141,10 @@
                     android:hint="Last Name">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/lNameTxt"
+                        android:id="@+id/last_name_txt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress" />
+                        android:inputType="textPersonName" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -151,7 +152,7 @@
 
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/emailTextField"
+                android:id="@+id/email_text_field"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -162,7 +163,7 @@
                 app:startIconDrawable="@drawable/ic_at">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/emailTxt"
+                    android:id="@+id/email_txt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress" />
@@ -175,7 +176,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/genderTextField"
+                    android:id="@+id/gender_text_field"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -186,7 +187,7 @@
                     android:hint="Gender">
 
                     <AutoCompleteTextView
-                        android:id="@+id/genderTxt"
+                        android:id="@+id/gender_txt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none" />
@@ -194,7 +195,7 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/ageTextField"
+                    android:id="@+id/dob_text_field"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -202,19 +203,21 @@
                     android:layout_marginTop="6dp"
                     android:layout_marginEnd="16dp"
                     android:layout_weight="1"
+                    android:focusable="false"
                     android:hint="Date of Birth">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/ageTxt"
+                        android:id="@+id/dob_txt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal" />
+                        android:focusable="false"
+                        android:inputType="date" />
 
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/passwordTextField"
+                android:id="@+id/password_text_field"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -226,7 +229,7 @@
                 app:startIconDrawable="@drawable/ic_password">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/passwordTxt"
+                    android:id="@+id/password_txt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword" />
@@ -235,102 +238,102 @@
 
 
             <Button
-                android:id="@+id/loginBtn"
+                android:id="@+id/sign_up_btn"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
+                android:onClick="validateSignUp"
                 android:text="Sign Up" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/socialButtons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:orientation="vertical">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/devider"
+            <LinearLayout
+                android:id="@+id/social_buttons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-
-                <View
-                    android:id="@+id/view"
-                    android:layout_width="0dp"
-                    android:layout_height="2dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@color/md_grey_100"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/textView5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textView5"
-                    android:layout_width="wrap_content"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/devider"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="OR"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline"
-                    app:layout_constraintStart_toStartOf="@+id/guideline"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="2dp"
                     android:layout_marginStart="16dp"
-                    android:background="@color/md_grey_200"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/textView5"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.5" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="horizontal">
 
 
-            <Button
-                android:id="@+id/googleLogin"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:text="Continue with Google"
-                android:textColor="@color/dark"
-                app:icon="@drawable/ic_google_logo"
-                app:iconTint="#00FFFFFF"
-                app:iconTintMode="add" />
+                    <View
+                        android:id="@+id/view"
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@color/md_grey_100"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/textView5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/linkedInLogin"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="4dp"
-                android:text="Continue with LinkedIn"
-                android:textColor="@color/dark"
-                app:icon="@drawable/ic_linkedin_logo"
-                app:iconTint="#00FFFFFF"
-                app:iconTintMode="add" />
+                    <TextView
+                        android:id="@+id/textView5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OR"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/guideline"
+                        app:layout_constraintStart_toStartOf="@+id/guideline"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="16dp"
+                        android:background="@color/md_grey_200"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/textView5"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/guideline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.5" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <Button
+                    android:id="@+id/google_login"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/login_with_google"
+                    android:textColor="@color/dark"
+                    app:icon="@drawable/ic_google_logo"
+                    app:iconTint="#00FFFFFF"
+                    app:iconTintMode="add" />
+
+                <Button
+                    android:id="@+id/linkedin_login"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/login_with_linkedin"
+                    android:textColor="@color/dark"
+                    app:icon="@drawable/ic_linkedin_logo"
+                    app:iconTint="#00FFFFFF"
+                    app:iconTintMode="add" />
+            </LinearLayout>
+
 
             <TextView
                 android:layout_width="match_parent"
@@ -349,6 +352,6 @@
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </com.examplesonly.android.ui.view.KeyboardSensitiveRelativeLayout>
 
 </ScrollView>

@@ -5,9 +5,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import com.google.android.material.card.MaterialCardView;
 
-public class NewEoCard extends MaterialCardView {
+public class SquareCard extends MaterialCardView {
 
-    public NewEoCard(final Context context, final AttributeSet attrs) {
+    public SquareCard(final Context context, final AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -15,8 +15,8 @@ public class NewEoCard extends MaterialCardView {
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        int width = getMeasuredWidth();
-        setMeasuredDimension(width, width);
+//        int width = getMeasuredWidth();
+//        setMeasuredDimension(width, width);
 
         final int count = getChildCount();
         for (int i = 0; i < count; i++) {

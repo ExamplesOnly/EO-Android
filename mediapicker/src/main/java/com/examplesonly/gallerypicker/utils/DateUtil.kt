@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class DateUtil {
+public class DateUtil {
     fun getTimeString(time: Long): String {
         val cal = Calendar.getInstance()
         cal.timeInMillis = time
@@ -158,7 +158,7 @@ class DateUtil {
         return Date()
     }
 
-    fun millisToTime(millis: Long): String {
+    public fun millisToTime(millis: Long): String {
         var seconds = 0
         var minutes = 0
         var hours = 0

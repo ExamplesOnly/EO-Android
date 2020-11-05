@@ -19,13 +19,15 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
             style="@style/Widget.MaterialComponents.Toolbar.Primary"
+            android:theme="@style/LightMenu"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/white"
+            app:menu="@menu/video_selection_menu"
             app:navigationIcon="@drawable/ic_back">
 
             <RelativeLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true">
 
@@ -56,18 +58,23 @@
                         android:src="@drawable/ic_dropdown" />
                 </FrameLayout>
 
-                <TextView
-                    android:id="@+id/done"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:paddingStart="15dp"
-                    android:paddingEnd="15dp"
-                    android:text="DONE"
-                    android:textColor="?colorPrimary"
-                    android:textSize="@dimen/_14sdp"
-                    android:textStyle="bold" />
+<!--                <Button-->
+<!--                    android:id="@+id/done"-->
+<!--                    style="@style/Widget.MaterialComponents.Button.TextButton"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_alignParentEnd="true"-->
+<!--                    android:layout_centerVertical="true"-->
+<!--                    android:paddingStart="15dp"-->
+<!--                    android:paddingEnd="15dp"-->
+<!--                    android:clickable="true"-->
+<!--                    android:focusable="true"-->
+<!--                    android:foreground="?attr/selectableItemBackgroundBorderless"-->
+<!--                    android:gravity="center"-->
+<!--                    android:text="NEXT"-->
+<!--                    android:textColor="@color/colorPrimary"-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:textStyle="bold" />-->
             </RelativeLayout>
 
         </com.google.android.material.appbar.MaterialToolbar>

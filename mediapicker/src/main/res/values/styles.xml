@@ -6,4 +6,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="LightMenu" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <item name="colorOnPrimary">@color/dark</item>
+    </style>
+
 </resources>

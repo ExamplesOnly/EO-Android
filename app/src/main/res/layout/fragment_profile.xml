@@ -26,6 +26,19 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@color/md_grey_200" />
 
+        <ImageButton
+            android:id="@+id/settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_setting"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintEnd_toEndOf="@+id/cover_image"
+            app:layout_constraintTop_toTopOf="@+id/cover_image" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/profile_image_card"
             android:layout_width="90dp"
@@ -80,6 +93,7 @@
             app:layout_constraintTop_toBottomOf="@+id/profile_image_card">
 
             <TextView
+                android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppins_semibold"
@@ -92,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-4dp"
                 android:fontFamily="@font/poppins"
-                android:text="\@prabindas"
+                android:text="Artificial Intelligence"
                 android:textColor="@color/md_grey_500"
                 android:textSize="16sp" />
 
@@ -270,44 +284,44 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/button_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/params_container">
+<!--        <LinearLayout-->
+<!--            android:id="@+id/button_container"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:layout_marginTop="15dp"-->
+<!--            android:layout_marginEnd="16dp"-->
+<!--            android:orientation="horizontal"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/params_container">-->
 
-            <Button
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/md_grey_100"
-                android:elevation="0dp"
-                android:text="Edit Profile"
-                android:textAllCaps="false"
-                android:textColor="@color/dark"
-                app:cornerRadius="20dp" />
+<!--            <Button-->
+<!--                style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginRight="8dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:backgroundTint="@color/md_grey_100"-->
+<!--                android:elevation="0dp"-->
+<!--                android:text="Edit Profile"-->
+<!--                android:textAllCaps="false"-->
+<!--                android:textColor="@color/dark"-->
+<!--                app:cornerRadius="20dp" />-->
 
-            <Button
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/md_grey_100"
-                android:text="Settings"
-                android:textAllCaps="false"
-                android:textColor="@color/dark"
-                app:cornerRadius="20dp" />
+<!--            <Button-->
+<!--                style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginLeft="8dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:backgroundTint="@color/md_grey_100"-->
+<!--                android:text="Settings"-->
+<!--                android:textAllCaps="false"-->
+<!--                android:textColor="@color/dark"-->
+<!--                app:cornerRadius="20dp" />-->
 
-        </LinearLayout>
+<!--        </LinearLayout>-->
 
         <include
             android:id="@+id/devider_two"
@@ -317,7 +331,7 @@
             android:layout_marginTop="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_container" />
+            app:layout_constraintTop_toBottomOf="@+id/params_container" />
 
         <LinearLayout
             android:id="@+id/exampleTabs"
@@ -325,7 +339,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/devider_two" >
+            app:layout_constraintTop_toBottomOf="@+id/devider_two"
+            android:orientation="vertical">
 
 
 

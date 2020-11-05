@@ -11,7 +11,7 @@
     app:behavior_peekHeight="90dp"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
-    <com.examplesonly.android.ui.view.NewEoCard
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/galleryCard"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -59,9 +59,9 @@
                 app:layout_constraintStart_toStartOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </com.examplesonly.android.ui.view.NewEoCard>
+    </com.google.android.material.card.MaterialCardView>
 
-    <com.examplesonly.android.ui.view.NewEoCard
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/cameraCard"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -108,6 +108,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.examplesonly.android.ui.view.NewEoCard>
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

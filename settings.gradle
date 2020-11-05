@@ -1,3 +1,4 @@
 include ':mediapicker'
+include ':thumbnail-chooser'
 include ':app'
 rootProject.name = "Examples Only"

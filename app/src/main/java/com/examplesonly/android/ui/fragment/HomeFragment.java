@@ -1,23 +1,33 @@
 package com.examplesonly.android.ui.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.examplesonly.android.adapter.HomeAdapter;
+import com.examplesonly.android.adapter.HomeAdapter.VideoClickListener;
 import com.examplesonly.android.databinding.FragmentHomeBinding;
-import com.examplesonly.android.model.Example;
 import com.examplesonly.android.model.User;
+import com.examplesonly.android.model.Video;
+import com.examplesonly.android.network.Api;
+import com.examplesonly.android.network.user.UserInterface;
+import com.examplesonly.android.network.video.VideoInterface;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private HomeAdapter mHomeAdapter;
-    private List<Example> mExampleListList = new ArrayList<>();
+    private VideoInterface videoInterface;
+    private ArrayList<Video> mExampleListList = new ArrayList<>();
 
     public HomeFragment() {
         // Required empty public constructor
@@ -33,72 +43,55 @@ public class HomeFragment extends Fragment {
             Bundle savedInstanceState) {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
+        videoInterface = new Api(getContext()).getClient().create(VideoInterface.class);
 
         setupExamples();
-
-        setDummyData();
+        getVideos();
+//        setDummyData();
 
         // Inflate the layout for this fragment
         return binding.getRoot();
     }
 
-    void setDummyData() {
-        mExampleListList.add(new Example("123", "a.com",
-                "https://images.pexels.com/photos/3184460/pexels-photo-3184460.jpeg?cs=srgb&dl=pexels-fauxels-3184460.jpg&fm=jpg",
-                "Smart IOT home automation project with ESP8266 and Arduino",
-                new User().setProfilePhoto(
-                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
+    @Override
+    public void onResume() {
+        super.onResume();
+        getVideos();
+    }
 
-        mExampleListList.add(new Example("123", "a.com",
-                "https://images.pexels.com/photos/193349/pexels-photo-193349.jpeg?cs=srgb&dl=pexels-markus-spiske-193349.jpg&fm=jpg",
-                "Parsing float as integer in Python using Raspberry Pi.",
-                new User().setProfilePhoto(
-                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
+    void getVideos() {
+        Log.e("Home", "getVideos");
+        videoInterface.getVideos().enqueue(new Callback<ArrayList<Video>>() {
+            @Override
+            public void onResponse(final Call<ArrayList<Video>> call, final Response<ArrayList<Video>> response) {
+                if (response.isSuccessful()) {
+                    ArrayList<Video> videos = response.body();
+                    mExampleListList.clear();
+                    for (int i = 0; i < videos.size(); i++) {
+                        mExampleListList.add(videos.get(i));
+                        mHomeAdapter.notifyDataSetChanged();
+                    }
+                } else {
+                    try {
+                        Log.e("Home", response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
-        mExampleListList.add(new Example("123", "a.com",
-                "https://images.pexels.com/photos/3345882/pexels-photo-3345882.jpeg?cs=srgb&dl=pexels-ola-dapo-3345882.jpg&fm=jpg",
-                "Creating a wake up word recognizer model using PyTorch.",
-                new User().setProfilePhoto(
-                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
-
-        mExampleListList.add(new Example("123", "a.com",
-                "https://images.pexels.com/photos/3568520/pexels-photo-3568520.jpeg?cs=srgb&dl=pexels-drew-williams-3568520.jpg&fm=jpg",
-                "Creating a wake up word recognizer model using PyTorch.",
-                new User().setProfilePhoto(
-                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
-
-        mExampleListList.add(new Example("123", "a.com",
-                "https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?cs=srgb&dl=pexels-thisisengineering-3861958.jpg&fm=jpg",
-                "Creating a wake up word recognizer model using PyTorch.",
-                new User().setProfilePhoto(
-                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
-
-        mExampleListList.add(new Example("123", "a.com",
-                "https://images.pexels.com/photos/3862634/pexels-photo-3862634.jpeg?cs=srgb&dl=pexels-thisisengineering-3862634.jpg&fm=jpg",
-                "Creating a wake up word recognizer model using PyTorch.",
-                new User().setProfilePhoto(
-                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
-
-        mExampleListList.add(new Example("123", "a.com",
-                "https://images.pexels.com/photos/3862618/pexels-photo-3862618.jpeg?cs=srgb&dl=pexels-thisisengineering-3862618.jpg&fm=jpg",
-                "Creating a wake up word recognizer model using PyTorch.",
-                new User().setProfilePhoto(
-                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
-
-        mExampleListList.add(new Example("123", "a.com",
-                "https://images.pexels.com/photos/3912474/pexels-photo-3912474.jpeg?cs=srgb&dl=pexels-thisisengineering-3912474.jpg&fm=jpg",
-                "Creating a wake up word recognizer model using PyTorch.",
-                new User().setProfilePhoto(
-                        "https://media-exp1.licdn.com/dms/image/C4E03AQGLcf5Ji62pXw/profile-displayphoto-shrink_200_200/0?e=1608163200&v=beta&t=2RAFKzeve2uooUiQQDWg7ZscS6lFkPJRgmEBf56M3q4")));
-
-        mHomeAdapter.notifyDataSetChanged();
+            @Override
+            public void onFailure(final Call<ArrayList<Video>> call, final Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     void setupExamples() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         binding.exampleList.setLayoutManager(layoutManager);
 
-        mHomeAdapter = new HomeAdapter(mExampleListList, getContext());
+        mHomeAdapter = new HomeAdapter(mExampleListList, getContext(), (VideoClickListener) getActivity());
         binding.exampleList.setAdapter(mHomeAdapter);
 
     }

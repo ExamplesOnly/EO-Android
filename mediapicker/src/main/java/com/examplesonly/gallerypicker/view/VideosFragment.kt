@@ -3,15 +3,18 @@ package com.examplesonly.gallerypicker.view
 import android.Manifest
 import android.annotation.TargetApi
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.animation.AnimationUtils
 import android.view.animation.LinearInterpolator
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +31,6 @@ import kotlinx.android.synthetic.main.fragment_media.albumselection
 import kotlinx.android.synthetic.main.fragment_media.albumsrecyclerview
 import kotlinx.android.synthetic.main.fragment_media.allowAccessButton
 import kotlinx.android.synthetic.main.fragment_media.allowAccessFrame
-import kotlinx.android.synthetic.main.fragment_media.done
 import kotlinx.android.synthetic.main.fragment_media.dropdown
 import kotlinx.android.synthetic.main.fragment_media.dropdownframe
 import kotlinx.android.synthetic.main.fragment_media.imageGrid
@@ -37,16 +39,19 @@ import org.jetbrains.anko.doAsync
 import java.io.File
 import java.util.ArrayList
 
+
 public class VideosFragment : Fragment(), ImagePickerContract {
 
     var photoList: ArrayList<GalleryData> = ArrayList()
     var albumList: ArrayList<GalleryAlbums> = ArrayList()
     lateinit var glm: GridLayoutManager
     var photoids: ArrayList<Int> = ArrayList()
+    lateinit var menu: Menu
 
     val imagePickerPresenter: VideosPresenterImpl = VideosPresenterImpl(this)
 
     lateinit var listener: OnPhoneImagesObtained
+    lateinit var videoChooseListener: VideoChooseListener
 
     private val PERMISSIONS_READ_WRITE = 123
 
@@ -63,7 +68,26 @@ public class VideosFragment : Fragment(), ImagePickerContract {
 
         albumselection.text = "All Videos"
         topAppBar.setNavigationOnClickListener {
-            activity?.onBackPressed()
+            activity?.finish()
+        }
+
+        topAppBar.setOnMenuItemClickListener { it ->
+            when (it.itemId) {
+                R.id.next -> {
+                    Log.e("Video", "Next")
+                    val newList: ArrayList<GalleryData> = ArrayList()
+                    photoList.filterTo(newList) { it.isSelected && it.isEnabled }
+
+                    if (newList.size > 0)
+                        videoChooseListener.onVideoChosen(newList[0].photoUri)
+                    else
+                        Toast.makeText(context, "Select a video to continue", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> {
+                    true
+                }
+            }
         }
 
         if (isReadWritePermitted()) initGalleryViews() else allowAccessFrame.visibility = View.VISIBLE
@@ -87,6 +111,7 @@ public class VideosFragment : Fragment(), ImagePickerContract {
     override fun galleryOperation() {
         doAsync {
             albumList = ArrayList()
+            photoList = ArrayList()
             listener = object : OnPhoneImagesObtained {
                 override fun onComplete(albums: ArrayList<GalleryAlbums>) {
                     albums.sortWith(compareBy { it.name })
@@ -105,14 +130,16 @@ public class VideosFragment : Fragment(), ImagePickerContract {
                     RunOnUiThread(ctx).safely {
                         imageGrid.layoutManager = glm
                         initRecyclerViews()
-                        done.setOnClickListener {
-                            val newList: ArrayList<GalleryData> = ArrayList()
-                            photoList.filterTo(newList) { it.isSelected && it.isEnabled }
-                            val i = Intent()
-                            i.putParcelableArrayListExtra("MEDIA", newList)
-//                            (ctx as PickerActivity).setResult((ctx as PickerActivity).REQUEST_RESULT_CODE, i)
-//                            (ctx as PickerActivity).onBackPressed()
-                        }
+//                        done.setOnClickListener {
+//                            val newList: ArrayList<GalleryData> = ArrayList()
+//                            photoList.filterTo(newList) { it.isSelected && it.isEnabled }
+//                            val i = Intent()
+//                            i.putParcelableArrayListExtra("MEDIA", newList)
+//
+//                            videoChooseListener.onVideoChosen(newList[0])
+////                            (ctx as PickerActivity).setResult((ctx as PickerActivity).REQUEST_RESULT_CODE, i)
+////                            (ctx as PickerActivity).onBackPressed()
+//                        }
                         albumselection.setOnClickListener {
                             toggleDropdown()
                         }
@@ -136,7 +163,7 @@ public class VideosFragment : Fragment(), ImagePickerContract {
     override fun initRecyclerViews() {
         albumsrecyclerview.layoutManager = LinearLayoutManager(ctx)
         albumsrecyclerview.adapter = AlbumAdapter(ArrayList(), this)
-        imageGrid.adapter = VideoGridAdapter(imageList = photoList, threshold = 4)
+        imageGrid.adapter = VideoGridAdapter(imageList = photoList, threshold = 1)
     }
 
     override fun toggleDropdown() {
@@ -145,17 +172,17 @@ public class VideosFragment : Fragment(), ImagePickerContract {
             albumsrecyclerview.adapter = AlbumAdapter(albumList, this)
             dropdown.setImageResource(R.drawable.ic_dropdown_rotate)
             try {
-                done.isEnabled = false
+//                done.isEnabled = false
                 val animation = AnimationUtils.loadAnimation(ctx, R.anim.scale_down)
-                done.startAnimation(animation)
+//                done.startAnimation(animation)
             } catch (e: Exception) {
             }
-            done.visibility = View.GONE
+//            done.visibility = View.GONE
         } else {
             albumsrecyclerview.adapter = AlbumAdapter(ArrayList(), this)
             dropdown.setImageResource(R.drawable.ic_dropdown)
-            done.isEnabled = true
-            done.visibility = View.VISIBLE
+//            done.isEnabled = true
+//            done.visibility = View.VISIBLE
         }
     }
 
@@ -174,6 +201,11 @@ public class VideosFragment : Fragment(), ImagePickerContract {
                 photo.isEnabled = selected.id == photo.id
             }
         }
+
+        val newList: ArrayList<GalleryData> = ArrayList()
+        photoList.filterTo(newList) { it.isSelected && it.isEnabled }
+//        done.isEnabled = newList.size > 0
+        menu.findItem(R.id.next).isEnabled = newList.size > 0
     }
 
     @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN)
@@ -189,5 +221,24 @@ public class VideosFragment : Fragment(), ImagePickerContract {
         }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is VideoChooseListener) {
+            videoChooseListener = context
+        } else {
+            throw RuntimeException(context.toString()
+                    + " must implement VideoChooseListener")
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        this.menu = menu
+    }
+
     private fun isReadWritePermitted(): Boolean = (context?.checkCallingOrSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && context?.checkCallingOrSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+
+    interface VideoChooseListener {
+        fun onVideoChosen(videouri: String)
+    }
 }

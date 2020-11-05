@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.provider.MediaStore
+import android.util.Log
 import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -149,21 +150,21 @@ class VideoGridAdapter() : RecyclerView.Adapter<VideoGridAdapter.MyViewHolder>()
         }
 
         var dialog: Dialog? = null
-        holder.image.setOnLongClickListener {
-            dialog = Dialog(ctx)
-            if (dialog != null) {
-                dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-                dialog?.setContentView(R.layout.detailedimage)
-                dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                doAsync {
-                    RunOnUiThread(ctx).safely {
-                        Glide.with(ctx).load(mimageList[holder.adapterPosition].photoUri).into(dialog?.bigimage!!)
-                    }
-                }
-                dialog?.show()
-            }
-            true
-        }
+//        holder.image.setOnLongClickListener {
+//            dialog = Dialog(ctx)
+//            if (dialog != null) {
+//                dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+//                dialog?.setContentView(R.layout.detailedimage)
+//                dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//                doAsync {
+//                    RunOnUiThread(ctx).safely {
+//                        Glide.with(ctx).load(mimageList[holder.adapterPosition].photoUri).into(dialog?.bigimage!!)
+//                    }
+//                }
+//                dialog?.show()
+//            }
+//            true
+//        }
 
         holder.image.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP || event.action == DragEvent.ACTION_DROP) dialog?.dismiss()

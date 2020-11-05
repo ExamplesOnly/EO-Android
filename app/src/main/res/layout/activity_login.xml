@@ -104,7 +104,7 @@
             android:orientation="vertical">
 
             <Button
-                android:id="@+id/googleLogin"
+                android:id="@+id/google_login"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -117,7 +117,7 @@
                 app:iconTintMode="add" />
 
             <Button
-                android:id="@+id/linkedInLogin"
+                android:id="@+id/linkedin_login"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -139,8 +139,8 @@
                 android:layout_marginBottom="4dp"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toTopOf="@+id/loginBtn"
-                app:layout_constraintEnd_toEndOf="@+id/linkedInLogin"
-                app:layout_constraintStart_toStartOf="@+id/linkedInLogin">
+                app:layout_constraintEnd_toEndOf="@+id/linkedin_login"
+                app:layout_constraintStart_toStartOf="@+id/linkedin_login">
 
 
                 <View
@@ -197,7 +197,7 @@
                 app:backgroundTint="@color/md_grey_100" />
 
             <Button
-                android:id="@+id/signUpBtn"
+                android:id="@+id/sign_up_btn"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
