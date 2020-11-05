@@ -1,5 +1,8 @@
 package com.examplesonly.android.ui.fragment;
 
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_CANCEL;
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
+
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import com.arthenica.mobileffmpeg.FFmpeg;
 import com.examplesonly.android.R;
 import com.examplesonly.android.adapter.CategoryListAdapter;
 import com.examplesonly.android.databinding.FragmentEditVideoBinding;
@@ -51,6 +55,7 @@ public class EditVideoFragment extends Fragment implements ThumbnailChooseListen
     private CategoryInterface categoryInterface;
     private Bitmap thumbnail;
     private final ArrayList<Category> categoryList = new ArrayList<>();
+    private VideoHandler videoHandler;
 
     public static EditVideoFragment newInstance(String video) {
         EditVideoFragment fragment = new EditVideoFragment();
@@ -72,6 +77,12 @@ public class EditVideoFragment extends Fragment implements ThumbnailChooseListen
         categoryInterface = new Api(getContext()).getClient().create(CategoryInterface.class);
         if (getArguments() != null) {
             video = getArguments().getString(ARG_VIDEO_LOCATION);
+
+//            String[] command = {"-y", "-i", "/storage/emulated/0/DCIM/Camera/VID20201104220903.mp4", "-c:v",
+//                    "libx264", "-crf", "23", "-profile:v",
+//                    "high", "-pix_fmt", "yuv420p", "-color_primaries", "1", "-color_trc", "1", "-colorspace", "1",
+//                    "-movflags", "+faststart", "-an",
+//                    Environment.getExternalStorageDirectory().getPath() + "/converted.mp4"};
 
             MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
             metadataRetriever.setDataSource(video);
@@ -114,7 +125,7 @@ public class EditVideoFragment extends Fragment implements ThumbnailChooseListen
                 progressDialog.setCancelable(false);
                 progressDialog.setIndeterminate(true);
                 progressDialog.show();
-                uploadVideo(new File(video), progressDialog);
+                processVideo(new File(video), progressDialog);
             }
             return true;
         });
@@ -179,14 +190,41 @@ public class EditVideoFragment extends Fragment implements ThumbnailChooseListen
         }
     }
 
-    void uploadVideo(File imageBytes, ProgressDialog progressDialog) {
+    void processVideo(File videoFile, ProgressDialog progressDialog) {
+        progressDialog.setMessage("Optimizing video...");
+        String convertedFile = getContext().getCacheDir().getPath() + "/" + System.currentTimeMillis() + ".mp4";
+
+        FFmpeg.executeAsync(
+                "-y -i " + videoFile.getPath() + " -c:v libx265 "
+                        + "-crf 23 -color_primaries 1 -color_trc 1 -colorspace "
+                        // -profile:v high -pix_fmt yuv420p
+                        + "1 -movflags +faststart -an "
+                        + convertedFile,
+                (executionId1, returnCode) -> {
+                    if (returnCode == RETURN_CODE_SUCCESS) {
+                        uploadVideo(new File(convertedFile), progressDialog);
+                        Log.e(TAG, "Async command execution completed successfully.");
+                    } else if (returnCode == RETURN_CODE_CANCEL) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(), "Failed to optimize video", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Async command execution cancelled by user.");
+                    } else {
+                        Toast.makeText(getContext(), "Failed to optimize video", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, String.format("Async command execution failed with returnCode=%d.",
+                                returnCode));
+                    }
+                });
+    }
+
+    void uploadVideo(File videoFile, ProgressDialog progressDialog) {
+        progressDialog.setMessage("Uploading video...");
         String title = Objects.requireNonNull(binding.videoTitleTxt.getText()).toString();
         String description = Objects.requireNonNull(binding.videoDescTxt.getText()).toString();
         int currentCategory = getCategoryIdFromTitle(binding.categoryTxt.getText().toString());
         String categoryValue = buildCategoryRequest(new String[]{String.valueOf(currentCategory)});
 
         MediaMetadataRetriever metadataRetriever = new MediaMetadataRetriever();
-        metadataRetriever.setDataSource(imageBytes.getPath());
+        metadataRetriever.setDataSource(videoFile.getPath());
 
         String metaHeight = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
         String metaWidth = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
@@ -200,7 +238,7 @@ public class EditVideoFragment extends Fragment implements ThumbnailChooseListen
         RequestBody durationBody = RequestBody.create(MediaType.parse("text/plain"), metaDuration);
         RequestBody heightBody = RequestBody.create(MediaType.parse("text/plain"), metaHeight);
         RequestBody widthBody = RequestBody.create(MediaType.parse("text/plain"), metaWidth);
-        RequestBody bodyFile = RequestBody.create(MediaType.parse("video/mp4"), imageBytes);
+        RequestBody bodyFile = RequestBody.create(MediaType.parse("video/mp4"), videoFile);
         RequestBody thumbFile = RequestBody
                 .create(MediaType.parse("image/png"), MediaUtil.bitmapToFile(thumbnail, getContext()));
 
@@ -210,8 +248,8 @@ public class EditVideoFragment extends Fragment implements ThumbnailChooseListen
             widthBody = oldHeightBody;
         }
 
-        MultipartBody.Part body = MultipartBody.Part.createFormData("file", imageBytes.getName(), bodyFile);
-        MultipartBody.Part thumb = MultipartBody.Part.createFormData("thumbnail", imageBytes.getName(), thumbFile);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", videoFile.getName(), bodyFile);
+        MultipartBody.Part thumb = MultipartBody.Part.createFormData("thumbnail", videoFile.getName(), thumbFile);
 
         videoInterface
                 .upload(titleBody, descriptionBody, categoryValueBody, durationBody,

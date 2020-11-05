@@ -100,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements VideoClickListene
     private void init() {
         mUserInterface = new Api(this).getClient().create(UserInterface.class);
         videoInterface = new Api(this).getClient().create(VideoInterface.class);
+
+
     }
 
     private void getVideos() {

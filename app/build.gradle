@@ -37,12 +37,18 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+    }
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
     testImplementation 'junit:junit:4.13.1'
@@ -59,7 +65,7 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.12.1'
     implementation 'com.ogaclejapan.smarttablayout:library:2.0.0@aar'
     implementation 'com.ogaclejapan.smarttablayout:utils-v4:2.0.0@aar'
-    compile 'com.writingminds:FFmpegAndroid:0.3.2'
+    implementation 'com.arthenica:mobile-ffmpeg-full-gpl:4.4.LTS'
 
     //network
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
