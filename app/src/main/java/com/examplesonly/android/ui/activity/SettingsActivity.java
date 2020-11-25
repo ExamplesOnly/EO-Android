@@ -17,7 +17,7 @@ public class SettingsActivity extends AppCompatActivity {
         binding = ActivitySettingsBinding.inflate(getLayoutInflater());
 
         binding.logoutBtn.setOnClickListener(view1 -> {
-            new UserDataProvider(this).logout();
+            UserDataProvider.getInstance(this).logout();
             finish();
         });
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView
-
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ui.fragment.ProfileFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,10 +17,11 @@
         <ImageView
             android:id="@+id/cover_image"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
+            app:layout_constraintDimensionRatio="16:6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -28,8 +29,8 @@
 
         <ImageButton
             android:id="@+id/settings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:background="?selectableItemBackgroundBorderless"
             android:src="@drawable/ic_setting"
             android:layout_marginTop="16dp"
@@ -43,7 +44,7 @@
             android:id="@+id/profile_image_card"
             android:layout_width="90dp"
             android:layout_height="90dp"
-            android:layout_marginLeft="18dp"
+            android:layout_marginStart="18dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="@+id/cover_image"
@@ -58,6 +59,7 @@
                 app:cardElevation="0dp">
 
                 <ImageView
+                    android:id="@+id/profile_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@color/md_grey_400" />
@@ -65,9 +67,9 @@
 
         </androidx.cardview.widget.CardView>
 
-
-        <Button
-            android:layout_width="110dp"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/profile_action_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
@@ -102,19 +104,22 @@
                 android:textSize="24sp" />
 
             <TextView
+                android:id="@+id/interest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-4dp"
                 android:fontFamily="@font/poppins"
-                android:text="Artificial Intelligence"
+                android:text=""
+                android:visibility="gone"
                 android:textColor="@color/md_grey_500"
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/bio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Amet minim 😎 mollit non deserunt #ullamco est sit aliqua dolor do amet sint. Velit #officia consequat duis enim velit mollit.😍 "
+                android:layout_marginTop="4dp"
+                android:text="User Bio"
                 android:textColor="@color/md_grey_900"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -124,19 +129,77 @@
             layout="@layout/devider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="20dp"
             app:layout_constraintTop_toBottomOf="@+id/personal_details_container" />
 
         <LinearLayout
-            android:id="@+id/params_container"
+            android:id="@+id/point_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dev_one">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/eoi_icon"
+                    android:layout_width="48sp"
+                    android:layout_height="48sp"
+                    android:src="@drawable/ic_eoi_3" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:text="EOI"
+                    android:textColor="@color/md_grey_500"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/esm_icon"
+                    android:layout_width="48sp"
+                    android:layout_height="48sp"
+                    android:src="@drawable/ic_esm_3"
+                    app:tint="@color/colorPrimary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:text="ESM"
+                    android:textColor="@color/md_grey_500"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/params_containera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="16dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dev_one">
+            app:layout_constraintTop_toBottomOf="@+id/point_container">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -284,76 +347,152 @@
 
         </LinearLayout>
 
-<!--        <LinearLayout-->
-<!--            android:id="@+id/button_container"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="16dp"-->
-<!--            android:layout_marginTop="15dp"-->
-<!--            android:layout_marginEnd="16dp"-->
-<!--            android:orientation="horizontal"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/params_container">-->
-
-<!--            <Button-->
-<!--                style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginRight="8dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:backgroundTint="@color/md_grey_100"-->
-<!--                android:elevation="0dp"-->
-<!--                android:text="Edit Profile"-->
-<!--                android:textAllCaps="false"-->
-<!--                android:textColor="@color/dark"-->
-<!--                app:cornerRadius="20dp" />-->
-
-<!--            <Button-->
-<!--                style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginLeft="8dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:backgroundTint="@color/md_grey_100"-->
-<!--                android:text="Settings"-->
-<!--                android:textAllCaps="false"-->
-<!--                android:textColor="@color/dark"-->
-<!--                app:cornerRadius="20dp" />-->
-
-<!--        </LinearLayout>-->
-
         <include
             android:id="@+id/devider_two"
             layout="@layout/devider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/params_container" />
+            app:layout_constraintTop_toBottomOf="@+id/params_containera" />
 
         <LinearLayout
-            android:id="@+id/exampleTabs"
+            android:id="@+id/tab_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/devider_two"
-            android:orientation="vertical">
+            android:layout_height="?attr/actionBarSize"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/devider_two">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/clips_tab"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="E"
+                        android:textColor="@color/dark"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="O"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:text="Clips"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/clip_selected"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_gravity="bottom"
+                    android:background="@color/md_grey_600" />
+
+            </com.google.android.material.card.MaterialCardView>
 
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/stats_tab"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="E"
+                        android:textColor="@color/dark"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="O"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:text="Stats"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/stat_selected"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_gravity="bottom"
+                    android:background="@color/transparent" />
+
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/exampleList"
+        <include
+            android:id="@+id/devider_three"
+            layout="@layout/devider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tab_container" />
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/content_pager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/exampleTabs" />
+            app:layout_constraintTop_toBottomOf="@+id/devider_three" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/example_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/devider_three" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

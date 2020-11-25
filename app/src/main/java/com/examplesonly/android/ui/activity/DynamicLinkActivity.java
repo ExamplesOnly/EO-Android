@@ -8,10 +8,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.examplesonly.android.R;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import timber.log.Timber;
 
 public class DynamicLinkActivity extends AppCompatActivity {
-
-    private final String TAG = DynamicLinkActivity.class.getCanonicalName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,11 +21,11 @@ public class DynamicLinkActivity extends AppCompatActivity {
         FirebaseDynamicLinks.getInstance()
                 .getDynamicLink(getIntent())
                 .addOnSuccessListener(this, pendingDynamicLinkData -> {
-                    Log.e(TAG, "getDynamicLink:addOnSuccessListener");
+                    Timber.e("getDynamicLink:addOnSuccessListener");
                     Uri deepLink = null;
                     if (pendingDynamicLinkData != null) {
                         deepLink = pendingDynamicLinkData.getLink();
-                        Log.e(TAG, "getDynamicLink:deepLink: " + deepLink.getPath());
+                        Timber.e("getDynamicLink:deepLink: %s", deepLink.getPath());
                         Intent main = new Intent(this, VerificationActivity.class);
                         main.putExtra(VerificationActivity.VERIFICATION_LINK, deepLink.getPath());
                         startActivity(main);

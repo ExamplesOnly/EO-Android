@@ -73,13 +73,20 @@
             app:layout_constraintStart_toStartOf="@+id/example_card"
             app:layout_constraintTop_toBottomOf="@+id/example_card">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profile_image"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                app:cardCornerRadius="20dp"
                 android:layout_marginStart="12dp"
-                android:src="@color/md_grey_200"
-                app:civ_border_width="0dp" />
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:id="@+id/profile_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@color/md_grey_400" />
+
+            </com.google.android.material.card.MaterialCardView>
 
             <LinearLayout
                 android:layout_width="match_parent"

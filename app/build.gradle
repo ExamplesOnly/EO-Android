@@ -66,6 +66,10 @@ dependencies {
     implementation 'com.ogaclejapan.smarttablayout:library:2.0.0@aar'
     implementation 'com.ogaclejapan.smarttablayout:utils-v4:2.0.0@aar'
     implementation 'com.arthenica:mobile-ffmpeg-full-gpl:4.4.LTS'
+    implementation 'com.airbnb.android:lottie:3.4.4'
+    implementation 'com.ncapdevi:frag-nav:3.2.0'
+    implementation 'com.github.yalantis:ucrop:2.2.6'
+    implementation 'com.airbnb.android:paris:1.7.2'
 
     //network
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -76,10 +80,11 @@ dependencies {
 
     implementation 'com.auth0:java-jwt:3.11.0'
 
-    implementation 'com.google.android.gms:play-services-auth:18.1.0'
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation 'javax.inject:javax.inject:1'
     implementation "io.reactivex.rxjava3:rxjava:3.0.7"
     implementation 'com.uber.autodispose2:autodispose:2.0.0'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
     //firebase
     implementation platform('com.google.firebase:firebase-bom:25.12.0')

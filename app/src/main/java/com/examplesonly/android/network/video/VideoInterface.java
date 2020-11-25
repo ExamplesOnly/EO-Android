@@ -21,6 +21,7 @@ public interface VideoInterface {
             @Part("duration") RequestBody duration,
             @Part("height") RequestBody height,
             @Part("width") RequestBody width,
+            @Part("demandId") RequestBody demandId,
             @Part MultipartBody.Part file,
             @Part MultipartBody.Part thumbnail
     );

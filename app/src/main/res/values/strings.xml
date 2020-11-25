@@ -8,6 +8,20 @@
     <string name="login_with_linkedin">Continue with LinkedIn</string>
 
     <string name="user_full_name">%s %s</string>
-<!--    <string name="video_meta_data">%s %s</string>-->
     <string name="choose_category">Voilà! I\'m interested in…</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="publish">Publish</string>
+    <string name="question">Question</string>
+    <string name="description">Description</string>
+    <string name="category">Category</string>
+    <string name="bio">Bio</string>
+    <string name="dot">•</string>
+    <string name="no_answer_yet">No Answer Yet</string>
+    <string name="post_example">Post Example</string>
+    <string name="save">Save</string>
+    <string name="request">Request</string>
+    <string name="more">More</string>
+    <string name="no_example_yet">No examples yet</string>
+    <string name="answer">Answer</string>
+    <string name="categories">Categories</string>
 </resources>

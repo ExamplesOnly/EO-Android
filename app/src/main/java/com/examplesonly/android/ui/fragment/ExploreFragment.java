@@ -1,7 +1,6 @@
 package com.examplesonly.android.ui.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.category.CategoryInterface;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import java.util.ArrayList;
+import org.jetbrains.annotations.NotNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,7 +23,7 @@ public class ExploreFragment extends Fragment {
     private CategoryInterface mCategoryInterface;
     private FragmentPagerItemAdapter fragmentAdapter;
     private ExploreTabAdapter mExploreTabAdapter;
-    private ArrayList<Category> categoryList;
+    private final ArrayList<Category> categoryList = new ArrayList<>();
 
     public ExploreFragment() {
     }
@@ -37,29 +37,32 @@ public class ExploreFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         binding = FragmentExploreBinding.inflate(inflater, container, false);
-
         mCategoryInterface = new Api(getContext()).getClient().create(CategoryInterface.class);
+
+        mExploreTabAdapter = new ExploreTabAdapter(getChildFragmentManager(), categoryList);
+        binding.viewpager.setAdapter(mExploreTabAdapter);
+        binding.tabs.setViewPager(binding.viewpager);
+
+        updateList();
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateList();
+    }
+
+    void updateList() {
         mCategoryInterface.getCategories().enqueue(new Callback<ArrayList<Category>>() {
             @Override
-            public void onResponse(final Call<ArrayList<Category>> call,
-                    final Response<ArrayList<Category>> response) {
-
-                if (response.isSuccessful()) {
-                    categoryList = response.body();
-
-//                    Creator pageItems = FragmentPagerItems.with(getContext());
-
-                    for (Category category : response.body()) {
-                        Log.e("Explore", category.getTitle());
-                    }
-
-//                    fragmentAdapter = new FragmentPagerItemAdapter(
-//                            getFragmentManager(), pageItems
-//                            .create());
-
-                    mExploreTabAdapter = new ExploreTabAdapter(getFragmentManager(), categoryList);
-                    binding.viewpager.setAdapter(mExploreTabAdapter);
-                    binding.tabs.setViewPager(binding.viewpager);
+            public void onResponse(final @NotNull Call<ArrayList<Category>> call,
+                    final @NotNull Response<ArrayList<Category>> response) {
+                if (response.isSuccessful() && categoryList.size() == 0) {
+                    categoryList.clear();
+                    categoryList.addAll(response.body());
+                    mExploreTabAdapter.notifyDataSetChanged();
                 }
             }
 
@@ -68,7 +71,5 @@ public class ExploreFragment extends Fragment {
 
             }
         });
-
-        return binding.getRoot();
     }
 }

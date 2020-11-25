@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class EmailLoginActivity extends AppCompatActivity {
 
@@ -40,7 +41,7 @@ public class EmailLoginActivity extends AppCompatActivity {
     private void init() {
         mAuthInterface = new Api(this).getClient().create(AuthInterface.class);
         mUserInterface = new Api(this).getClient().create(UserInterface.class);
-        mUserDataProvider = new UserDataProvider(this);
+        mUserDataProvider = UserDataProvider.getInstance(this);
     }
 
     public void signIn(View view) {
@@ -55,7 +56,7 @@ public class EmailLoginActivity extends AppCompatActivity {
                     @NotNull final Response<HashMap<String, String>> response) {
                 if (response.isSuccessful()) {
                     String token = response.body().get("token");
-                    Log.e(TAG, "login token: " + token);
+                    Timber.e("login token: %s", token);
                     mUserDataProvider.saveToken(token);
 
                     mUserInterface = new Api(getApplicationContext()).getClient().create(UserInterface.class);
@@ -65,10 +66,10 @@ public class EmailLoginActivity extends AppCompatActivity {
                                 final Response<User> response) {
                             if (response.isSuccessful()) {
                                 mUserDataProvider.saveUserData(response.body());
-                                Log.e(TAG, response.body().toString());
+                                Timber.e(response.body().toString());
                             } else {
                                 try {
-                                    Log.e(TAG, response.errorBody().string());
+                                    Timber.e(response.errorBody().string());
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }

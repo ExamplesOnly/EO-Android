@@ -18,13 +18,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".ui.activity.ProfileImageActivity"></activity>
+        <activity android:name=".ui.activity.EditProfileActivity" />
+        <activity android:name=".ui.activity.NotificationActivity" />
         <activity android:name="org.buffer.android.thumby.ThumbyActivity" />
         <activity android:name=".ui.activity.ChooseCategoryActivity">
-            <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.MAIN" />-->
 
-            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-            <!--            </intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity android:name=".ui.activity.SettingsActivity" />
         <activity android:name=".ui.activity.VideoPlayerActivity" />

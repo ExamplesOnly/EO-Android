@@ -10,7 +10,7 @@ import com.examplesonly.android.ui.fragment.ExploreContentFragment;
 import java.util.ArrayList;
 public class ExploreTabAdapter extends FragmentPagerAdapter {
 
-    private ArrayList<Category> videoList;
+    private ArrayList<Category> mCategories;
 
     public ExploreTabAdapter(@NonNull final FragmentManager fm, final int behavior) {
         super(fm, behavior);
@@ -18,24 +18,24 @@ public class ExploreTabAdapter extends FragmentPagerAdapter {
 
     public ExploreTabAdapter(@NonNull final FragmentManager fm, ArrayList<Category> videos) {
         super(fm);
-        this.videoList = videos;
+        this.mCategories = videos;
     }
 
     @Override
     public int getCount() {
-        return videoList.size();
+        return mCategories.size();
     }
 
     @NonNull
     @Override
     public Fragment getItem(final int position) {
-        return ExploreContentFragment.newInstance(videoList.get(position).getSlug());
+        return ExploreContentFragment.newInstance(mCategories.get(position).getSlug());
     }
 
     @Nullable
     @Override
     public CharSequence getPageTitle(final int position) {
 //        return super.getPageTitle(position);
-        return videoList.get(position).getTitle();
+        return mCategories.get(position).getTitle();
     }
 }

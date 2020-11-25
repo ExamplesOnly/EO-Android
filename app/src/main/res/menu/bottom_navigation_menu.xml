@@ -13,13 +13,13 @@
     <item
         android:id="@+id/add"
         android:enabled="true"
-        android:icon="@drawable/ic_plus"
+        android:icon="@drawable/ic_add_mono"
         android:title="Add" />
     <item
-        android:id="@+id/notification"
+        android:id="@+id/ask_eo"
         android:enabled="true"
-        android:icon="@drawable/selector_nav_notification"
-        android:title="Notification" />
+        android:icon="@drawable/selector_nav_demand"
+        android:title="Ask EO" />
     <item
         android:id="@+id/profile"
         android:enabled="true"

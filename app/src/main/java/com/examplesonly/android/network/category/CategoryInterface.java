@@ -15,12 +15,6 @@ public interface CategoryInterface {
     @GET("/v1/category/list")
     Call<ArrayList<Category>> getCategories();
 
-    @FormUrlEncoded
-    @POST("/j")
-    Call<HashMap<String, String>> updateInterests(@Field("categories") String categories);
-
-
-
     @GET("/v1/category/videos/{slug}")
     public Call<ArrayList<Video>> getVideos(@Path("slug") String slug);
 }

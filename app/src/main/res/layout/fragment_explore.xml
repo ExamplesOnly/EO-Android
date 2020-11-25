@@ -6,84 +6,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragment.HomeFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:elevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:contentScrim="?attr/colorPrimary"
-            android:clipChildren="false"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:statusBarScrim="?attr/colorPrimaryVariant">
+<!--    <include layout="@layout/under_development"/>-->
 
-            <com.google.android.material.appbar.MaterialToolbar
-
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin">
-
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_bold"
-                            android:text="Examples"
-                            android:textColor="@color/dark"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_bold"
-                            android:text="Only"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="18sp" />
-
-                    </LinearLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </com.google.android.material.appbar.MaterialToolbar>
-
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
 
 
         <com.ogaclejapan.smarttablayout.SmartTabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="34dp"
             android:paddingLeft="6dp"
 
             android:paddingRight="6dp"
 
             app:stl_clickable="true"
-            app:stl_defaultTabBackground="?attr/selectableItemBackground"
+            app:stl_defaultTabBackground="?attr/selectableItemBackgroundBorderless"
             app:stl_defaultTabTextAllCaps="false"
 
-            app:stl_defaultTabTextColor="#FC000000"
+            app:stl_defaultTabTextColor="@color/dark"
 
             app:stl_defaultTabTextHorizontalPadding="16dp"
             app:stl_defaultTabTextMinWidth="0dp"
-            app:stl_defaultTabTextSize="12sp"
+            app:stl_defaultTabTextSize="14sp"
             app:stl_distributeEvenly="false"
 
             app:stl_dividerColor="@color/transparent"
@@ -92,24 +36,40 @@
             app:stl_drawDecorationAfterTab="false"
             app:stl_indicatorAlwaysInCenter="false"
 
-            app:stl_indicatorColor="@color/dark"
+            app:stl_indicatorColor="@color/colorPrimary"
             app:stl_indicatorCornerRadius="18dp"
             app:stl_indicatorGravity="bottom"
-            app:stl_indicatorThickness="4dp"
-            app:stl_indicatorWithoutPadding="false"
+            app:stl_indicatorThickness="3dp"
+            app:stl_indicatorWithoutPadding="true"
 
-            app:stl_overlineColor="#4D000000"
             app:stl_overlineThickness="0dp"
             app:stl_titleOffset="44dp"
             app:stl_underlineColor="@color/transparent"
             app:stl_underlineThickness="0dp" />
 
-    </com.google.android.material.appbar.AppBarLayout>
-
-
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="34dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+<!--    <ScrollView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <include layout="@layout/view_explore_item_big_thumb"/>-->
+
+<!--            <include-->
+<!--                layout="@layout/view_explore_item_small_thumb"/>-->
+<!--            <include-->
+<!--                layout="@layout/view_explore_item_small_thumb"/>-->
+
+<!--        </LinearLayout>-->
+<!--    </ScrollView>-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

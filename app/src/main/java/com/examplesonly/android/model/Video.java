@@ -14,6 +14,10 @@ public class Video {
     String url;
     String thumbUrl;
     String createdAt;
+    int demandId;
+
+    @SerializedName("ExampleDemand")
+    Demand demand;
 
     @SerializedName("User")
     User user;
@@ -138,6 +142,24 @@ public class Video {
 
     public Video setCreatedAt(final String createdAt) {
         this.createdAt = createdAt;
+        return this;
+    }
+
+    public int getDemandId() {
+        return demandId;
+    }
+
+    public Video setDemandId(final int demandId) {
+        this.demandId = demandId;
+        return this;
+    }
+
+    public Demand getDemand() {
+        return demand;
+    }
+
+    public Video setDemand(final Demand demand) {
+        this.demand = demand;
         return this;
     }
 }

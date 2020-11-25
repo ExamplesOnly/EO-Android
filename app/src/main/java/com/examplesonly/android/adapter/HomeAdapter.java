@@ -1,5 +1,7 @@
 package com.examplesonly.android.adapter;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +11,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
+import com.examplesonly.android.R;
+import com.examplesonly.android.databinding.ViewExampleItemFourBinding;
+import com.examplesonly.android.databinding.ViewExampleItemThreeBinding;
 import com.examplesonly.android.databinding.ViewExampleItemTwoBinding;
+import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.android.util.MediaUtil;
 import com.examplesonly.gallerypicker.utils.DateUtil;
@@ -19,10 +27,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import timber.log.Timber;
 
-public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
+public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int VIEW_TYPE_EXAMPLE_FULL = 0;
+    private static final int VIEW_TYPE_EXAMPLE_ONE = 0;
+    private static final int VIEW_TYPE_EXAMPLE_TWO = 1;
+    private static final int VIEW_TYPE_EXAMPLE_THREE = 2;
+    private static final int VIEW_TYPE_EXAMPLE_FOUR = 3;
 
     private final ArrayList<Video> mList;
     private final Context context;
@@ -39,26 +51,44 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
 
         View v = null;
+//        return new ExampleItemTwoViewHolder(ViewExampleItemTwoBinding.inflate(inflater, parent, false), context);
+//        return new ViewHolder(ViewEx.inflate(inflater, parent, false), context);
 
         switch (viewType) {
-            case VIEW_TYPE_EXAMPLE_FULL:
-                return new ViewHolder(ViewExampleItemTwoBinding.inflate(inflater, parent, false));
+            case VIEW_TYPE_EXAMPLE_TWO:
+            case VIEW_TYPE_EXAMPLE_ONE:
             default:
-                return new ViewHolder(ViewExampleItemTwoBinding.inflate(inflater, parent, false));
+                return new ExampleItemTwoViewHolder(ViewExampleItemTwoBinding.inflate(inflater, parent, false),
+                        context);
+            case VIEW_TYPE_EXAMPLE_THREE:
+                return new ExampleItemThreeViewHolder(ViewExampleItemThreeBinding.inflate(inflater, parent, false),
+                        context);
+            case VIEW_TYPE_EXAMPLE_FOUR:
+                return new ExampleItemFourViewHolder(ViewExampleItemFourBinding.inflate(inflater, parent, false),
+                        context);
         }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        holder.bind(mList.get(position));
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
+        switch (holder.getItemViewType()) {
+            case VIEW_TYPE_EXAMPLE_ONE:
+            case VIEW_TYPE_EXAMPLE_TWO:
+            default:
+                ((ExampleItemTwoViewHolder) holder).bind(mList.get(position));
+                break;
+            case VIEW_TYPE_EXAMPLE_THREE:
+                ((ExampleItemThreeViewHolder) holder).bind(mList.get(position));
+                break;
+        }
     }
 
     @Override
     public int getItemViewType(final int position) {
-        return super.getItemViewType(position);
+        return VIEW_TYPE_EXAMPLE_THREE;
     }
 
     @Override
@@ -66,20 +96,87 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         return mList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ExampleItemFourViewHolder extends RecyclerView.ViewHolder {
 
+        public ExampleItemFourViewHolder(@NonNull final ViewExampleItemFourBinding itemView,
+                @NonNull Context context) {
+            super(itemView.getRoot());
+
+        }
+    }
+
+    public class ExampleItemThreeViewHolder extends RecyclerView.ViewHolder {
+
+        Context context;
+        ViewExampleItemThreeBinding binding;
+        DrawableCrossFadeFactory factory =
+                new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+
+        public ExampleItemThreeViewHolder(@NonNull final ViewExampleItemThreeBinding itemView,
+                @NonNull Context context) {
+            super(itemView.getRoot());
+            binding = itemView;
+            this.context = context;
+        }
+
+        void bind(Video video) {
+            if (video != null) {
+                Glide.with(context).load(video.getThumbUrl()).into(binding.thumbnail);
+
+                if (video.getDemand() != null) {
+//                    Spannable spannable = new SpannableString(video.getDemand().getTitle() + " answer");
+
+                    binding.title.setText(video.getDemand().getTitle());
+                } else {
+                    binding.title.setText(video.getTitle());
+                }
+
+                binding.metaData.setText(
+                        String.format("%s • %s", new DateUtil().millisToTime(Long.parseLong(video.getDuration())),
+                                new DateUtil()
+                                        .getPrettyDateString(StringToDate(video.getCreatedAt()).getTime()))
+                );
+
+                Glide.with(context)
+                        .load(video.getUser().getProfilePhoto())
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.color.md_grey_400)
+                        .transition(withCrossFade(factory))
+                        .into(binding.profileImage);
+
+                binding.userName.setText(video.getUser().getFirstName());
+
+                binding.exampleCard.setOnClickListener(view -> {
+                    clickListener.onVideoClicked(video.getUrl());
+                });
+            }
+        }
+    }
+
+    public class ExampleItemTwoViewHolder extends RecyclerView.ViewHolder {
+
+        Context context;
         ViewExampleItemTwoBinding mItemOneBinding;
+        DrawableCrossFadeFactory factory =
+                new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
-        public ViewHolder(@NonNull final ViewExampleItemTwoBinding itemView) {
+        public ExampleItemTwoViewHolder(@NonNull final ViewExampleItemTwoBinding itemView, @NonNull Context context) {
             super(itemView.getRoot());
             mItemOneBinding = itemView;
+            this.context = context;
         }
 
         void bind(Video video) {
             if (video != null) {
                 Glide.with(context).load(video.getThumbUrl()).into(mItemOneBinding.thumbnail);
-//            Glide.with(context).load(example.getUser().getProfilePhoto()).into(mItemOneBinding.profileImage);
-                mItemOneBinding.title.setText(video.getTitle());
+
+                if (video.getDemand() != null) {
+//                    Spannable spannable = new SpannableString(video.getDemand().getTitle() + " answer");
+
+                    mItemOneBinding.title.setText(video.getDemand().getTitle());
+                } else {
+                    mItemOneBinding.title.setText(video.getTitle());
+                }
                 mItemOneBinding.duration.setText(new DateUtil().millisToTime(Long.parseLong(video.getDuration())));
 
                 ConstraintLayout thumbnailConstraintLayout = mItemOneBinding.thumbConstrains;
@@ -97,6 +194,14 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 constraintSet.applyTo(thumbnailConstraintLayout);
 
                 if (video.getUser() != null) {
+                    Timber.e(video.getUser().getFirstName(), video.getUser().getProfilePhoto());
+                    Glide.with(context)
+                            .load(video.getUser().getProfilePhoto())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(R.color.md_grey_400)
+                            .transition(withCrossFade(factory))
+                            .into(mItemOneBinding.profileImage);
+
                     mItemOneBinding.metaData.setText(
                             String.format("%s %s • %s", video.getUser().getFirstName(), video.getUser().getLastName(),
                                     new DateUtil()
@@ -123,10 +228,5 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public interface VideoClickListener {
-
-        void onVideoClicked(String url);
     }
 }

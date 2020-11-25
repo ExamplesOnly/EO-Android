@@ -46,7 +46,7 @@ public class VerificationActivity extends AppCompatActivity {
 
     void init() {
         mUserInterface = new Api(this).getClient().create(UserInterface.class);
-        mUserDataProvider = new UserDataProvider(this);
+        mUserDataProvider = UserDataProvider.getInstance(this);
     }
 
     @Override

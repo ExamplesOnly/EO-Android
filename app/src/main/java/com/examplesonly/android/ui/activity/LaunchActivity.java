@@ -21,7 +21,7 @@ public class LaunchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launch);
 
-        mUserDataProvider = new UserDataProvider(this);
+        mUserDataProvider = UserDataProvider.getInstance(this);
         Log.e("LAUNCH USER", mUserDataProvider.toString());
 
         login = new Intent(this, LoginActivity.class);

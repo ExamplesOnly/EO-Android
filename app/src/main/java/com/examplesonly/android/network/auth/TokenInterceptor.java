@@ -15,7 +15,7 @@ public class TokenInterceptor implements Interceptor {
     }
 
     public TokenInterceptor(Context context) {
-        this.userDataProvider = new UserDataProvider(context);
+        this.userDataProvider = UserDataProvider.getInstance(context);
     }
 
     @Override

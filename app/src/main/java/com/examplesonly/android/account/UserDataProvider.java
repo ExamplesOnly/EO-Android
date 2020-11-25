@@ -9,20 +9,41 @@ public class UserDataProvider {
     private static final String USER_DATA_PREF = "user_data";
     public static final String TOKEN_KEY = "token";
 
+    private static final String USER_UUID = "user_uuid";
     private static final String USER_FIRST_NAME_KEY = "user_first_name";
     private static final String USER_LAST_NAME_KEY = "user_last_name";
     private static final String USER_EMAIL_KEY = "user_email";
     private static final String USER_GENDER_KEY = "user_gender";
+    private static final String USER_DOB_KEY = "user_dob";
+    private static final String USER_BIO_KEY = "user_bio";
     private static final String USER_VERIFICATION_KEY = "user_verified";
+    private static final String USER_PROFILE_PHOTO = "user_profile_photo";
+    private static final String USER_COVER_PHOTO = "user_cover_photo";
 
     private final SharedPreferences sharedPreferences;
 
-    public UserDataProvider(Context context) {
-        this.sharedPreferences = context.getSharedPreferences(USER_DATA_PREF, Context.MODE_PRIVATE);
+    private User user;
+    private static UserDataProvider userDataProvider;
+
+    private UserDataProvider(Context context) {
+        final Context appContext = context.getApplicationContext();
+        this.sharedPreferences = appContext.getSharedPreferences(USER_DATA_PREF, Context.MODE_PRIVATE);
+    }
+
+    public static UserDataProvider getInstance(Context context) {
+        if (userDataProvider == null) {
+            userDataProvider = new UserDataProvider(context);
+            return userDataProvider;
+        }
+        return userDataProvider;
     }
 
     public String getToken() {
         return sharedPreferences.getString(TOKEN_KEY, null);
+    }
+
+    public String getUserUuid() {
+        return sharedPreferences.getString(USER_UUID, null);
     }
 
     public String getUserFirstName() {
@@ -46,6 +67,22 @@ public class UserDataProvider {
         return sharedPreferences.getString(USER_GENDER_KEY, null);
     }
 
+    public String getUserBio() {
+        return sharedPreferences.getString(USER_BIO_KEY, null);
+    }
+
+    public String getUserDob() {
+        return sharedPreferences.getString(USER_DOB_KEY, null);
+    }
+
+    public String getUserProfileImage() {
+        return sharedPreferences.getString(USER_PROFILE_PHOTO, null);
+    }
+
+    public String getUserCoverImage() {
+        return sharedPreferences.getString(USER_COVER_PHOTO, null);
+    }
+
     public boolean getVerificationStatus() {
         return sharedPreferences.getBoolean(USER_VERIFICATION_KEY, false);
     }
@@ -65,19 +102,37 @@ public class UserDataProvider {
 
     public void saveUserData(User user) {
         sharedPreferences.edit()
+                .putString(USER_UUID, user.getUuid())
                 .putString(USER_FIRST_NAME_KEY, user.getFirstName())
                 .putString(USER_LAST_NAME_KEY, user.getLastName())
                 .putString(USER_EMAIL_KEY, user.getEmail())
                 .putString(USER_GENDER_KEY, user.getGender())
+                .putString(USER_DOB_KEY, user.getDob())
+                .putString(USER_BIO_KEY, user.getBio())
+                .putString(USER_PROFILE_PHOTO, user.getProfilePhoto())
+                .putString(USER_COVER_PHOTO, user.getCoverPhoto())
                 .putBoolean(USER_VERIFICATION_KEY, user.getVerified()).apply();
+        updateCurrentUser();
     }
 
-    public User getCurrentUser() {
-        return new User().setFirstName(getUserFirstName())
+    public void updateCurrentUser() {
+        user = new User()
+                .setUuid(getUserUuid())
+                .setFirstName(getUserFirstName())
                 .setLastName(getUserLastName())
                 .setEmail(getUserEmail())
                 .setGender(getUserGender())
-                .setVerified(getVerificationStatus());
+                .setBio(getUserBio())
+                .setVerified(getVerificationStatus())
+                .setProfilePhoto(getUserProfileImage())
+                .setCoverPhoto(getUserCoverImage());
+    }
+
+    public User getCurrentUser() {
+        if (user == null) {
+            updateCurrentUser();
+        }
+        return user;
     }
 
     public String toString() {

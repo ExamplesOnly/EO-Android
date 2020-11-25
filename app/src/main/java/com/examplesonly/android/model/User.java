@@ -1,10 +1,12 @@
 package com.examplesonly.android.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
-public class User {
+public class User implements Parcelable {
 
     @SerializedName("uuid")
-    String id;
+    String uuid;
 
     @SerializedName("firstName")
     String firstName;
@@ -18,6 +20,9 @@ public class User {
     @SerializedName("email")
     String email;
 
+    @SerializedName("bio")
+    String bio;
+
     @SerializedName("gender")
     String gender;
 
@@ -27,8 +32,11 @@ public class User {
     @SerializedName("password")
     String password;
 
-    @SerializedName("profilePhoto")
+    @SerializedName("profileImage")
     String profilePhoto;
+
+    @SerializedName("coverImage")
+    String coverPhoto;
 
     @SerializedName("verified")
     Boolean verified;
@@ -36,27 +44,59 @@ public class User {
     public User() {
     }
 
-    public User(final String id, final String firstName, final String middleName, final String lastName,
-            final String email, final String gender, final String dob, final String password,
-            final String profilePhoto, final boolean verified) {
-        this.id = id;
-        this.firstName = firstName;
-        this.middleName = middleName;
-        this.lastName = lastName;
-        this.email = email;
-        this.gender = gender;
-        this.dob = dob;
-        this.password = password;
-        this.profilePhoto = profilePhoto;
-        this.verified = verified;
+    protected User(Parcel in) {
+        uuid = in.readString();
+        firstName = in.readString();
+        middleName = in.readString();
+        lastName = in.readString();
+        email = in.readString();
+        bio = in.readString();
+        gender = in.readString();
+        dob = in.readString();
+        password = in.readString();
+        profilePhoto = in.readString();
+        int tmpVerified = in.readInt();
+        verified = tmpVerified != 0;
     }
 
-    public String getId() {
-        return id;
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public User setId(final String id) {
-        this.id = id;
+    @Override
+    public void writeToParcel(final Parcel parcel, final int i) {
+        parcel.writeString(uuid);
+        parcel.writeString(firstName);
+        parcel.writeString(middleName);
+        parcel.writeString(lastName);
+        parcel.writeString(email);
+        parcel.writeString(bio);
+        parcel.writeString(gender);
+        parcel.writeString(dob);
+        parcel.writeString(password);
+        parcel.writeString(profilePhoto);
+        parcel.writeInt(verified ? 1 : 0);
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public User setUuid(final String uuid) {
+        this.uuid = uuid;
         return this;
     }
 
@@ -96,6 +136,15 @@ public class User {
         return this;
     }
 
+    public String getBio() {
+        return bio;
+    }
+
+    public User setBio(final String bio) {
+        this.bio = bio;
+        return this;
+    }
+
     public String getGender() {
         return gender;
     }
@@ -129,6 +178,15 @@ public class User {
 
     public User setProfilePhoto(final String profilePhoto) {
         this.profilePhoto = profilePhoto;
+        return this;
+    }
+
+    public String getCoverPhoto() {
+        return coverPhoto;
+    }
+
+    public User setCoverPhoto(final String coverPhoto) {
+        this.coverPhoto = coverPhoto;
         return this;
     }
 

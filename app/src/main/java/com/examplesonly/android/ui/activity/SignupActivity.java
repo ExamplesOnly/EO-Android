@@ -75,7 +75,7 @@ public class SignupActivity extends AppCompatActivity implements OnKeyboardShowH
             binding.dobTxt.setText(dob);
         });
 
-        mUserDataProvider = new UserDataProvider(this);
+        mUserDataProvider = UserDataProvider.getInstance(this);
         mAuthInterface = new Api(this).getClient().create(AuthInterface.class);
         mUserInterface = new Api(this).getClient().create(UserInterface.class);
 

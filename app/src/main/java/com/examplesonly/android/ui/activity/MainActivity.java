@@ -1,40 +1,70 @@
 package com.examplesonly.android.ui.activity;
 
+import static com.examplesonly.android.ui.activity.NewEoActivity.ARG_DEMAND;
+import static com.examplesonly.android.ui.activity.NewEoActivity.ARG_LAUNCH_MODE;
+import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_CAMERA;
+import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_CHOOSE_VIDEO;
+import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_NEW_DEMAND;
 import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_LINK;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.PersistableBundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
-import com.examplesonly.android.adapter.HomeAdapter.VideoClickListener;
+import com.examplesonly.android.component.BottomSheetOptionsDialog;
+import com.examplesonly.android.component.BottomSheetOptionsDialog.BottomSheetOptionChooseListener;
 import com.examplesonly.android.databinding.ActivityMainBinding;
-import com.examplesonly.android.model.Video;
+import com.examplesonly.android.handler.FragmentChangeListener;
+import com.examplesonly.android.handler.VideoClickListener;
+import com.examplesonly.android.model.BottomSheetOption;
+import com.examplesonly.android.model.Demand;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.network.video.VideoInterface;
+import com.examplesonly.android.ui.fragment.DemandDetailsFragment;
+import com.examplesonly.android.ui.fragment.DemandFragment;
 import com.examplesonly.android.ui.fragment.ExploreFragment;
 import com.examplesonly.android.ui.fragment.HomeFragment;
-import com.examplesonly.android.ui.fragment.NewEoSheetFragment;
-import com.examplesonly.android.ui.fragment.NotificationFragment;
 import com.examplesonly.android.ui.fragment.ProfileFragment;
+import com.ncapdevi.fragnav.FragNavController;
+import com.ncapdevi.fragnav.FragNavController.RootFragmentListener;
+import com.ncapdevi.fragnav.tabhistory.UniqueTabHistoryStrategy;
 import java.util.ArrayList;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class MainActivity extends AppCompatActivity implements VideoClickListener {
+public class MainActivity extends AppCompatActivity
+        implements VideoClickListener, RootFragmentListener, BottomSheetOptionChooseListener, FragmentChangeListener,
+        FragNavController.TransactionListener {
 
-    private final String TAG = MainActivity.class.getCanonicalName();
+    private final int INDEX_HOME = 0;
+    private final int INDEX_EXPLORE = 1;
+    private final int INDEX_EOD = 2;
+    private final int INDEX_PROFILE = 3;
+    public static final int INDEX_DEMAND_DETAILS = 4;
+
+    private final int OPTION_CHOOSE_VIDEO = 101;
+    private final int OPTION_RECORD_VIDEO = 102;
+    private final int OPTION_CREATE_EOD = 103;
+    public static final int OPTION_CHOOSE_VIDEO_EOD = 104;
+    public static final int OPTION_RECORD_VIDEO_EOD = 105;
+
     private ActivityMainBinding binding;
     private FragmentManager fm = getSupportFragmentManager();
-    private UserInterface mUserInterface;
+    private UserInterface userInterface;
     private VideoInterface videoInterface;
+    private UserDataProvider userDataProvider;
+    private FragNavController fragNavController;
+    private final ArrayList<Fragment> fragments = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,44 +73,47 @@ public class MainActivity extends AppCompatActivity implements VideoClickListene
         View view = binding.getRoot();
         setContentView(view);
 
-        init();
-        getVideos();
-
-        getUserData();
-
-        binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
-            Log.e(TAG, item.getTitle().toString());
-
-            int itemId = item.getItemId();
-            if (itemId == R.id.home) {
-//                switchFragment(itemId, "Home");
-                setFragment(new HomeFragment(), R.id.frame_container);
-            } else if (itemId == R.id.explore) {
-//                switchFragment(itemId, "Explore");
-                setFragment(new ExploreFragment(), R.id.frame_container);
-            } else if (itemId == R.id.add) {
-                NewEoSheetFragment bottomSheet = new NewEoSheetFragment();
-                bottomSheet.show(getSupportFragmentManager(),
-                        "ModalBottomSheet");
-            } else if (itemId == R.id.notification) {
-//                switchFragment(itemId, "Notification");
-                setFragment(new NotificationFragment(), R.id.frame_container);
-            } else if (itemId == R.id.profile) {
-//                switchFragment(itemId, "Profile");
-                setFragment(new ProfileFragment(), R.id.frame_container);
+        setSupportActionBar(binding.topAppBar);
+        getSupportActionBar().setTitle("");
+        binding.topAppBar.setNavigationOnClickListener(view1 -> {
+            if (!fragNavController.popFragment()) {
+                super.onBackPressed();
             }
-
-            return item.getItemId() != R.id.add;
         });
 
-        setFragment(new HomeFragment(), R.id.frame_container);
+        init();
+        setupFragments();
 
+        binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.home) {
+                fragNavController.switchTab(INDEX_HOME);
+            } else if (itemId == R.id.explore) {
+                fragNavController.switchTab(INDEX_EXPLORE);
+            } else if (itemId == R.id.add) {
+                ArrayList<BottomSheetOption> optionList = new ArrayList<>();
+                optionList.add(new BottomSheetOption(OPTION_CHOOSE_VIDEO, "Upload from device",
+                        ContextCompat.getDrawable(this, R.drawable.ic_upload_mono)));
+                optionList.add(new BottomSheetOption(OPTION_RECORD_VIDEO, "Record a video",
+                        ContextCompat.getDrawable(this, R.drawable.ic_camera_mono)));
+                optionList.add(new BottomSheetOption(OPTION_CREATE_EOD, "Request an Example",
+                        ContextCompat.getDrawable(this, R.drawable.ic_video_question_mono)));
+                BottomSheetOptionsDialog bottomSheet = new BottomSheetOptionsDialog("Create", optionList);
+                bottomSheet.show(getSupportFragmentManager(), "ModalBottomSheet");
+            } else if (itemId == R.id.ask_eo) {
+                fragNavController.switchTab(INDEX_EOD);
+            } else if (itemId == R.id.profile) {
+                fragNavController.switchTab(INDEX_PROFILE);
+            }
+            return item.getItemId() != R.id.add;
+        });
+        fragNavController.switchTab(INDEX_HOME);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (!new UserDataProvider(this).isAuthorized()) {
+        if (!userDataProvider.isAuthorized()) {
             Intent login = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(login);
             finish();
@@ -88,93 +121,148 @@ public class MainActivity extends AppCompatActivity implements VideoClickListene
     }
 
     @Override
-    public void onVideoClicked(final String url) {
-        Log.e("Home", url);
+    public void onBackPressed() {
+        if (!fragNavController.popFragment()) {
+            super.onBackPressed();
+        }
+    }
 
+    @Override
+    public void onSaveInstanceState(@NonNull final Bundle outState,
+            @NonNull final PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        fragNavController.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public int getNumberOfRootFragments() {
+        return fragments.size();
+    }
+
+    @NotNull
+    @Override
+    public Fragment getRootFragment(final int i) {
+
+        switch (i) {
+            case INDEX_HOME:
+                return new HomeFragment();
+            case INDEX_EXPLORE:
+                return new ExploreFragment();
+            case INDEX_EOD:
+                return new DemandFragment();
+            case INDEX_PROFILE:
+                return ProfileFragment.newInstance(userDataProvider.getCurrentUser());
+        }
+
+        return null;
+    }
+
+    @Override
+    public void onFragmentTransaction(@Nullable final Fragment fragment,
+            @NotNull final FragNavController.TransactionType transactionType) {
+        updateToolBar();
+    }
+
+    @Override
+    public void onTabTransaction(@Nullable final Fragment fragment, final int i) {
+        updateToolBar();
+    }
+
+    @Override
+    public void onBottomSheetOptionChosen(final int index, final int id, final Object data) {
+        switch (id) {
+            case OPTION_CHOOSE_VIDEO:
+                launchNewEo(FRAGMENT_CHOOSE_VIDEO, null);
+                break;
+            case OPTION_RECORD_VIDEO:
+                launchNewEo(FRAGMENT_CAMERA, null);
+                break;
+            case OPTION_CREATE_EOD:
+                launchNewEo(FRAGMENT_NEW_DEMAND, null);
+                break;
+            case OPTION_CHOOSE_VIDEO_EOD:
+                launchNewEo(FRAGMENT_CHOOSE_VIDEO, (Demand) data);
+                break;
+            case OPTION_RECORD_VIDEO_EOD:
+                launchNewEo(FRAGMENT_CAMERA, (Demand) data);
+                break;
+        }
+    }
+
+    @Override
+    public void onVideoClicked(final String url) {
         Intent videoPlayer = new Intent(MainActivity.this, VideoPlayerActivity.class);
         videoPlayer.putExtra(VIDEO_LINK, url);
         startActivity(videoPlayer);
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.home_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.notification) {
+            Intent notification = new Intent(MainActivity.this, NotificationActivity.class);
+            startActivity(notification);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void switchFragment(final int fragmentId, Object data) {
+        switch (fragmentId) {
+            case INDEX_DEMAND_DETAILS:
+                fragNavController.pushFragment(DemandDetailsFragment.newInstance((Demand) data));
+        }
     }
 
     private void init() {
-        mUserInterface = new Api(this).getClient().create(UserInterface.class);
+        userInterface = new Api(this).getClient().create(UserInterface.class);
         videoInterface = new Api(this).getClient().create(VideoInterface.class);
 
-
+        userDataProvider = UserDataProvider.getInstance(this);
+        fragNavController = new FragNavController(fm, R.id.frame_container);
+        fragNavController.setTransactionListener(this);
+//        fragNavController.setDefaultTransactionOptions(new Builder()
+//                .customAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_left,
+//                        R.anim.slide_out_to_right).build());
+        fragNavController.setNavigationStrategy(new UniqueTabHistoryStrategy((i, fragNavTransactionOptions) -> {
+        }));
     }
 
-    private void getVideos() {
-        videoInterface.getVideos().enqueue(new Callback<ArrayList<Video>>() {
-            @Override
-            public void onResponse(final Call<ArrayList<Video>> call, final Response<ArrayList<Video>> response) {
-                if (response.isSuccessful()) {
-                    ArrayList<Video> videos = response.body();
-                    for (int i = 0; i < videos.size() - 1; i++) {
-                        Log.e("VIDEO ", "Title " + videos.get(0).getTitle());
-                    }
-                }
-            }
+    private void setupFragments() {
+        fragments.add(new HomeFragment());
+        fragments.add(new ExploreFragment());
+        fragments.add(new DemandFragment());
+        fragments.add(ProfileFragment.newInstance(userDataProvider.getCurrentUser()));
 
-            @Override
-            public void onFailure(final Call<ArrayList<Video>> call, final Throwable t) {
-
-            }
-        });
+        fragNavController.setRootFragments(fragments);
+        fragNavController.initialize(FragNavController.TAB3, null);
     }
 
-    public void setFragment(Fragment frag, int parentView) {
-        FragmentManager fm = getSupportFragmentManager();
-        fm.beginTransaction().replace(parentView, frag).commit();
-    }
-
-    private void switchFragment(int itemId, String pageTag) {
-//        if(pageTag == fm.)
-        Fragment fragment;
-        fragment = fm.findFragmentByTag(pageTag);
-        FragmentTransaction fragmentTransaction = fm.beginTransaction();
-
-        if (itemId == R.id.home) {
-            if (fragment instanceof HomeFragment) {
-                fm.popBackStack(pageTag, 0);
-                return;
-            }
-            if (fragment == null) {
-                fragment = new HomeFragment();
-            }
-        } else if (itemId == R.id.explore) {
-            if (fragment instanceof ExploreFragment) {
-                fm.popBackStack(pageTag, 0);
-                return;
-            }
-            if (fragment == null) {
-                fragment = new ExploreFragment();
-            }
-        } else if (itemId == R.id.notification) {
-            if (fragment instanceof NotificationFragment) {
-                fm.popBackStack(pageTag, 0);
-                return;
-            }
-            if (fragment == null) {
-                fragment = new NotificationFragment();
-            }
-        } else if (itemId == R.id.profile) {
-            if (fragment instanceof ProfileFragment) {
-
-                return;
-            }
-            if (fragment == null) {
-                fragment = new ProfileFragment();
-            }
-        }
-
-        fragmentTransaction.replace(R.id.frame_container, fragment, pageTag);
-
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+    void launchNewEo(int mode, Demand demand) {
+        Intent intent = new Intent(this, NewEoActivity.class);
+        Bundle b = new Bundle();
+        b.putInt(ARG_LAUNCH_MODE, mode);
+        b.putParcelable(ARG_DEMAND, demand);
+        intent.putExtras(b);
+        startActivity(intent);
     }
 
     public void getUserData() {
 //        mUserInterface.me(email);
+    }
+
+    private void updateToolBar() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(!fragNavController.isRootFragment());
+        if (fragNavController.isRootFragment()) {
+            binding.eoTitle.setVisibility(View.VISIBLE);
+        } else {
+            binding.eoTitle.setVisibility(View.GONE);
+        }
     }
 }

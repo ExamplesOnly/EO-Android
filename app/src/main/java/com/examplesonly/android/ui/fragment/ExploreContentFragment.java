@@ -7,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import com.examplesonly.android.adapter.HomeAdapter;
-import com.examplesonly.android.adapter.HomeAdapter.VideoClickListener;
+import com.examplesonly.android.adapter.ExploreAdapter;
 import com.examplesonly.android.databinding.FragmentExploreContentBinding;
+import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.category.CategoryInterface;
@@ -24,7 +24,7 @@ public class ExploreContentFragment extends Fragment {
     private static final String ARG_SLUG = "slug";
     private FragmentExploreContentBinding binding;
     private CategoryInterface categoryInterface;
-    private HomeAdapter mHomeAdapter;
+    private ExploreAdapter exploreAdapter;
     private ArrayList<Video> videoList = new ArrayList<>();
 
     private String slug;
@@ -73,7 +73,7 @@ public class ExploreContentFragment extends Fragment {
                         Log.e(TAG, video.getTitle());
                     }
 
-                    mHomeAdapter.notifyDataSetChanged();
+                    exploreAdapter.notifyDataSetChanged();
                 } else {
                     Log.e(TAG, "REQ ERROR " + response.errorBody());
                 }
@@ -94,7 +94,7 @@ public class ExploreContentFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         binding.exampleList.setLayoutManager(layoutManager);
 
-        mHomeAdapter = new HomeAdapter(videoList, getContext(), (VideoClickListener) getActivity());
-        binding.exampleList.setAdapter(mHomeAdapter);
+        exploreAdapter = new ExploreAdapter(videoList, getContext(), (VideoClickListener) getActivity());
+        binding.exampleList.setAdapter(exploreAdapter);
     }
 }

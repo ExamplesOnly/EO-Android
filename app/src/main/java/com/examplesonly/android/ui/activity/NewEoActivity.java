@@ -1,10 +1,10 @@
 package com.examplesonly.android.ui.activity;
 
+import static com.examplesonly.android.ui.fragment.CameraFragment.MODE_VIDEO;
 import static org.buffer.android.thumby.ThumbyActivity.EXTRA_THUMBNAIL_POSITION;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,19 +13,28 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ActivityNewEoBinding;
-import com.examplesonly.android.ui.fragment.EditVideoFragment;
-import com.examplesonly.android.ui.fragment.NewCameraFragment;
+import com.examplesonly.android.model.Demand;
+import com.examplesonly.android.ui.fragment.AddDemandFragment;
+import com.examplesonly.android.ui.fragment.CameraFragment;
+import com.examplesonly.android.ui.fragment.PostVideoFragment;
 import com.examplesonly.gallerypicker.view.VideosFragment;
 import com.examplesonly.gallerypicker.view.VideosFragment.VideoChooseListener;
 import org.jetbrains.annotations.NotNull;
 
 public class NewEoActivity extends AppCompatActivity implements VideoChooseListener {
 
-    private final String TAG = NewEoActivity.class.getCanonicalName();
+    public static final int FRAGMENT_CHOOSE_VIDEO = 0;
+    public static final int FRAGMENT_CAMERA = 1;
+    public static final int FRAGMENT_EDIT_VIDEO = 2;
+    public static final int FRAGMENT_NEW_DEMAND = 3;
+
+    public static final String ARG_LAUNCH_MODE = "mode";
+    public static final String ARG_DEMAND = "demand";
+
     private ActivityNewEoBinding binding;
     private final FragmentManager fm = getSupportFragmentManager();
-    private Bundle mBundle;
     private ThumbnailChooseListener thumbnailChooseListener;
+    private Demand demand;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,17 +43,19 @@ public class NewEoActivity extends AppCompatActivity implements VideoChooseListe
         View view = binding.getRoot();
         setContentView(view);
 
-        mBundle = getIntent().getExtras();
-        int mode = mBundle.getInt("mode");
+        final Bundle bundle = getIntent().getExtras();
+        int mode = bundle.getInt(ARG_LAUNCH_MODE);
+        demand = bundle.getParcelable(ARG_DEMAND);
 
         switch (mode) {
-            case 1:
-//                setFragment(new NewCameraFragment());
+            case FRAGMENT_CHOOSE_VIDEO:
                 switchFragment(mode, "choose_video", null);
                 break;
-            default:
-//                setFragment(new VideosFragment());
+            case FRAGMENT_CAMERA:
                 switchFragment(mode, "record_video", null);
+                break;
+            case FRAGMENT_NEW_DEMAND:
+                switchFragment(mode, "new_demand", null);
                 break;
         }
     }
@@ -57,7 +68,8 @@ public class NewEoActivity extends AppCompatActivity implements VideoChooseListe
     @Override
     public void onBackPressed() {
         Fragment fragment = fm.findFragmentById(R.id.root);
-        if (fragment instanceof VideosFragment || fragment instanceof NewCameraFragment) {
+        if (fragment instanceof VideosFragment || fragment instanceof CameraFragment
+                || fragment instanceof AddDemandFragment) {
             finish();
         }
 
@@ -85,22 +97,25 @@ public class NewEoActivity extends AppCompatActivity implements VideoChooseListe
         fragment = fm.findFragmentByTag(tag);
 
         switch (step) {
-            case 1:
+            case FRAGMENT_CAMERA:
                 if (fragment == null) {
-                    fragment = new NewCameraFragment();
+                    fragment = CameraFragment.newInstance(MODE_VIDEO);
                 }
                 break;
-            case 2:
-                if (fragment == null) {
-                    fragment = EditVideoFragment.newInstance(data);
-                    if (fragment instanceof ThumbnailChooseListener) {
-                        thumbnailChooseListener = (ThumbnailChooseListener) fragment;
-                    }
-                }
-                break;
-            default:
+            case FRAGMENT_CHOOSE_VIDEO:
                 if (fragment == null) {
                     fragment = new VideosFragment();
+                }
+                break;
+            case FRAGMENT_EDIT_VIDEO:
+                if (fragment == null) {
+                    fragment = PostVideoFragment.newInstance(data, demand);
+                    thumbnailChooseListener = (ThumbnailChooseListener) fragment;
+                }
+                break;
+            case FRAGMENT_NEW_DEMAND:
+                if (fragment == null) {
+                    fragment = new AddDemandFragment();
                 }
                 break;
         }
@@ -112,7 +127,6 @@ public class NewEoActivity extends AppCompatActivity implements VideoChooseListe
     }
 
     public interface ThumbnailChooseListener {
-
         void onThumbnailChosen(long thumbPosition);
     }
 

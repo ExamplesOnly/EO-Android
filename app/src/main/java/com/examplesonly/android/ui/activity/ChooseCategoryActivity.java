@@ -2,7 +2,6 @@ package com.examplesonly.android.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.animation.TranslateAnimation;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
@@ -14,20 +13,25 @@ import com.examplesonly.android.databinding.ActivityChooseCategoryBinding;
 import com.examplesonly.android.model.Category;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.category.CategoryInterface;
+import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.ui.view.CategoryGridItemDecoration;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class ChooseCategoryActivity extends AppCompatActivity implements CategorySelectionListener {
 
     private ActivityChooseCategoryBinding binding;
     private InterestChooserAdapter adapter;
+    private UserInterface userInterface;
     private final List<Category> categories = new ArrayList<>();
+    private final List<Category> selectedCategories = new ArrayList<>();
     CategoryInterface mCategoryInterface;
     private int selectCount = 0;
 
@@ -44,7 +48,7 @@ public class ChooseCategoryActivity extends AppCompatActivity implements Categor
 
     @Override
     public void onCategorySelection(final int index) {
-        Log.e("ChooseCategory", "selected " + index);
+        Timber.e("selected %s", index);
         Category category = categories.get(index);
         categories.set(index, category.setSelected(!category.isSelected()));
         adapter.notifyItemChanged(index);
@@ -53,6 +57,7 @@ public class ChooseCategoryActivity extends AppCompatActivity implements Categor
 
     void init() {
         mCategoryInterface = new Api(this).getClient().create(CategoryInterface.class);
+        userInterface = new Api(this).getClient().create(UserInterface.class);
 
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2,
                 StaggeredGridLayoutManager.VERTICAL);
@@ -83,8 +88,7 @@ public class ChooseCategoryActivity extends AppCompatActivity implements Categor
                     adapter.notifyDataSetChanged();
                 } else {
                     try {
-                        Log.e("ChooseCategory",
-                                response.errorBody().string());
+                        Timber.e(response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -93,7 +97,7 @@ public class ChooseCategoryActivity extends AppCompatActivity implements Categor
 
             @Override
             public void onFailure(@NotNull final Call<ArrayList<Category>> call, final Throwable t) {
-                Log.e("ChooseCategory", "Fail");
+                Timber.e("Fail");
             }
         });
     }
@@ -101,10 +105,11 @@ public class ChooseCategoryActivity extends AppCompatActivity implements Categor
     void updateButton() {
         int selected = 0;
         TranslateAnimation animate = null;
-
+        selectedCategories.clear();
         for (Category category : categories) {
             if (category.isSelected()) {
                 selected++;
+                selectedCategories.add(category);
             }
         }
 
@@ -146,11 +151,44 @@ public class ChooseCategoryActivity extends AppCompatActivity implements Categor
                 binding.next.setText("Get Started");
                 binding.next.setIconResource(R.drawable.ic_arrow_right);
                 binding.next.setOnClickListener(view -> {
-                    Intent main = new Intent(ChooseCategoryActivity.this, MainActivity.class);
-                    startActivity(main);
-                    finish();
+                    binding.next.setEnabled(false);
+                    String categoryValue = buildCategoryRequest(selectedCategories);
+                    Timber.e("categoryValue %s", categoryValue);
+                    userInterface.updateInterest(categoryValue).enqueue(new Callback<HashMap<String, String>>() {
+                        @Override
+                        public void onResponse(final Call<HashMap<String, String>> call,
+                                final Response<HashMap<String, String>> response) {
+                            if (response.isSuccessful()) {
+                                Intent main = new Intent(ChooseCategoryActivity.this, MainActivity.class);
+                                startActivity(main);
+                                finish();
+                            } else {
+                                Timber.e("Category Update error");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(final Call<HashMap<String, String>> call, final Throwable t) {
+                            Timber.e("Category Update fail %s", t.getMessage());
+                        }
+                    });
                 });
                 break;
         }
+    }
+
+    String buildCategoryRequest(List<Category> categoryList) {
+        StringBuilder start = new StringBuilder("{ \"categories\": [");
+        String end = "]}";
+
+        for (int i = 0; i < categoryList.size(); i++) {
+            if (i == 0) {
+                start.append("\"").append(categoryList.get(i).getId()).append("\"");
+            } else {
+                start.append(",\"").append(categoryList.get(i).getId()).append("\"");
+            }
+        }
+        start.append(end);
+        return start.toString();
     }
 }
