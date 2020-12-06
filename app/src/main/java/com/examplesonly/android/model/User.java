@@ -3,43 +3,53 @@ package com.examplesonly.android.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
+import java.util.ArrayList;
 public class User implements Parcelable {
 
     @SerializedName("uuid")
     String uuid;
 
     @SerializedName("firstName")
-    String firstName;
+    String firstName = "";
 
     @SerializedName("middleName")
-    String middleName;
+    String middleName = "";
 
     @SerializedName("lastName")
-    String lastName;
+    String lastName = "";
 
     @SerializedName("email")
-    String email;
+    String email = "";
 
     @SerializedName("bio")
-    String bio;
+    String bio = "";
 
     @SerializedName("gender")
-    String gender;
+    String gender = "";
 
     @SerializedName("dob")
-    String dob;
+    String dob = "";
 
     @SerializedName("password")
-    String password;
+    String password = "";
 
     @SerializedName("profileImage")
-    String profilePhoto;
+    String profilePhoto = "";
 
     @SerializedName("coverImage")
-    String coverPhoto;
+    String coverPhoto = "";
 
-    @SerializedName("verified")
-    Boolean verified;
+    @SerializedName("emailVerified")
+    boolean emailVerified = false;
+
+    @SerializedName("profileVerified")
+    boolean profileVerified = false;
+
+    @SerializedName("Categories")
+    ArrayList<Category> categories = new ArrayList<>();
+
+    @SerializedName("Videos")
+    ArrayList<Video> videos = new ArrayList<>();
 
     public User() {
     }
@@ -56,7 +66,10 @@ public class User implements Parcelable {
         password = in.readString();
         profilePhoto = in.readString();
         int tmpVerified = in.readInt();
-        verified = tmpVerified != 0;
+        emailVerified = tmpVerified != 0;
+
+        categories = in.readArrayList(Category.class.getClassLoader());
+        videos = in.readArrayList(Video.class.getClassLoader());
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -88,7 +101,9 @@ public class User implements Parcelable {
         parcel.writeString(dob);
         parcel.writeString(password);
         parcel.writeString(profilePhoto);
-        parcel.writeInt(verified ? 1 : 0);
+        parcel.writeInt(emailVerified ? 1 : 0);
+        parcel.writeList(categories);
+        parcel.writeList(videos);
     }
 
     public String getUuid() {
@@ -190,12 +205,60 @@ public class User implements Parcelable {
         return this;
     }
 
-    public Boolean getVerified() {
-        return verified;
+    public Boolean isEmailVerified() {
+        return emailVerified;
     }
 
-    public User setVerified(final Boolean verified) {
-        this.verified = verified;
+    public User setEmailVerified(final Boolean verified) {
+        this.emailVerified = verified;
         return this;
+    }
+
+    public Boolean isProfileVerified() {
+        return emailVerified;
+    }
+
+    public User setProfileVerified(final Boolean verified) {
+        this.profileVerified = verified;
+        return this;
+    }
+
+    public ArrayList<Category> getCategories() {
+        return categories;
+    }
+
+    public User setCategories(final ArrayList<Category> categories) {
+        this.categories = categories;
+        return this;
+    }
+
+    public ArrayList<Video> getVideos() {
+        return videos;
+    }
+
+    public User setVideos(final ArrayList<Video> videos) {
+        this.videos = videos;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "uuid='" + uuid + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", bio='" + bio + '\'' +
+                ", gender='" + gender + '\'' +
+                ", dob='" + dob + '\'' +
+                ", password='" + password + '\'' +
+                ", profilePhoto='" + profilePhoto + '\'' +
+                ", coverPhoto='" + coverPhoto + '\'' +
+                ", emailVerified=" + emailVerified +
+                ", profileVerified=" + profileVerified +
+                ", categories=" + categories +
+                ", videos=" + videos +
+                '}';
     }
 }

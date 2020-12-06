@@ -12,12 +12,8 @@ public class ExploreTabAdapter extends FragmentPagerAdapter {
 
     private ArrayList<Category> mCategories;
 
-    public ExploreTabAdapter(@NonNull final FragmentManager fm, final int behavior) {
+    public ExploreTabAdapter(@NonNull final FragmentManager fm, final int behavior, ArrayList<Category> videos) {
         super(fm, behavior);
-    }
-
-    public ExploreTabAdapter(@NonNull final FragmentManager fm, ArrayList<Category> videos) {
-        super(fm);
         this.mCategories = videos;
     }
 
@@ -29,6 +25,7 @@ public class ExploreTabAdapter extends FragmentPagerAdapter {
     @NonNull
     @Override
     public Fragment getItem(final int position) {
+//        return null;
         return ExploreContentFragment.newInstance(mCategories.get(position).getSlug());
     }
 

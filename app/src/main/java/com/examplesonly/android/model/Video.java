@@ -1,7 +1,9 @@
 package com.examplesonly.android.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
-public class Video {
+public class Video implements Parcelable {
 
     String videoId;
     int size;
@@ -35,6 +37,58 @@ public class Video {
         this.description = description;
         this.url = url;
         this.thumbUrl = thumbUrl;
+    }
+
+    protected Video(Parcel in) {
+        videoId = in.readString();
+        size = in.readInt();
+        duration = in.readString();
+        height = in.readString();
+        width = in.readString();
+        title = in.readString();
+        description = in.readString();
+        blurHash = in.readString();
+        url = in.readString();
+        thumbUrl = in.readString();
+        createdAt = in.readString();
+        demandId = in.readInt();
+        demand = in.readParcelable(Demand.class.getClassLoader());
+        user = in.readParcelable(User.class.getClassLoader());
+    }
+
+    public static final Creator<Video> CREATOR = new Creator<Video>() {
+        @Override
+        public Video createFromParcel(Parcel in) {
+            return new Video(in);
+        }
+
+        @Override
+        public Video[] newArray(int size) {
+            return new Video[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(final Parcel parcel, final int i) {
+        parcel.writeString(videoId);
+        parcel.writeInt(size);
+        parcel.writeString(duration);
+        parcel.writeString(height);
+        parcel.writeString(width);
+        parcel.writeString(title);
+        parcel.writeString(description);
+        parcel.writeString(blurHash);
+        parcel.writeString(url);
+        parcel.writeString(thumbUrl);
+        parcel.writeString(createdAt);
+        parcel.writeInt(demandId);
+        parcel.writeParcelable(demand, i);
+        parcel.writeParcelable(user, i);
     }
 
     public String getVideoId() {

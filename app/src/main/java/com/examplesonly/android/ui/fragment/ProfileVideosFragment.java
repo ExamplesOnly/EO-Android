@@ -72,6 +72,12 @@ public class ProfileVideosFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateVideos();
+    }
+
     void updateVideos() {
         mUserInterface.myVideos().enqueue(new Callback<ArrayList<Video>>() {
             @Override

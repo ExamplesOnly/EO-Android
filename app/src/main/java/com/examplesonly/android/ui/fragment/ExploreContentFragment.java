@@ -13,6 +13,7 @@ import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.category.CategoryInterface;
+import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItem;
 import java.util.ArrayList;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +51,7 @@ public class ExploreContentFragment extends Fragment {
         }
 
         categoryInterface = new Api(getContext()).getClient().create(CategoryInterface.class);
+        FragmentPagerItem.getPosition(getArguments());
     }
 
     @Override
@@ -60,6 +62,8 @@ public class ExploreContentFragment extends Fragment {
                 .inflate(getLayoutInflater(), container, false);
         View view = binding.getRoot();
 
+        binding.noContentLayout.setVisibility(View.GONE);
+
         setupExamples();
 
         categoryInterface.getVideos(slug).enqueue(new Callback<ArrayList<Video>>() {
@@ -69,11 +73,19 @@ public class ExploreContentFragment extends Fragment {
                     Log.e(TAG, "REQ SUCCESS " + response.body());
                     videoList = response.body();
 
-                    for(Video video: videoList) {
+                    for (Video video : videoList) {
                         Log.e(TAG, video.getTitle());
                     }
-
                     exploreAdapter.notifyDataSetChanged();
+
+                    if (videoList.size() < 1) {
+                        binding.exampleList.setVisibility(View.GONE);
+                        binding.noContentLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.exampleList.setVisibility(View.VISIBLE);
+                        binding.noContentLayout.setVisibility(View.GONE);
+
+                    }
                 } else {
                     Log.e(TAG, "REQ ERROR " + response.errorBody());
                 }

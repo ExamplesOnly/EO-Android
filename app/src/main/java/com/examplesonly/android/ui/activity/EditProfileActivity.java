@@ -216,7 +216,7 @@ public class EditProfileActivity extends AppCompatActivity implements BottomShee
         userBio = userDataProvider.getUserBio();
 
         binding.firstNameTxt.setText(userFirstName);
-        binding.lastNameTxt.setText(userLastName);
+//        binding.lastNameTxt.setText(userLastName);
         binding.bioTxt.setText(userBio);
 
         userInterface.getInterest().enqueue(new Callback<ArrayList<Category>>() {
@@ -308,23 +308,23 @@ public class EditProfileActivity extends AppCompatActivity implements BottomShee
             }
         });
 
-        binding.lastNameTxt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
-                userLastName = charSequence.toString();
-                verifyChanges();
-            }
-
-            @Override
-            public void afterTextChanged(final Editable editable) {
-
-            }
-        });
+//        binding.lastNameTxt.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
+//                userLastName = charSequence.toString();
+//                verifyChanges();
+//            }
+//
+//            @Override
+//            public void afterTextChanged(final Editable editable) {
+//
+//            }
+//        });
 
         binding.bioTxt.addTextChangedListener(new TextWatcher() {
             @Override
@@ -347,7 +347,6 @@ public class EditProfileActivity extends AppCompatActivity implements BottomShee
 
     void verifyChanges() {
         if (!userFirstName.equals(userDataProvider.getUserFirstName())
-                || !userLastName.equals(userDataProvider.getUserLastName())
                 || !userBio.equals(userDataProvider.getUserBio())) {
             isDataChanged = true;
         } else {

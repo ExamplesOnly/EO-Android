@@ -477,22 +477,50 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tab_container" />
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/content_pager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/devider_three" />
+        <!--        <androidx.core.widget.NestedScrollView-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            android:fillViewport="true"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/devider_three" >-->
+
+        <!--            <androidx.viewpager.widget.ViewPager-->
+        <!--                android:id="@+id/content_pager"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"/>-->
+        <!--        </androidx.core.widget.NestedScrollView>-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/example_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/devider_three" />
+
+        <LinearLayout
+            android:id="@+id/stat_parent"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/devider_three">
+
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animation_view"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/man_with_graphs" />
+
+        </LinearLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

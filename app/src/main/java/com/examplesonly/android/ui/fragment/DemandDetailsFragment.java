@@ -1,5 +1,6 @@
 package com.examplesonly.android.ui.fragment;
 
+import static com.examplesonly.android.adapter.ExampleAdapter.VIEW_TYPE_EXAMPLE_THREE;
 import static com.examplesonly.android.ui.activity.MainActivity.OPTION_CHOOSE_VIDEO_EOD;
 import static com.examplesonly.android.ui.activity.MainActivity.OPTION_RECORD_VIDEO_EOD;
 
@@ -12,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.examplesonly.android.R;
-import com.examplesonly.android.adapter.HomeAdapter;
+import com.examplesonly.android.adapter.ExampleAdapter;
 import com.examplesonly.android.component.BottomSheetOptionsDialog;
 import com.examplesonly.android.databinding.FragmentDemandDetailsBinding;
 import com.examplesonly.android.handler.VideoClickListener;
@@ -21,7 +22,6 @@ import com.examplesonly.android.model.Demand;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.demand.DemandInterface;
-import com.examplesonly.android.network.video.VideoInterface;
 import java.io.IOException;
 import java.util.ArrayList;
 import retrofit2.Call;
@@ -36,7 +36,7 @@ public class DemandDetailsFragment extends Fragment {
     private ArrayList<Video> exampleListList = new ArrayList<>();
     private FragmentDemandDetailsBinding binding;
     private DemandInterface demandInterface;
-    private HomeAdapter mHomeAdapter;
+    private ExampleAdapter mExampleAdapter;
     private Demand demand;
 
     public static DemandDetailsFragment newInstance(Demand demand) {
@@ -109,7 +109,7 @@ public class DemandDetailsFragment extends Fragment {
                     exampleListList.clear();
                     for (int i = 0; i < videos.size(); i++) {
                         exampleListList.add(videos.get(i));
-                        mHomeAdapter.notifyDataSetChanged();
+                        mExampleAdapter.notifyDataSetChanged();
                     }
                 } else {
                     try {
@@ -131,7 +131,8 @@ public class DemandDetailsFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         binding.videoList.setLayoutManager(layoutManager);
 
-        mHomeAdapter = new HomeAdapter(exampleListList, getContext(), (VideoClickListener) getActivity());
-        binding.videoList.setAdapter(mHomeAdapter);
+        mExampleAdapter = new ExampleAdapter(exampleListList, getContext(), (VideoClickListener) getActivity(),
+                VIEW_TYPE_EXAMPLE_THREE);
+        binding.videoList.setAdapter(mExampleAdapter);
     }
 }

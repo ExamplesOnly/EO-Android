@@ -20,15 +20,15 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:clickable="false"
             android:focusable="false"
             app:cardBackgroundColor="@color/md_grey_400"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
             app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toStartOf="@+id/guideline2"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/guideline2"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
@@ -53,8 +53,8 @@
             android:orientation="horizontal"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintEnd_toStartOf="@+id/guideline2"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
@@ -107,12 +107,13 @@
             </LinearLayout>
 
         </LinearLayout>
+
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.22" />
+            app:layout_constraintGuide_percent="0.78" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

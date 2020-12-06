@@ -29,7 +29,7 @@ public class Api {
                 .addInterceptor(tokenInterceptor).build();
 
         return new Retrofit.Builder()
-                .baseUrl("http://api.examplesonly.com/")
+                .baseUrl("https://api.examplesonly.com/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

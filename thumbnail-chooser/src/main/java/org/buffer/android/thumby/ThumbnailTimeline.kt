@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.view_timeline.view.container_seek_bar
 import kotlinx.android.synthetic.main.view_timeline.view.container_thumbnails
@@ -67,8 +68,8 @@ class ThumbnailTimeline @JvmOverloads constructor(
         currentSeekPosition = (event.x.roundToInt() - (seekViewWidth / 2)).toFloat()
 
         val availableWidth = container_thumbnails.width -
-                (layoutParams as LinearLayout.LayoutParams).marginEnd -
-                (layoutParams as LinearLayout.LayoutParams).marginStart
+                (layoutParams as ConstraintLayout.LayoutParams).marginEnd -
+                (layoutParams as ConstraintLayout.LayoutParams).marginStart
         if (currentSeekPosition + seekViewWidth > container_thumbnails.right) {
             currentSeekPosition = (container_thumbnails.right - seekViewWidth).toFloat()
         } else if (currentSeekPosition < container_thumbnails.left) {

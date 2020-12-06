@@ -1,14 +1,39 @@
 package com.examplesonly.android.ui.activity;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+import static com.examplesonly.android.adapter.ExampleAdapter.VIEW_TYPE_EXAMPLE_THREE;
+
 import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
+import com.bumptech.glide.request.transition.Transition;
+import com.examplesonly.android.R;
+import com.examplesonly.android.adapter.ExampleAdapter;
 import com.examplesonly.android.databinding.ActivityVideoPlayerBinding;
+import com.examplesonly.android.handler.VideoClickListener;
+import com.examplesonly.android.model.Video;
+import com.examplesonly.android.network.Api;
+import com.examplesonly.android.network.video.VideoInterface;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.Player.EventListener;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
@@ -17,25 +42,44 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import java.io.IOException;
+import java.util.ArrayList;
+import jp.wasabeef.glide.transformations.BlurTransformation;
+import org.jetbrains.annotations.NotNull;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import timber.log.Timber;
 
-public class VideoPlayerActivity extends AppCompatActivity {
+public class VideoPlayerActivity extends AppCompatActivity implements VideoClickListener {
 
-    public static final String VIDEO_LINK = "video_link";
+    public static final String VIDEO_DATA = "video_data";
 
     private ActivityVideoPlayerBinding binding;
-    private PlayerView playerView;
     private SimpleExoPlayer player;
     private boolean playWhenReady = true;
     private int currentWindow = 0;
     private long playbackPosition = 0;
 
-    private String videoId;
+    private ArrayList<Video> exampleList = new ArrayList<>();
+    private VideoInterface videoInterface;
+    private ExampleAdapter mExampleAdapter;
+    private TextView titleText;
+    private ImageButton fullScreenBtn;
+    private ImageButton exoPlay;
+    private ImageButton exoPause;
+    private boolean isFullScreen = false;
+    ConstraintSet defaultConstrains = new ConstraintSet();
+
+    DrawableCrossFadeFactory factory =
+            new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+
+    private Video currentVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,40 +88,56 @@ public class VideoPlayerActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-        videoId = getIntent().getStringExtra(VIDEO_LINK);
+        currentVideo = getIntent().getParcelableExtra(VIDEO_DATA);
 
         init();
+        setupExamples();
+        getVideos();
+    }
+
+    @Override
+    public void onVideoClicked(final Video video) {
+        playVideo(video);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isFullScreen) {
+            clearFullScreenVideo();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     void init() {
-        LoadControl loadControl = new DefaultLoadControl();
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(this).build();
-        TrackSelector trackSelector = new DefaultTrackSelector(this);
-        player = new SimpleExoPlayer.Builder(this)
-                .setLoadControl(loadControl).setBandwidthMeter(bandwidthMeter)
-                .setTrackSelector(trackSelector)
-                .build();
-        binding.exoplayer.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
-        binding.exoplayer.setPlayer(player);
-        Uri uri = Uri.parse(videoId);
+        titleText = findViewById(R.id.exo_text);
+        fullScreenBtn = findViewById(R.id.bt_fullscreen);
+        exoPlay = findViewById(R.id.exo_play);
+        exoPause = findViewById(R.id.exo_pause);
 
-        MediaSource mediaSource = buildMediaSource(uri);
-        player.setPlayWhenReady(playWhenReady);
-        player.prepare(mediaSource, false, false);
-    }
+        binding.videoLoading.setVisibility(View.GONE);
+        exoPlay.setVisibility(View.GONE);
+        exoPause.setVisibility(View.GONE);
 
-    private MediaSource buildMediaSource(Uri uri) {
-        DataSource.Factory dataSourceFactory = new DefaultHttpDataSourceFactory("eo-player");
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
-                .createMediaSource(MediaItem.fromUri(uri));
+        videoInterface = new Api(this).getClient().create(VideoInterface.class);
 
-        return mediaSource;
+        defaultConstrains.clone(binding.playerParent);
+
+        fullScreenBtn.setOnClickListener(v -> {
+            if (isFullScreen) {
+                clearFullScreenVideo();
+            } else {
+                fullScreenVideo();
+            }
+        });
+
+        loadPlayer();
+        playVideo(currentVideo);
     }
 
     @SuppressLint("InlinedApi")
     private void hideSystemUi() {
-        playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+        binding.exoplayer.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -85,14 +145,14 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
-    private void releasePlayer() {
-        if (player != null) {
-            playWhenReady = player.getPlayWhenReady();
-            playbackPosition = player.getCurrentPosition();
-            currentWindow = player.getCurrentWindowIndex();
-            player.release();
-            player = null;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (player == null) {
+            loadPlayer();
         }
+        playVideo(currentVideo);
+        loadState();
     }
 
     @Override
@@ -110,4 +170,182 @@ public class VideoPlayerActivity extends AppCompatActivity {
             releasePlayer();
         }
     }
+
+    private void releasePlayer() {
+        if (player != null) {
+            playWhenReady = player.getPlayWhenReady();
+            playbackPosition = player.getCurrentPosition();
+            currentWindow = player.getCurrentWindowIndex();
+            player.release();
+            player = null;
+        }
+    }
+
+    private void loadPlayer() {
+        LoadControl loadControl = new DefaultLoadControl();
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(this).build();
+        TrackSelector trackSelector = new DefaultTrackSelector(this);
+
+        player = new SimpleExoPlayer.Builder(this)
+                .setLoadControl(loadControl).setBandwidthMeter(bandwidthMeter)
+                .setTrackSelector(trackSelector)
+                .build();
+        player.setPlayWhenReady(playWhenReady);
+        player.addListener(new EventListener() {
+            @Override
+            public void onPlaybackStateChanged(final int state) {
+                switch (state) {
+                    case Player.STATE_IDLE:
+                    case Player.STATE_READY:
+                    case Player.STATE_ENDED:
+                        binding.videoLoading.setVisibility(View.GONE);
+                        exoPlay.setVisibility(View.VISIBLE);
+                        exoPause.setVisibility(View.VISIBLE);
+                        break;
+                    case Player.STATE_BUFFERING:
+                        binding.videoLoading.setVisibility(View.VISIBLE);
+                        exoPlay.setVisibility(View.GONE);
+                        exoPause.setVisibility(View.GONE);
+                        break;
+                }
+            }
+        });
+
+        binding.exoplayer.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+        binding.exoplayer.setPlayer(player);
+    }
+
+    private void loadState() {
+        if (player != null) {
+            player.seekTo(currentWindow, playbackPosition);
+        }
+    }
+
+    private void playVideo(Video video) {
+        this.currentVideo = video;
+
+        Uri uri = Uri.parse(currentVideo.getUrl());
+        MediaSource mediaSource = buildMediaSource(uri);
+//        player.setMediaSource(mediaSource, false);
+        player.prepare(mediaSource, false, false);
+
+        titleText.setText(currentVideo.getTitle());
+
+        Glide.with(this)
+                .load(video.getThumbUrl())
+                .apply(RequestOptions.bitmapTransform(new BlurTransformation(25, 3)))
+                .placeholder(R.color.md_grey_100)
+                .transition(withCrossFade(factory))
+                .into(new CustomTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(@NonNull final Drawable resource,
+                            @Nullable final Transition<? super Drawable> transition) {
+                        binding.exoplayer.setBackground(resource);
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable final Drawable placeholder) {
+
+                    }
+                });
+        player.seekTo(0);
+    }
+
+    void getVideos() {
+        videoInterface.getVideos().enqueue(new Callback<ArrayList<Video>>() {
+            @Override
+            public void onResponse(final Call<ArrayList<Video>> call, final Response<ArrayList<Video>> response) {
+
+//                binding.relatedVideos.setVisibility(View.VISIBLE);
+//                binding.noInternet.setVisibility(View.GONE);
+
+                if (response.isSuccessful()) {
+                    Timber.e("HOME isSuccessful");
+                    ArrayList<Video> videos = response.body();
+                    exampleList.clear();
+                    exampleList.addAll(videos);
+                    mExampleAdapter.notifyDataSetChanged();
+                } else {
+                    Timber.e("HOME error");
+                    try {
+                        Timber.e(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(final @NotNull Call<ArrayList<Video>> call, final @NotNull Throwable t) {
+                t.printStackTrace();
+                if (t instanceof IOException) {
+//                    binding.exampleList.setVisibility(View.GONE);
+//                    binding.noInternet.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    private MediaSource buildMediaSource(Uri uri) {
+        DataSource.Factory dataSourceFactory = new DefaultHttpDataSourceFactory("eo-player");
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+
+        return new ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
+                .createMediaSource(MediaItem.fromUri(uri));
+    }
+
+    private void fullScreenVideo() {
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        setRequestedOrientation(Integer.parseInt(currentVideo.getHeight()) < Integer.parseInt(currentVideo.getWidth())
+                ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        ConstraintSet landscapeConstrains = new ConstraintSet();
+        landscapeConstrains.clone(binding.playerParent);
+        landscapeConstrains
+                .connect(R.id.exoplayer, ConstraintSet.START, R.id.player_parent, ConstraintSet.START, 0);
+        landscapeConstrains
+                .connect(R.id.exoplayer, ConstraintSet.END, R.id.player_parent, ConstraintSet.END, 0);
+        landscapeConstrains
+                .connect(R.id.exoplayer, ConstraintSet.TOP, R.id.player_parent, ConstraintSet.TOP, 0);
+        landscapeConstrains
+                .connect(R.id.exoplayer, ConstraintSet.BOTTOM, R.id.player_parent, ConstraintSet.BOTTOM, 0);
+        landscapeConstrains.applyTo(binding.playerParent);
+
+        ConstraintLayout.LayoutParams exoParams = (ConstraintLayout.LayoutParams) binding.exoplayer
+                .getLayoutParams();
+        exoParams.dimensionRatio = null;
+        binding.exoplayer.setLayoutParams(exoParams);
+
+        isFullScreen = true;
+    }
+
+    private void clearFullScreenVideo() {
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().show();
+        }
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        defaultConstrains.applyTo(binding.playerParent);
+
+        isFullScreen = false;
+    }
+
+    void setupExamples() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        binding.relatedVideos.setLayoutManager(layoutManager);
+
+        mExampleAdapter = new ExampleAdapter(exampleList, this, this,
+                VIEW_TYPE_EXAMPLE_THREE);
+        binding.relatedVideos.setAdapter(mExampleAdapter);
+    }
+
 }

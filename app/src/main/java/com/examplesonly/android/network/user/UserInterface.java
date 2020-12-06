@@ -20,33 +20,36 @@ import retrofit2.http.Path;
 public interface UserInterface {
 
     @GET("v1/user/me")
-    public Call<User> me();
+    Call<User> me();
 
     @GET("v1/user/videos")
-    public Call<ArrayList<Video>> myVideos();
+    Call<ArrayList<Video>> myVideos();
 
     @FormUrlEncoded
     @POST("v1/user/addInterests")
-    public Call<HashMap<String, String>> updateInterest(@Field("categories") String categories);
+    Call<HashMap<String, String>> updateInterest(@Field("categories") String categories);
 
     @GET("v1/user/interests")
-    public Call<ArrayList<Category>> getInterest();
+    Call<ArrayList<Category>> getInterest();
 
     @GET("v1/auth/verify/{token}")
-    public Call<HashMap<String, String>> verifyAccount(@Path("token") String token);
+    Call<HashMap<String, String>> verifyAccount(@Path("token") String token);
 
     @POST("v1/user/update/profile")
-    public Call<HashMap<String, String>> updateUser(@Body User user);
+    Call<HashMap<String, String>> updateUser(@Body User user);
 
     @Multipart
     @POST("v1/user/update/profileImage")
-    public Call<HashMap<String, String>> updateProfileImage(@Part MultipartBody.Part file);
+    Call<HashMap<String, String>> updateProfileImage(@Part MultipartBody.Part file);
 
     @Multipart
     @POST("v1/user/update/coverImage")
-    public Call<HashMap<String, String>> updateCoverImage(@Part MultipartBody.Part file);
+    Call<HashMap<String, String>> updateCoverImage(@Part MultipartBody.Part file);
 
     @GET("v1/user/myDemands")
-    public Call<ArrayList<Demand>> getDemands();
+    Call<ArrayList<Demand>> getDemands();
+
+    @GET("v1/user/getProfile/{uuid}")
+    Call<User> getUserProfile(@Path("uuid") String uuid);
 
 }

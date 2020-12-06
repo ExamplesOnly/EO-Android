@@ -148,15 +148,6 @@ public class SignupActivity extends AppCompatActivity implements OnKeyboardShowH
                     isLoading(false);
                     Toast.makeText(getApplication(), "Could not create account.", Toast.LENGTH_LONG).show();
                 }
-
-                try {
-                    Log.e(TAG, "Success: " + response.toString() + " " + (response.body() != null ? response.body()
-                            .toString()
-                            : "No Body") + " " + (response.errorBody() != null ? response.errorBody().string()
-                            : "NO ERROR"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
 
             @Override

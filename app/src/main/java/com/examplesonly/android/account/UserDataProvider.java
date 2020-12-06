@@ -111,7 +111,7 @@ public class UserDataProvider {
                 .putString(USER_BIO_KEY, user.getBio())
                 .putString(USER_PROFILE_PHOTO, user.getProfilePhoto())
                 .putString(USER_COVER_PHOTO, user.getCoverPhoto())
-                .putBoolean(USER_VERIFICATION_KEY, user.getVerified()).apply();
+                .putBoolean(USER_VERIFICATION_KEY, user.isEmailVerified()).apply();
         updateCurrentUser();
     }
 
@@ -123,7 +123,7 @@ public class UserDataProvider {
                 .setEmail(getUserEmail())
                 .setGender(getUserGender())
                 .setBio(getUserBio())
-                .setVerified(getVerificationStatus())
+                .setEmailVerified(getVerificationStatus())
                 .setProfilePhoto(getUserProfileImage())
                 .setCoverPhoto(getUserCoverImage());
     }

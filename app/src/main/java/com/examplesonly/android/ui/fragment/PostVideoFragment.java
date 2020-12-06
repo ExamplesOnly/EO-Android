@@ -193,16 +193,21 @@ public class PostVideoFragment extends Fragment implements ThumbnailChooseListen
     }
 
     void processVideo(File videoFile, ProgressDialog progressDialog) {
+
         progressDialog.setMessage("Optimizing video...");
         String convertedFile = Objects.requireNonNull(getContext()).getCacheDir().getPath() + "/" + System
                 .currentTimeMillis() + ".mp4";
+        String videoFileName = videoFile.getPath().replace(" ", "\\ ");
+
+        Timber.e(videoFileName);
+        Timber.e(convertedFile);
 
         FFmpeg.executeAsync(
-                "-y -i " + videoFile.getPath() + " -c:v libx264 -crf 23 "
+                "-y -i \"" + videoFile.getPath() + "\" -c:v libx264 -crf 23 "
                         + "-preset ultrafast "
                         + "-x264-params opencl=true "
 //                        + "-hwaccel auto "
-                        + "-movflags +faststart -an "
+                        + "-movflags +faststart "
 //                        + "-me_method zero "
                         + "-tune fastdecode "
                         + "-tune zerolatency "

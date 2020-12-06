@@ -4,7 +4,6 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 
 import android.content.Intent;
 import android.graphics.Outline;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,11 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
@@ -37,8 +36,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.Call;
@@ -55,15 +52,12 @@ public class ProfileFragment extends Fragment {
     private UserDataProvider userDataProvider;
     private UserInterface mUserInterface;
     private String interests = "";
-    private int currentEsmIcon, currentEoiIcon;
     private final ArrayList<Video> mExampleListList = new ArrayList<>();
-    private final ArrayList<Drawable> esmDrawableList = new ArrayList<>();
-    private final ArrayList<Drawable> eoiDrawableList = new ArrayList<>();
 
     DrawableCrossFadeFactory factory =
             new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
-    private User user;
+    private User currentUser;
 
     public static ProfileFragment newInstance(User user) {
         ProfileFragment fragment = new ProfileFragment();
@@ -81,8 +75,7 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            user = getArguments().getParcelable(ARG_USER);
-            Timber.e("FName %s", user.getFirstName());
+            currentUser = getArguments().getParcelable(ARG_USER);
         } else {
             throw new RuntimeException("User data not found");
         }
@@ -98,43 +91,10 @@ public class ProfileFragment extends Fragment {
         init();
         updateProfile();
 
-        currentEsmIcon = 0;
-        currentEoiIcon = 0;
-        esmDrawableList.add(getResources().getDrawable(R.drawable.ic_esm_1));
-        esmDrawableList.add(getResources().getDrawable(R.drawable.ic_esm_2));
-        esmDrawableList.add(getResources().getDrawable(R.drawable.ic_esm_3));
-        esmDrawableList.add(getResources().getDrawable(R.drawable.ic_esm_4));
-        esmDrawableList.add(getResources().getDrawable(R.drawable.ic_esm_5));
-
-        eoiDrawableList.add(getResources().getDrawable(R.drawable.ic_eoi_1));
-        eoiDrawableList.add(getResources().getDrawable(R.drawable.ic_eoi_2));
-        eoiDrawableList.add(getResources().getDrawable(R.drawable.ic_eoi_3));
-        eoiDrawableList.add(getResources().getDrawable(R.drawable.ic_eoi_4));
-        eoiDrawableList.add(getResources().getDrawable(R.drawable.ic_eoi_5));
-
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                binding.esmIcon.setImageDrawable(esmDrawableList.get(currentEsmIcon));
-                currentEsmIcon++;
-                if (currentEsmIcon == 5) {
-                    currentEsmIcon = 0;
-                }
-            }
-        }, 2000, 2000);
-
-        Timer timer2 = new Timer();
-        timer2.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                binding.eoiIcon.setImageDrawable(eoiDrawableList.get(currentEoiIcon));
-                currentEoiIcon++;
-                if (currentEoiIcon == 5) {
-                    currentEoiIcon = 0;
-                }
-            }
-        }, 2000, 2000);
+        binding.esmIcon.setImageDrawable(
+                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_esm_1, getActivity().getTheme()));
+        binding.eoiIcon.setImageDrawable(
+                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_eoi_1, getActivity().getTheme()));
 
         // Inflate the layout for this fragment
         return binding.getRoot();
@@ -172,8 +132,8 @@ public class ProfileFragment extends Fragment {
         binding.exampleList.setAdapter(profileVideosAdapter);
 
         List<Fragment> profileFragments = new Vector<Fragment>();
-        profileFragments.add(ProfileVideosFragment.newInstance(user));
-        profileFragments.add(ProfileStatsFragment.newInstance(user));
+        profileFragments.add(ProfileVideosFragment.newInstance(currentUser));
+        profileFragments.add(ProfileStatsFragment.newInstance(currentUser));
 
         PagerAdapter pagerAdapter = new FragmentPagerAdapter(getChildFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
@@ -189,48 +149,32 @@ public class ProfileFragment extends Fragment {
             }
         };
 
-        binding.contentPager.setAdapter(pagerAdapter);
-        binding.contentPager.addOnPageChangeListener(new OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(final int position, final float positionOffset,
-                    final int positionOffsetPixels) {
+        binding.statParent.setVisibility(View.GONE);
+        binding.exampleList.setVisibility(View.VISIBLE);
 
-            }
-
-            @Override
-            public void onPageSelected(final int position) {
-                updateTab();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(final int state) {
-
-            }
-        });
         binding.clipsTab.setOnClickListener(view -> {
-            binding.contentPager.setCurrentItem(0);
-            binding.clipSelected.setBackground(getResources().getDrawable(R.color.md_grey_600));
-            binding.statSelected.setBackground(getResources().getDrawable(R.color.transparent));
+            binding.statParent.setVisibility(View.GONE);
+            binding.exampleList.setVisibility(View.VISIBLE);
+            binding.clipSelected.setBackground(
+                    ResourcesCompat.getDrawable(getResources(), R.color.md_grey_600, getActivity().getTheme()));
+            binding.statSelected.setBackground(
+                    ResourcesCompat.getDrawable(getResources(), R.color.transparent, getActivity().getTheme()));
         });
         binding.statsTab.setOnClickListener(view -> {
-            binding.contentPager.setCurrentItem(1);
-            binding.statSelected.setBackground(getResources().getDrawable(R.color.md_grey_600));
-            binding.clipSelected.setBackground(getResources().getDrawable(R.color.transparent));
+            binding.statParent.setVisibility(View.VISIBLE);
+            binding.exampleList.setVisibility(View.GONE);
+            binding.statSelected.setBackground(
+                    ResourcesCompat.getDrawable(getResources(), R.color.md_grey_600, getActivity().getTheme()));
+            binding.clipSelected.setBackground(
+                    ResourcesCompat.getDrawable(getResources(), R.color.transparent, getActivity().getTheme()));
         });
-    }
-
-    void updateTab() {
-        if (binding.contentPager.getCurrentItem() == 0) {
-            binding.clipSelected.setBackground(getResources().getDrawable(R.color.md_grey_600));
-            binding.statSelected.setBackground(getResources().getDrawable(R.color.transparent));
-        } else if (binding.contentPager.getCurrentItem() == 1) {
-            binding.statSelected.setBackground(getResources().getDrawable(R.color.md_grey_600));
-            binding.clipSelected.setBackground(getResources().getDrawable(R.color.transparent));
-        }
     }
 
     void updateProfile() {
-        if (user.getUuid().equals(userDataProvider.getCurrentUser().getUuid())) {
+
+        if (currentUser.getUuid().equals(userDataProvider.getCurrentUser().getUuid())) {
+            currentUser = userDataProvider.getCurrentUser();
+
             binding.profileActionButton
                     .setBackgroundColor(getResources().getColor(R.color.md_grey_100, getContext().getTheme()));
             binding.profileActionButton
@@ -245,29 +189,28 @@ public class ProfileFragment extends Fragment {
                 startActivity(editProfile);
             });
 
-            binding.name
-                    .setText(getResources().getString(R.string.user_full_name, userDataProvider.getUserFirstName(),
-                            userDataProvider.getUserLastName()));
-            binding.bio.setText(userDataProvider.getUserBio());
+            mUserInterface.myVideos().enqueue(new Callback<ArrayList<Video>>() {
+                @Override
+                public void onResponse(final @NotNull Call<ArrayList<Video>> call,
+                        final @NotNull Response<ArrayList<Video>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        mExampleListList.clear();
+                        mExampleListList.addAll(response.body());
+                        profileVideosAdapter.notifyDataSetChanged();
+                    } else {
+                    }
+                }
 
-            Glide.with(Objects.requireNonNull(getActivity()))
-                    .load(userDataProvider.getUserProfileImage())
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.color.md_grey_400)
-                    .transition(withCrossFade(factory))
-                    .into(binding.profileImage);
-
-            Glide.with(Objects.requireNonNull(getActivity()))
-                    .load(userDataProvider.getUserCoverImage())
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.color.md_grey_200)
-                    .transition(withCrossFade(factory))
-                    .into(binding.coverImage);
+                @Override
+                public void onFailure(final Call<ArrayList<Video>> call, final Throwable t) {
+                    Log.e("PROFILE", "FAIL");
+                }
+            });
 
             mUserInterface.getInterest().enqueue(new Callback<ArrayList<Category>>() {
                 @Override
-                public void onResponse(final Call<ArrayList<Category>> call,
-                        final Response<ArrayList<Category>> response) {
+                public void onResponse(final @NotNull Call<ArrayList<Category>> call,
+                        final @NotNull Response<ArrayList<Category>> response) {
                     if (response.isSuccessful()) {
 
                         Timber.e("getInterest");
@@ -296,34 +239,61 @@ public class ProfileFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(final Call<ArrayList<Category>> call, final Throwable t) {
-
+                public void onFailure(final @NotNull Call<ArrayList<Category>> call, final @NotNull Throwable t) {
+                    t.printStackTrace();
                     Timber.e("getInterest onFailure");
                 }
             });
-
         } else {
-            binding.name.setText(getResources().getString(R.string.user_full_name, user.getFirstName(),
-                    user.getLastName()));
+
+            mUserInterface.getUserProfile(currentUser.getUuid()).enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(final @NotNull Call<User> call, final @NotNull Response<User> response) {
+                    if (response.isSuccessful()) {
+                        mExampleListList.clear();
+                        mExampleListList.addAll(response.body().getVideos());
+                        profileVideosAdapter.notifyDataSetChanged();
+
+                        Glide.with(Objects.requireNonNull(getActivity()))
+                                .load(response.body().getCoverPhoto())
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .placeholder(R.color.md_grey_200)
+                                .transition(withCrossFade(factory))
+                                .into(binding.coverImage);
+                    } else {
+                        try {
+                            Timber.e(response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(final @NotNull Call<User> call, final @NotNull Throwable t) {
+                    t.printStackTrace();
+                    Timber.e("getUserProfile onFailure");
+
+                }
+            });
         }
 
-        mUserInterface.myVideos().enqueue(new Callback<ArrayList<Video>>() {
-            @Override
-            public void onResponse(final @NotNull Call<ArrayList<Video>> call,
-                    final @NotNull Response<ArrayList<Video>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    mExampleListList.clear();
-                    mExampleListList.addAll(response.body());
-                    profileVideosAdapter.notifyDataSetChanged();
-                } else {
-                }
-            }
+        binding.name.setText(currentUser.getFirstName());
+        binding.bio.setText(currentUser.getBio());
 
-            @Override
-            public void onFailure(final Call<ArrayList<Video>> call, final Throwable t) {
-                Log.e("PROFILE", "FAIL");
-            }
-        });
+        Glide.with(Objects.requireNonNull(getActivity()))
+                .load(currentUser.getProfilePhoto())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.color.md_grey_400)
+                .transition(withCrossFade(factory))
+                .into(binding.profileImage);
+
+        Glide.with(Objects.requireNonNull(getActivity()))
+                .load(currentUser.getCoverPhoto())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.color.md_grey_200)
+                .transition(withCrossFade(factory))
+                .into(binding.coverImage);
     }
 
 

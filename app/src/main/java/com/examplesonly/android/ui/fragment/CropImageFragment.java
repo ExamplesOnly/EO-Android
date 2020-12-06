@@ -1,6 +1,7 @@
 package com.examplesonly.android.ui.fragment;
 
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -54,7 +55,8 @@ public class CropImageFragment extends Fragment {
         }
 
         uCropOptions = new UCrop.Options();
-        uCropOptions.setCompressionFormat(Bitmap.CompressFormat.PNG);
+        uCropOptions.setCompressionFormat(CompressFormat.WEBP);
+        uCropOptions.setCompressionQuality(50);
         uCropOptions.setAllowedGestures(UCropActivity.SCALE, UCropActivity.ROTATE, UCropActivity.ALL);
         uCropOptions.setRootViewBackgroundColor(getResources().getColor(R.color.white, Objects
                 .requireNonNull(getActivity()).getTheme()));
@@ -62,7 +64,7 @@ public class CropImageFragment extends Fragment {
         Uri imageUri = Uri.fromFile(new File(sourceImage));
         ucrop = UCrop
                 .of(imageUri, Uri.fromFile(
-                        new File(getActivity().getCacheDir(), System.currentTimeMillis() + ".png")))
+                        new File(getActivity().getCacheDir(), System.currentTimeMillis() + ".webp")))
                 .withAspectRatio(cropRatio[0], cropRatio[1])
                 .withOptions(uCropOptions);
     }

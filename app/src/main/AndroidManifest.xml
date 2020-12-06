@@ -16,9 +16,9 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".ui.activity.ProfileImageActivity"></activity>
+        android:theme="@style/AppTheme">
+        <activity android:name=".ui.activity.VideoSwipeActivity"></activity>
+        <activity android:name=".ui.activity.ProfileImageActivity" />
         <activity android:name=".ui.activity.EditProfileActivity" />
         <activity android:name=".ui.activity.NotificationActivity" />
         <activity android:name="org.buffer.android.thumby.ThumbyActivity" />
@@ -32,7 +32,9 @@
             <!-- </intent-filter> -->
         </activity>
         <activity android:name=".ui.activity.SettingsActivity" />
-        <activity android:name=".ui.activity.VideoPlayerActivity" />
+        <activity
+            android:name=".ui.activity.VideoPlayerActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity android:name=".ui.activity.VerificationActivity" />
         <activity android:name=".ui.activity.DynamicLinkActivity">
             <intent-filter android:autoVerify="true">

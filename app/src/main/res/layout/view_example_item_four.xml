@@ -48,7 +48,7 @@
             android:paddingStart="6dp"
             android:paddingTop="1dp"
             android:paddingEnd="6dp"
-            android:text="@string/answer"
+            android:text="On Demand"
             android:textColor="@color/white"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@+id/meta_container"
@@ -132,6 +132,7 @@
 
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/profile_card"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginStart="16dp"
@@ -158,16 +159,36 @@
             </com.google.android.material.card.MaterialCardView>
         </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/review_status"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="0dp"
+        <View
+            android:id="@+id/unverified"
+            android:layout_width="6dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/md_red_600"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
+            app:layout_constraintTop_toTopOf="@+id/thumbnail" />
+
+        <!--        <ImageView-->
+        <!--            android:id="@+id/unverified"-->
+        <!--            android:layout_width="34dp"-->
+        <!--            android:layout_height="34dp"-->
+        <!--            android:src="@drawable/ic_review"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent"-->
+        <!--            app:tint="@color/md_red_400"/>-->
+
+        <!--        <com.google.android.material.card.MaterialCardView-->
+        <!--            android:id="@+id/review_status"-->
+        <!--            android:layout_width="8dp"-->
+        <!--            android:layout_height="8dp"-->
+        <!--            android:layout_marginTop="8dp"-->
+        <!--            android:layout_marginEnd="8dp"-->
+        <!--            app:cardCornerRadius="10dp"-->
+        <!--            app:cardElevation="0dp"-->
+        <!--            android:background="@drawable/ic_eoi_3"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent" />-->
 
         <!--        <ImageView-->
         <!--            android:layout_width="24dp"-->

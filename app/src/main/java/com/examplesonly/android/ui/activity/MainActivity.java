@@ -5,7 +5,7 @@ import static com.examplesonly.android.ui.activity.NewEoActivity.ARG_LAUNCH_MODE
 import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_CAMERA;
 import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_CHOOSE_VIDEO;
 import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_NEW_DEMAND;
-import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_LINK;
+import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_DATA;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,6 +27,8 @@ import com.examplesonly.android.handler.FragmentChangeListener;
 import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.BottomSheetOption;
 import com.examplesonly.android.model.Demand;
+import com.examplesonly.android.model.User;
+import com.examplesonly.android.model.Video;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.network.video.VideoInterface;
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity
     private final int INDEX_HOME = 0;
     private final int INDEX_EXPLORE = 1;
     private final int INDEX_EOD = 2;
-    private final int INDEX_PROFILE = 3;
+    public static final int INDEX_PROFILE = 3;
     public static final int INDEX_DEMAND_DETAILS = 4;
 
     private final int OPTION_CHOOSE_VIDEO = 101;
@@ -107,6 +109,14 @@ public class MainActivity extends AppCompatActivity
             }
             return item.getItemId() != R.id.add;
         });
+
+        binding.bottomNavigation.setOnNavigationItemReselectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId != R.id.add) {
+                fragNavController.clearStack();
+            }
+        });
+
         fragNavController.switchTab(INDEX_HOME);
     }
 
@@ -142,7 +152,6 @@ public class MainActivity extends AppCompatActivity
     @NotNull
     @Override
     public Fragment getRootFragment(final int i) {
-
         switch (i) {
             case INDEX_HOME:
                 return new HomeFragment();
@@ -190,9 +199,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onVideoClicked(final String url) {
+    public void onVideoClicked(final Video video) {
         Intent videoPlayer = new Intent(MainActivity.this, VideoPlayerActivity.class);
-        videoPlayer.putExtra(VIDEO_LINK, url);
+        videoPlayer.putExtra(VIDEO_DATA, video);
         startActivity(videoPlayer);
     }
 
@@ -217,6 +226,8 @@ public class MainActivity extends AppCompatActivity
         switch (fragmentId) {
             case INDEX_DEMAND_DETAILS:
                 fragNavController.pushFragment(DemandDetailsFragment.newInstance((Demand) data));
+            case INDEX_PROFILE:
+                fragNavController.pushFragment(ProfileFragment.newInstance((User) data));
         }
     }
 

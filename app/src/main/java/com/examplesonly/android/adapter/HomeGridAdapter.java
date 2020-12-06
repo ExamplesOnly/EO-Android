@@ -1,9 +1,10 @@
 package com.examplesonly.android.adapter;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+import static com.examplesonly.android.ui.activity.MainActivity.INDEX_PROFILE;
 
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ViewExampleItemFourBinding;
+import com.examplesonly.android.handler.FragmentChangeListener;
 import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.gallerypicker.utils.DateUtil;
@@ -21,30 +23,28 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Random;
 import java.util.TimeZone;
-import timber.log.Timber;
 
 public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHolder> {
 
     private final ArrayList<Video> videoList;
-    private final Context context;
+    private final Activity activity;
     LayoutInflater inflater;
     private final VideoClickListener clickListener;
 
-    public HomeGridAdapter(ArrayList<Video> videoList, Context context, VideoClickListener clickListener) {
+    public HomeGridAdapter(ArrayList<Video> videoList, Activity activity, VideoClickListener clickListener) {
         this.videoList = videoList;
-        this.context = context;
+        this.activity = activity;
         this.clickListener = clickListener;
 
-        inflater = LayoutInflater.from(context);
+        inflater = LayoutInflater.from(activity);
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
         return new ViewHolder(ViewExampleItemFourBinding.inflate(inflater, parent, false),
-                context);
+                activity);
     }
 
     @Override
@@ -72,11 +72,13 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
         }
 
         void bind(Video video) {
-            Glide.with(context)
-                    .load(video.getUser().getProfilePhoto())
-                    .placeholder(R.color.md_grey_100)
-                    .transition(withCrossFade(factory))
-                    .into(binding.profileImage);
+            if (video.getUser() != null) {
+                Glide.with(context)
+                        .load(video.getUser().getProfilePhoto())
+                        .placeholder(R.color.md_grey_100)
+                        .transition(withCrossFade(factory))
+                        .into(binding.profileImage);
+            }
             Glide.with(context)
                     .load(video.getThumbUrl())
                     .placeholder(R.color.md_grey_100)
@@ -93,15 +95,20 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
             }
 
             binding.exampleCard.setOnClickListener(v -> {
-                clickListener.onVideoClicked(video.getUrl());
+                clickListener.onVideoClicked(video);
             });
 
-            if(Math.random() < 0.5) {
-                Timber.e("GREEN");
-                binding.reviewStatus.setCardBackgroundColor(Color.parseColor("#00FECA"));
+            binding.profileCard.setOnClickListener(v -> {
+                if (activity instanceof FragmentChangeListener) {
+                    FragmentChangeListener fragmentChangeListener = (FragmentChangeListener) activity;
+                    fragmentChangeListener.switchFragment(INDEX_PROFILE, video.getUser());
+                }
+            });
+
+            if (Math.random() < 0.5) {
+                binding.unverified.setVisibility(View.GONE);
             } else {
-                Timber.e("RED");
-                binding.reviewStatus.setCardBackgroundColor(Color.parseColor("#ffe500"));
+                binding.unverified.setVisibility(View.VISIBLE);
             }
         }
     }

@@ -110,7 +110,7 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
                 }
 
                 mItemOneBinding.exampleCard.setOnClickListener(view -> {
-                    clickListener.onVideoClicked(video.getUrl());
+                    clickListener.onVideoClicked(video);
                 });
             }
         }
