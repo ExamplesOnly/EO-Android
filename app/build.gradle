@@ -77,6 +77,8 @@ dependencies {
     implementation 'com.github.AsynctaskCoffee:VideoLayout:1.2'
     implementation 'com.robinhood.ticker:ticker:2.0.2'
     implementation 'jp.wasabeef:glide-transformations:4.3.0'
+    implementation 'com.yarolegovich:discrete-scrollview:1.5.1'
+    implementation "com.andkulikov:transitionseverywhere:2.1.0"
 
     //network
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

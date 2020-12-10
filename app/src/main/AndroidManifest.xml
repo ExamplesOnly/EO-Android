@@ -17,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.VideoSwipeActivity"></activity>
+        <activity android:name=".ui.videoSwipe.VideoSwipeActivity"/>
         <activity android:name=".ui.activity.ProfileImageActivity" />
         <activity android:name=".ui.activity.EditProfileActivity" />
         <activity android:name=".ui.activity.NotificationActivity" />

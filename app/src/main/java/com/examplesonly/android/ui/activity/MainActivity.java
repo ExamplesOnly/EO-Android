@@ -13,11 +13,15 @@ import android.os.PersistableBundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
 import com.examplesonly.android.component.BottomSheetOptionsDialog;
@@ -37,10 +41,13 @@ import com.examplesonly.android.ui.fragment.DemandFragment;
 import com.examplesonly.android.ui.fragment.ExploreFragment;
 import com.examplesonly.android.ui.fragment.HomeFragment;
 import com.examplesonly.android.ui.fragment.ProfileFragment;
+import com.examplesonly.android.ui.videoSwipe.VideoSwipeActivity;
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavController.RootFragmentListener;
 import com.ncapdevi.fragnav.tabhistory.UniqueTabHistoryStrategy;
+
 import java.util.ArrayList;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -139,7 +146,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onSaveInstanceState(@NonNull final Bundle outState,
-            @NonNull final PersistableBundle outPersistentState) {
+                                    @NonNull final PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         fragNavController.onSaveInstanceState(outState);
     }
@@ -168,7 +175,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentTransaction(@Nullable final Fragment fragment,
-            @NotNull final FragNavController.TransactionType transactionType) {
+                                      @NotNull final FragNavController.TransactionType transactionType) {
         updateToolBar();
     }
 
@@ -201,7 +208,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onVideoClicked(final Video video) {
         Intent videoPlayer = new Intent(MainActivity.this, VideoPlayerActivity.class);
+//        Intent videoPlayer = new Intent(MainActivity.this, VideoSwipeActivity.class);
         videoPlayer.putExtra(VIDEO_DATA, video);
+
+//        Pair<View, String> p1 = Pair.create(findViewById(R.id.thumbnail), "thumbnail");
+//        Pair<View, String> p2 = Pair.create(vPalette, "palette");
+//        Pair<View, String> p3 = Pair.create((View) tvName, "text");
+//        ActivityOptionsCompat options = ActivityOptionsCompat.
+//                makeSceneTransitionAnimation(this, p1);
+//        startActivity(videoPlayer, options.toBundle());
+
         startActivity(videoPlayer);
     }
 
