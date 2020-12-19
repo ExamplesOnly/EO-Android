@@ -4,23 +4,31 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
+import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ViewExampleItemTwoBinding;
 import com.examplesonly.android.databinding.ViewExploreItemBigThumbBinding;
 import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.android.util.MediaUtil;
 import com.examplesonly.gallerypicker.utils.DateUtil;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHolder> {
 
@@ -30,6 +38,8 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
     private final Context context;
     LayoutInflater inflater;
     private final VideoClickListener clickListener;
+    DrawableCrossFadeFactory factory =
+            new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
     public ExploreAdapter(ArrayList<Video> mList, Context context, VideoClickListener clickListener) {
         this.mList = mList;
@@ -80,7 +90,6 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
         void bind(Video video) {
             if (video != null) {
                 Glide.with(context).load(video.getThumbUrl()).into(mItemOneBinding.thumbnail);
-//            Glide.with(context).load(example.getUser().getProfilePhoto()).into(mItemOneBinding.profileImage);
                 mItemOneBinding.title.setText(video.getTitle());
                 mItemOneBinding.duration.setText(new DateUtil().millisToTime(Long.parseLong(video.getDuration())));
 
@@ -103,6 +112,12 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
                             String.format("%s %s • %s", video.getUser().getFirstName(), video.getUser().getLastName(),
                                     new DateUtil()
                                             .getPrettyDateString(StringToDate(video.getCreatedAt()).getTime())));
+                    Glide.with(context)
+                            .load(video.getUser().getProfilePhoto())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(R.drawable.ic_user)
+                            .transition(withCrossFade(factory))
+                            .into(mItemOneBinding.profileImage);
                 } else {
                     mItemOneBinding.metaData.setText(
                             String.format("%s", new DateUtil()

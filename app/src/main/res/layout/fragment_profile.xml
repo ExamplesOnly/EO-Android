@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ui.fragment.ProfileFragment">
@@ -31,12 +30,12 @@
             android:id="@+id/settings"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:background="?selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_setting"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
+            android:src="@drawable/ic_setting"
             app:layout_constraintEnd_toEndOf="@+id/cover_image"
             app:layout_constraintTop_toTopOf="@+id/cover_image" />
 
@@ -62,7 +61,8 @@
                     android:id="@+id/profile_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@color/md_grey_400" />
+                    android:background="@color/md_grey_100"
+                    android:src="@drawable/ic_user"/>
             </androidx.cardview.widget.CardView>
 
         </androidx.cardview.widget.CardView>
@@ -110,9 +110,9 @@
                 android:layout_marginTop="-4dp"
                 android:fontFamily="@font/poppins"
                 android:text=""
-                android:visibility="gone"
                 android:textColor="@color/md_grey_500"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/bio"

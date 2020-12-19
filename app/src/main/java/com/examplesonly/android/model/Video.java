@@ -2,7 +2,9 @@ package com.examplesonly.android.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
+
 public class Video implements Parcelable {
 
     String videoId;
@@ -15,6 +17,9 @@ public class Video implements Parcelable {
     String blurHash;
     String url;
     String thumbUrl;
+    int bow;
+    int view;
+    int userBowed;
     String createdAt;
     int demandId;
 
@@ -28,8 +33,8 @@ public class Video implements Parcelable {
     }
 
     public Video(final String videoId, final int size, final String length, final String title,
-            final String description, final String url,
-            final String thumbUrl) {
+                 final String description, final String url,
+                 final String thumbUrl) {
         this.videoId = videoId;
         this.size = size;
         this.duration = duration;
@@ -50,6 +55,9 @@ public class Video implements Parcelable {
         blurHash = in.readString();
         url = in.readString();
         thumbUrl = in.readString();
+        bow = in.readInt();
+        view = in.readInt();
+        userBowed = in.readInt();
         createdAt = in.readString();
         demandId = in.readInt();
         demand = in.readParcelable(Demand.class.getClassLoader());
@@ -85,6 +93,9 @@ public class Video implements Parcelable {
         parcel.writeString(blurHash);
         parcel.writeString(url);
         parcel.writeString(thumbUrl);
+        parcel.writeInt(bow);
+        parcel.writeInt(view);
+        parcel.writeInt(userBowed);
         parcel.writeString(createdAt);
         parcel.writeInt(demandId);
         parcel.writeParcelable(demand, i);
@@ -181,12 +192,30 @@ public class Video implements Parcelable {
         return this;
     }
 
-    public User getUser() {
-        return user;
+    public int getBow() {
+        return bow;
     }
 
-    public Video setUser(final User user) {
-        this.user = user;
+    public Video setBow(int bow) {
+        this.bow = bow;
+        return this;
+    }
+
+    public int getViewCount() {
+        return view;
+    }
+
+    public Video setViewCount(int view) {
+        this.view = view;
+        return this;
+    }
+
+    public int isUserBowed() {
+        return userBowed;
+    }
+
+    public Video setUserBowed(int userBowed) {
+        this.userBowed = userBowed;
         return this;
     }
 
@@ -214,6 +243,15 @@ public class Video implements Parcelable {
 
     public Video setDemand(final Demand demand) {
         this.demand = demand;
+        return this;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Video setUser(final User user) {
+        this.user = user;
         return this;
     }
 }

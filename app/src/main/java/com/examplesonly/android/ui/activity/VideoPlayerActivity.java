@@ -8,21 +8,26 @@ import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.bumptech.glide.request.transition.Transition;
 import com.examplesonly.android.R;
+import com.examplesonly.android.account.UserDataProvider;
 import com.examplesonly.android.adapter.ExampleAdapter;
 import com.examplesonly.android.databinding.ActivityVideoPlayerBinding;
 import com.examplesonly.android.handler.VideoClickListener;
@@ -47,10 +52,17 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import jp.wasabeef.glide.transformations.BlurTransformation;
+
 import org.jetbrains.annotations.NotNull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -65,11 +77,16 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     private boolean playWhenReady = true;
     private int currentWindow = 0;
     private long playbackPosition = 0;
+    private CountDownTimer viewTimer;
+    private Handler vStretchHandler;
+    private Runnable vStretchRunnable;
+    private long millisUntilView = 10000;
 
-    private ArrayList<Video> exampleList = new ArrayList<>();
+    private final ArrayList<Video> exampleList = new ArrayList<>();
     private VideoInterface videoInterface;
     private ExampleAdapter mExampleAdapter;
-    private TextView titleText;
+    private UserDataProvider userDataProvider;
+    private TextView titleText, viewCount, bowCount;
     private ImageButton fullScreenBtn;
     private ImageButton exoPlay;
     private ImageButton exoPause;
@@ -110,16 +127,62 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     }
 
     void init() {
+        userDataProvider = UserDataProvider.getInstance(this);
+        videoInterface = new Api(this).getClient().create(VideoInterface.class);
+        vStretchHandler = new Handler();
+
         titleText = findViewById(R.id.exo_text);
         fullScreenBtn = findViewById(R.id.bt_fullscreen);
         exoPlay = findViewById(R.id.exo_play);
         exoPause = findViewById(R.id.exo_pause);
+        viewCount = findViewById(R.id.view_count);
+        bowCount = findViewById(R.id.bow_count);
 
         binding.videoLoading.setVisibility(View.GONE);
         exoPlay.setVisibility(View.GONE);
         exoPause.setVisibility(View.GONE);
 
-        videoInterface = new Api(this).getClient().create(VideoInterface.class);
+        binding.bowBtn.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                binding.bowBtn.setEnabled(false);
+                videoInterface.postBow(currentVideo.getVideoId(), userDataProvider.getUserUuid()).enqueue(new Callback<HashMap<String, String>>() {
+                    @Override
+                    public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
+                        if (response.isSuccessful()) {
+                            binding.bowBtn.setEnabled(true);
+                        } else {
+                            binding.bowBtn.setLiked(false);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
+                        binding.bowBtn.setLiked(false);
+                    }
+                });
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                binding.bowBtn.setEnabled(false);
+                videoInterface.postBow(currentVideo.getVideoId(), userDataProvider.getUserUuid()).enqueue(new Callback<HashMap<String, String>>() {
+                    @Override
+                    public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
+                        if (response.isSuccessful()) {
+                            binding.bowBtn.setEnabled(true);
+                        } else {
+                            binding.bowBtn.setLiked(true);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
+                        binding.bowBtn.setLiked(true);
+                    }
+                });
+            }
+        });
 
         defaultConstrains.clone(binding.playerParent);
 
@@ -158,6 +221,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     @Override
     public void onPause() {
         super.onPause();
+        if (viewTimer != null)
+            viewTimer.cancel();
         if (Util.SDK_INT < 24) {
             releasePlayer();
         }
@@ -166,6 +231,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     @Override
     public void onStop() {
         super.onStop();
+        if (viewTimer != null)
+            viewTimer.cancel();
         if (Util.SDK_INT >= 24) {
             releasePlayer();
         }
@@ -209,6 +276,28 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
                         break;
                 }
             }
+
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                if (isPlaying) {
+                    Timber.e("Playing");
+                    viewTimer = new CountDownTimer(millisUntilView, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            millisUntilView = millisUntilFinished;
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            postVideoView(currentVideo.getVideoId());
+                        }
+                    };
+                    viewTimer.start();
+                } else {
+                    Timber.e("Not Playing");
+                    viewTimer.cancel();
+                }
+            }
         });
 
         binding.exoplayer.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
@@ -223,13 +312,27 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
 
     private void playVideo(Video video) {
         this.currentVideo = video;
+        this.millisUntilView = 10000;
 
         Uri uri = Uri.parse(currentVideo.getUrl());
         MediaSource mediaSource = buildMediaSource(uri);
 //        player.setMediaSource(mediaSource, false);
         player.prepare(mediaSource, false, false);
 
-        titleText.setText(currentVideo.getTitle());
+        if (titleText != null)
+            titleText.setText(currentVideo.getTitle());
+
+        if (viewCount != null)
+            viewCount.setText(String.valueOf(currentVideo.getViewCount()));
+
+        if (bowCount != null)
+            bowCount.setText(String.valueOf(currentVideo.getBow()));
+
+        if (currentVideo.isUserBowed() == 1) {
+            binding.bowBtn.setLiked(true);
+        } else {
+            binding.bowBtn.setLiked(false);
+        }
 
         Glide.with(this)
                 .load(video.getThumbUrl())
@@ -239,7 +342,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
                 .into(new CustomTarget<Drawable>() {
                     @Override
                     public void onResourceReady(@NonNull final Drawable resource,
-                            @Nullable final Transition<? super Drawable> transition) {
+                                                @Nullable final Transition<? super Drawable> transition) {
                         binding.exoplayer.setBackground(resource);
                     }
 
@@ -260,13 +363,14 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
 //                binding.noInternet.setVisibility(View.GONE);
 
                 if (response.isSuccessful()) {
-                    Timber.e("HOME isSuccessful");
                     ArrayList<Video> videos = response.body();
+                    Timber.e("VideoPlayer getVideos success: %s", videos.size());
+
                     exampleList.clear();
                     exampleList.addAll(videos);
                     mExampleAdapter.notifyDataSetChanged();
                 } else {
-                    Timber.e("HOME error");
+                    Timber.e("VideoPlayer getVideos error");
                     try {
                         Timber.e(response.errorBody().string());
                     } catch (IOException e) {
@@ -346,6 +450,18 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         mExampleAdapter = new ExampleAdapter(exampleList, this, this,
                 VIEW_TYPE_EXAMPLE_THREE);
         binding.relatedVideos.setAdapter(mExampleAdapter);
+    }
+
+    void postVideoView(String videoId) {
+        videoInterface.postView(videoId, userDataProvider.getUserUuid()).enqueue(new Callback<HashMap<String, String>>() {
+            @Override
+            public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
+            }
+
+            @Override
+            public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
+            }
+        });
     }
 
 }

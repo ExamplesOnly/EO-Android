@@ -2,7 +2,7 @@
 <defaultsMap>
     <entry>
         <key>app_latest_version_code</key>
-        <value>3</value>
+        <value>4</value>
     </entry>
     <entry>
         <key>show_update_dialog</key>
@@ -10,14 +10,14 @@
     </entry>
     <entry>
         <key>force_min_version_code</key>
-        <value>3</value>
+        <value>4</value>
     </entry>
     <entry>
         <key>force_update</key>
-        <value>true</value>
+        <value>false</value>
     </entry>
     <entry>
         <key>app_update_url</key>
-        <value>https://google.com</value>
+        <value>https://drive.google.com/drive/folders/1Q_ZzN_3yEZQHPL8GdKwamwVUjgFRe6qh?usp=sharing</value>
     </entry>
 </defaultsMap>

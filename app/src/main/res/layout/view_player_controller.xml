@@ -5,16 +5,6 @@
     android:layout_height="match_parent"
     android:background="#94000000">
 
-    <!--    <ProgressBar-->
-    <!--        android:id="@id/exo_buffering"-->
-    <!--        style="?android:attr/progressBarStyleLarge"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_centerInParent="true"-->
-    <!--        android:layout_gravity="center"-->
-    <!--        android:indeterminate="true"-->
-    <!--        android:indeterminateTint="@android:color/white" />-->
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -81,7 +71,7 @@
                 app:tint="@color/white" />
 
             <TextView
-                android:id="@+id/views"
+                android:id="@+id/view_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
@@ -98,7 +88,7 @@
                 app:tint="@color/white" />
 
             <TextView
-                android:id="@+id/now"
+                android:id="@+id/bow_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"

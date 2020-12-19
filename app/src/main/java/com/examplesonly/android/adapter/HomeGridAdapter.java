@@ -8,9 +8,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ViewExampleItemFourBinding;
@@ -18,6 +21,7 @@ import com.examplesonly.android.handler.FragmentChangeListener;
 import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.gallerypicker.utils.DateUtil;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,7 +69,7 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
                 new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
         public ViewHolder(@NonNull final ViewExampleItemFourBinding itemView,
-                @NonNull Context context) {
+                          @NonNull Context context) {
             super(itemView.getRoot());
             this.binding = itemView;
             this.context = context;
@@ -75,7 +79,8 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
             if (video.getUser() != null) {
                 Glide.with(context)
                         .load(video.getUser().getProfilePhoto())
-                        .placeholder(R.color.md_grey_100)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.ic_user)
                         .transition(withCrossFade(factory))
                         .into(binding.profileImage);
             }
@@ -94,6 +99,9 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
                 binding.title.setText(video.getTitle());
             }
 
+            binding.viewCount.setText(String.valueOf(video.getViewCount()));
+            binding.bowCount.setText(String.valueOf(video.getBow()));
+
             binding.exampleCard.setOnClickListener(v -> {
                 clickListener.onVideoClicked(video);
             });
@@ -108,7 +116,7 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
             if (Math.random() < 0.5) {
                 binding.unverified.setVisibility(View.GONE);
             } else {
-                binding.unverified.setVisibility(View.VISIBLE);
+                binding.unverified.setVisibility(View.GONE);
             }
         }
     }

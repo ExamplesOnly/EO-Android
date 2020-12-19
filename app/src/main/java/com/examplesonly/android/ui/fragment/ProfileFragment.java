@@ -171,7 +171,6 @@ public class ProfileFragment extends Fragment {
     }
 
     void updateProfile() {
-
         if (currentUser.getUuid().equals(userDataProvider.getCurrentUser().getUuid())) {
             currentUser = userDataProvider.getCurrentUser();
 
@@ -188,65 +187,67 @@ public class ProfileFragment extends Fragment {
                 Intent editProfile = new Intent(getActivity(), EditProfileActivity.class);
                 startActivity(editProfile);
             });
-
-            mUserInterface.myVideos().enqueue(new Callback<ArrayList<Video>>() {
-                @Override
-                public void onResponse(final @NotNull Call<ArrayList<Video>> call,
-                        final @NotNull Response<ArrayList<Video>> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        mExampleListList.clear();
-                        mExampleListList.addAll(response.body());
-                        profileVideosAdapter.notifyDataSetChanged();
-                    } else {
-                    }
-                }
-
-                @Override
-                public void onFailure(final Call<ArrayList<Video>> call, final Throwable t) {
-                    Log.e("PROFILE", "FAIL");
-                }
-            });
-
-            mUserInterface.getInterest().enqueue(new Callback<ArrayList<Category>>() {
-                @Override
-                public void onResponse(final @NotNull Call<ArrayList<Category>> call,
-                        final @NotNull Response<ArrayList<Category>> response) {
-                    if (response.isSuccessful()) {
-
-                        Timber.e("getInterest");
-                        ArrayList<Category> interestList = response.body();
-
-                        if (interestList.size() > 0) {
-                            interests = "";
-                            for (int i = 0; i < interestList.size(); i++) {
-                                Timber.e(interestList.get(i).getTitle());
-                                if (interests.length() > 0) {
-                                    interests += ", ";
-                                }
-                                interests += interestList.get(i).getTitle();
-                            }
-                            binding.interest.setText(interests);
-                            binding.interest.setVisibility(View.VISIBLE);
-                        }
-
-                    } else {
-                        try {
-                            Timber.e("getInterest ERROR %s", response.errorBody().string());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(final @NotNull Call<ArrayList<Category>> call, final @NotNull Throwable t) {
-                    t.printStackTrace();
-                    Timber.e("getInterest onFailure");
-                }
-            });
+//
+//            mUserInterface.myVideos().enqueue(new Callback<ArrayList<Video>>() {
+//                @Override
+//                public void onResponse(final @NotNull Call<ArrayList<Video>> call,
+//                        final @NotNull Response<ArrayList<Video>> response) {
+//                    if (response.isSuccessful() && response.body() != null) {
+//                        mExampleListList.clear();
+//                        mExampleListList.addAll(response.body());
+//                        profileVideosAdapter.notifyDataSetChanged();
+//                    } else {
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(final Call<ArrayList<Video>> call, final Throwable t) {
+//                    Log.e("PROFILE", "FAIL");
+//                }
+//            });
+//
+//            mUserInterface.getInterest().enqueue(new Callback<ArrayList<Category>>() {
+//                @Override
+//                public void onResponse(final @NotNull Call<ArrayList<Category>> call,
+//                        final @NotNull Response<ArrayList<Category>> response) {
+//                    if (response.isSuccessful()) {
+//
+//                        Timber.e("getInterest");
+//                        ArrayList<Category> interestList = response.body();
+//
+//                        if (interestList.size() > 0) {
+//                            interests = "";
+//                            for (int i = 0; i < interestList.size(); i++) {
+//                                Timber.e(interestList.get(i).getTitle());
+//                                if (interests.length() > 0) {
+//                                    interests += ", ";
+//                                }
+//                                interests += interestList.get(i).getTitle();
+//                            }
+//                            binding.interest.setText(interests);
+//                            binding.interest.setVisibility(View.VISIBLE);
+//                        }
+//
+//                    } else {
+//                        try {
+//                            Timber.e("getInterest ERROR %s", response.errorBody().string());
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(final @NotNull Call<ArrayList<Category>> call, final @NotNull Throwable t) {
+//                    t.printStackTrace();
+//                    Timber.e("getInterest onFailure");
+//                }
+//            });
         } else {
 
-            mUserInterface.getUserProfile(currentUser.getUuid()).enqueue(new Callback<User>() {
+        }
+
+        mUserInterface.getUserProfile(currentUser.getUuid()).enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(final @NotNull Call<User> call, final @NotNull Response<User> response) {
                     if (response.isSuccessful()) {
@@ -273,10 +274,9 @@ public class ProfileFragment extends Fragment {
                 public void onFailure(final @NotNull Call<User> call, final @NotNull Throwable t) {
                     t.printStackTrace();
                     Timber.e("getUserProfile onFailure");
-
+                    Timber.e(t.getMessage());
                 }
             });
-        }
 
         binding.name.setText(currentUser.getFirstName());
         binding.bio.setText(currentUser.getBio());
@@ -284,7 +284,7 @@ public class ProfileFragment extends Fragment {
         Glide.with(Objects.requireNonNull(getActivity()))
                 .load(currentUser.getProfilePhoto())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.color.md_grey_400)
+                .placeholder(R.drawable.ic_user)
                 .transition(withCrossFade(factory))
                 .into(binding.profileImage);
 

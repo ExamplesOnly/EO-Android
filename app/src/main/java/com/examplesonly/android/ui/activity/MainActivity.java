@@ -242,8 +242,10 @@ public class MainActivity extends AppCompatActivity
         switch (fragmentId) {
             case INDEX_DEMAND_DETAILS:
                 fragNavController.pushFragment(DemandDetailsFragment.newInstance((Demand) data));
+                break;
             case INDEX_PROFILE:
                 fragNavController.pushFragment(ProfileFragment.newInstance((User) data));
+                break;
         }
     }
 

@@ -1,6 +1,8 @@
 package com.examplesonly.android.network;
 
 import android.content.Context;
+
+import com.examplesonly.android.BuildConfig;
 import com.examplesonly.android.network.auth.TokenInterceptor;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
@@ -29,7 +31,7 @@ public class Api {
                 .addInterceptor(tokenInterceptor).build();
 
         return new Retrofit.Builder()
-                .baseUrl("https://api.examplesonly.com/")
+                .baseUrl(BuildConfig.API_URL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
