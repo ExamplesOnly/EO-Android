@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.examplesonly.android.ui.view.ExampleCard
+    <com.solvevolve.examplesonly.ui.view.ExampleCard
         android:id="@+id/example_card"
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -48,7 +48,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </com.examplesonly.android.ui.view.ExampleCard>
+    </com.solvevolve.examplesonly.ui.view.ExampleCard>
 
 
     <de.hdodenhof.circleimageview.CircleImageView

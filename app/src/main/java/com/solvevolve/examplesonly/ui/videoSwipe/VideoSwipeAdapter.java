@@ -1,0 +1,89 @@
+package com.solvevolve.examplesonly.ui.videoSwipe;
+
+import android.app.Activity;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.solvevolve.examplesonly.databinding.ViewVideoSwipeBinding;
+import com.solvevolve.examplesonly.handler.VideoClickListener;
+import com.solvevolve.examplesonly.model.Video;
+import com.solvevolve.examplesonly.ui.videoSwipe.helper.VideoSwipeViewHolder;
+
+import java.util.ArrayList;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+
+public class VideoSwipeAdapter extends RecyclerView.Adapter<VideoSwipeViewHolder> {
+
+    private ArrayList<Video> videoList;
+    private final Activity activity;
+    LayoutInflater inflater;
+    private final VideoClickListener clickListener;
+
+    public VideoSwipeAdapter(ArrayList<Video> videoList, Activity activity, VideoClickListener clickListener) {
+        this.videoList = videoList;
+        this.activity = activity;
+        this.clickListener = clickListener;
+
+        inflater = LayoutInflater.from(activity);
+    }
+
+    @NonNull
+    @Override
+    public VideoSwipeViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
+        return new VideoSwipeViewHolder(ViewVideoSwipeBinding.inflate(inflater, parent, false),
+                activity);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final VideoSwipeViewHolder holder, final int position) {
+        holder.bind(videoList.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return videoList.size();
+    }
+//
+//    public static class ViewHolder extends RecyclerView.ViewHolder {
+//
+//        Context context;
+//        ViewVideoSwipeBinding binding;
+//        DrawableCrossFadeFactory factory =
+//                new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+//
+//
+//        public ViewHolder(@NonNull final ViewVideoSwipeBinding itemView,
+//                          @NonNull Context context) {
+//            super(itemView.getRoot());
+//            this.binding = itemView;
+//            this.context = context;
+//        }
+//
+//        void bind(Video video, int position, int currentItem) {
+//            if (video == null)
+//                return;
+//
+//            binding.title.setText(video.getTitle());
+//
+//            Glide.with(context)
+//                    .load(video.getThumbUrl())
+//                    .placeholder(R.color.md_grey_100)
+//                    .transition(withCrossFade(factory))
+//                    .into(binding.thumbnail);
+//
+////            if(position == currentItem) {
+////                TransitionManager.beginDelayedTransition(binding.root);
+////                binding.overlay.setVisibility(View.GONE);
+////            } else {
+////                TransitionManager.beginDelayedTransition(binding.root);
+////                binding.overlay.setVisibility(View.VISIBLE);
+////            }
+//
+////            binding.videoPlayer.setBackground();x
+//        }
+//    }
+}
