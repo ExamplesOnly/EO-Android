@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.solvevolve.examplesonly.adapter.ExampleAdapter;
 import com.solvevolve.examplesonly.adapter.HomeGridAdapter;
 import com.solvevolve.examplesonly.databinding.FragmentHomeBinding;
@@ -14,9 +17,12 @@ import com.solvevolve.examplesonly.model.Video;
 import com.solvevolve.examplesonly.network.Api;
 import com.solvevolve.examplesonly.network.video.VideoInterface;
 import com.solvevolve.examplesonly.ui.view.ProfileGridDecoration;
+
 import java.io.IOException;
 import java.util.ArrayList;
+
 import org.jetbrains.annotations.NotNull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,7 +34,7 @@ public class HomeFragment extends Fragment {
     private ExampleAdapter mExampleAdapter;
     private HomeGridAdapter mHomeGridAdapter;
     private VideoInterface videoInterface;
-    private ArrayList<Video> mExampleListList = new ArrayList<>();
+    private ArrayList<Video> mExampleList = new ArrayList<>();
 
     public HomeFragment() {
         // Required empty public constructor
@@ -41,7 +47,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         videoInterface = new Api(getContext()).getClient().create(VideoInterface.class);
@@ -49,16 +55,14 @@ public class HomeFragment extends Fragment {
         binding.noInternet.setVisibility(View.GONE);
 
         setupGridExamples();
-        getVideos();
+
+        if (mExampleList.size() == 0)
+            getVideos();
+
+        binding.swipeRefresh.setOnRefreshListener(this::getVideos);
 
         // Inflate the layout for this fragment
         return binding.getRoot();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        getVideos();
     }
 
     void getVideos() {
@@ -72,8 +76,8 @@ public class HomeFragment extends Fragment {
                 if (response.isSuccessful()) {
                     Timber.e("HOME isSuccessful");
                     ArrayList<Video> videos = response.body();
-                    mExampleListList.clear();
-                    mExampleListList.addAll(videos);
+                    mExampleList.clear();
+                    mExampleList.addAll(videos);
                     mHomeGridAdapter.notifyDataSetChanged();
                 } else {
                     Timber.e("HOME error");
@@ -83,6 +87,7 @@ public class HomeFragment extends Fragment {
                         e.printStackTrace();
                     }
                 }
+                binding.swipeRefresh.setRefreshing(false);
             }
 
             @Override
@@ -92,6 +97,7 @@ public class HomeFragment extends Fragment {
                     binding.exampleList.setVisibility(View.GONE);
                     binding.noInternet.setVisibility(View.VISIBLE);
                 }
+                binding.swipeRefresh.setRefreshing(false);
             }
         });
     }
@@ -102,7 +108,7 @@ public class HomeFragment extends Fragment {
         binding.exampleList.setLayoutManager(layoutManager);
         binding.exampleList.addItemDecoration(new ProfileGridDecoration(20, 2));
 
-        mHomeGridAdapter = new HomeGridAdapter(mExampleListList, getActivity(),
+        mHomeGridAdapter = new HomeGridAdapter(mExampleList, getActivity(),
                 (VideoClickListener) getActivity());
         binding.exampleList.setAdapter(mHomeGridAdapter);
     }
