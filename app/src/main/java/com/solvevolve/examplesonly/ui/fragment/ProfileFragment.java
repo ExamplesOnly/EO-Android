@@ -253,7 +253,7 @@ public class ProfileFragment extends Fragment {
                         mExampleListList.addAll(response.body().getVideos());
                         profileVideosAdapter.notifyDataSetChanged();
 
-                        Glide.with(Objects.requireNonNull(getActivity()))
+                        Glide.with(getActivity())
                                 .load(response.body().getCoverPhoto())
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .placeholder(R.color.md_grey_200)

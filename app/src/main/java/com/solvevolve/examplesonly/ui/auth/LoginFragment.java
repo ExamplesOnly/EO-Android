@@ -7,10 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
+
 import androidx.core.app.SharedElementCallback;
 import androidx.fragment.app.Fragment;
 import androidx.transition.Transition;
 import androidx.transition.TransitionInflater;
+
 import com.solvevolve.examplesonly.R;
 import com.solvevolve.examplesonly.account.UserDataProvider;
 import com.solvevolve.examplesonly.databinding.FragmentLoginBinding;
@@ -19,12 +21,15 @@ import com.solvevolve.examplesonly.network.Api;
 import com.solvevolve.examplesonly.network.auth.AuthInterface;
 import com.solvevolve.examplesonly.network.user.UserInterface;
 import com.solvevolve.examplesonly.ui.activity.MainActivity;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import org.jetbrains.annotations.NotNull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -48,7 +53,7 @@ public class LoginFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
         binding = FragmentLoginBinding.inflate(getLayoutInflater());
@@ -90,7 +95,7 @@ public class LoginFragment extends Fragment {
         mAuthInterface.login(user).enqueue(new Callback<HashMap<String, String>>() {
             @Override
             public void onResponse(@NotNull final Call<HashMap<String, String>> call,
-                    @NotNull final Response<HashMap<String, String>> response) {
+                                   @NotNull final Response<HashMap<String, String>> response) {
                 if (response.isSuccessful()) {
                     String token = response.body().get("token");
                     Timber.e("login token: %s", token);
@@ -100,7 +105,7 @@ public class LoginFragment extends Fragment {
                     mUserInterface.me().enqueue(new Callback<User>() {
                         @Override
                         public void onResponse(final Call<User> call,
-                                final Response<User> response) {
+                                               final Response<User> response) {
                             if (response.isSuccessful()) {
                                 mUserDataProvider.saveUserData(response.body());
                                 Timber.e(response.body().toString());
@@ -146,6 +151,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onFailure(final Call<HashMap<String, String>> call, final Throwable t) {
                 isLoading(false);
+                t.printStackTrace();
             }
         });
     }

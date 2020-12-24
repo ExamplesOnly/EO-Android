@@ -25,8 +25,8 @@ public class Api {
 
     public Retrofit getClient() {
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(1500, TimeUnit.SECONDS)
-                .readTimeout(1500, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(1500, TimeUnit.SECONDS)
                 .addInterceptor(tokenInterceptor).build();
 

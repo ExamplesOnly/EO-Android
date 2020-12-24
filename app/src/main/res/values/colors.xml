@@ -6,4 +6,5 @@
     <color name="white">#FFFFFF</color>
     <color name="dark">#202020</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="error">#ED4956</color>
 </resources>

@@ -3,6 +3,7 @@ package com.solvevolve.examplesonly;
 import android.app.Application;
 import androidx.lifecycle.LifecycleObserver;
 import com.google.firebase.FirebaseApp;
+import com.solvevolve.gallerypicker.BuildConfig;
 
 import timber.log.Timber;
 import timber.log.Timber.DebugTree;

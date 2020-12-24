@@ -16,10 +16,10 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "com.solveevolve.examplesonly"
+        applicationId "com.solvevolve.examplesonly"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 5
+        versionCode 6
         versionName "1.0.1"
 
         buildConfigField "String", "API_URL", "\"https://api.examplesonly.com/\""
@@ -34,7 +34,7 @@ android {
             buildConfigField "String", "API_URL", "\"https://api.examplesonly.com/\""
         }
         debug {
-            buildConfigField "String", "API_URL", "\"https://dev-api.examplesonly.com/\""
+            buildConfigField "String", "API_URL", "\"https://api.examplesonly.com/\""
         }
     }
     buildFeatures {
@@ -100,6 +100,8 @@ dependencies {
     implementation "io.reactivex.rxjava3:rxjava:3.0.7"
     implementation 'com.uber.autodispose2:autodispose:2.0.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
+//    implementation "androidx.room:room-runtime:2.2.6"
+//    annotationProcessor "androidx.room:room-compiler:2.2.6"
 
     //firebase
     implementation platform('com.google.firebase:firebase-bom:26.1.0')

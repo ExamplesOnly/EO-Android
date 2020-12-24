@@ -43,12 +43,19 @@ public interface VideoInterface {
     Call<HashMap<String, String>> postReach(@Field("videoId") String videoId, @Field("userId") String userId);
 
     @FormUrlEncoded
-    @POST("/v1/video/postBow")
-    Call<HashMap<String, String>> postBow(@Field("videoId") String videoId, @Field("userId") String userId);
-
-    @FormUrlEncoded
     @POST("/v1/video/postView")
     Call<HashMap<String, String>> postView(@Field("videoId") String videoId, @Field("userId") String userId);
+
+    @FormUrlEncoded
+    @POST("/v1/video/postPlayTime")
+    Call<HashMap<String, String>> postPlayTime(@Field("videoId") String videoId,
+                                               @Field("userId") String userId,
+                                               @Field("viewId") String viewId,
+                                               @Field("playTime") long playTime);
+
+    @FormUrlEncoded
+    @POST("/v1/video/postBow")
+    Call<HashMap<String, String>> postBow(@Field("videoId") String videoId, @Field("userId") String userId);
 
     @FormUrlEncoded
     @POST("/v1/video/delete")

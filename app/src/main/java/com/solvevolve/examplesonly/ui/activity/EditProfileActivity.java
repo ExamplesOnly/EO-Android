@@ -9,45 +9,50 @@ import static com.yalantis.ucrop.UCrop.EXTRA_OUTPUT_URI;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Outline;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.SpannableString;
-import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewOutlineProvider;
-import androidx.annotation.NonNull;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.solvevolve.examplesonly.R;
 import com.solvevolve.examplesonly.account.UserDataProvider;
-import com.solvevolve.examplesonly.component.BottomSheetOptionsDialog;
 import com.solvevolve.examplesonly.component.BottomSheetOptionsDialog.BottomSheetOptionChooseListener;
 import com.solvevolve.examplesonly.databinding.ActivityEditProfileBinding;
-import com.solvevolve.examplesonly.model.BottomSheetOption;
 import com.solvevolve.examplesonly.model.Category;
 import com.solvevolve.examplesonly.model.User;
 import com.solvevolve.examplesonly.network.Api;
 import com.solvevolve.examplesonly.network.user.UserInterface;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.solvevolve.examplesonly.ui.fragment.AddDemandFragment;
+import com.solvevolve.examplesonly.ui.fragment.CameraFragment;
+import com.solvevolve.examplesonly.ui.settings.ChangePasswordFragment;
+import com.solvevolve.examplesonly.ui.settings.EditProfileFragment;
+import com.solvevolve.gallerypicker.view.VideosFragment;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+
 import org.jetbrains.annotations.NotNull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -63,19 +68,13 @@ public class EditProfileActivity extends AppCompatActivity implements BottomShee
     private final int GET_PROFILE_IMAGE = 111;
     private final int GET_COVER_IMAGE = 121;
 
+    public static final int FRAGMENT_EDIT_PROFILE = 121;
+    public static final int FRAGMENT_CHANGE_PASSWORD = 122;
+
     private ActivityEditProfileBinding binding;
     private UserDataProvider userDataProvider;
     private UserInterface userInterface;
-    private MenuItem saveBtn;
-
-    private String userFirstName = "";
-    private String userLastName = "";
-    private String userBio = "";
-    //    private String userInterests = "";
-    private boolean isDataChanged = false;
-
-    DrawableCrossFadeFactory factory =
-            new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,13 +82,36 @@ public class EditProfileActivity extends AppCompatActivity implements BottomShee
         binding = ActivityEditProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        init();
-        setupTextBox();
+        setSupportActionBar(binding.topAppBar);
+        binding.topAppBar.setNavigationOnClickListener(v -> {
+            onBackPressed();
+        });
+
+
+        userInterface = new Api(this).getClient().create(UserInterface.class);
+        userDataProvider = UserDataProvider.getInstance(this);
+
+        switchFragment(FRAGMENT_EDIT_PROFILE, "choose_video", null);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+        super.onDestroy();
     }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.save_menu, menu);
+//        getMenuInflater().inflate(R.menu.save_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+//        return super.onPrepareOptionsMenu(menu);
         return true;
     }
 
@@ -128,276 +150,156 @@ public class EditProfileActivity extends AppCompatActivity implements BottomShee
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
-        if (requestCode == GET_PROFILE_IMAGE && data != null) {
-            Uri profileImageUri = data.getParcelableExtra(EXTRA_OUTPUT_URI);
-            Timber.e("onActivityResult %s", profileImageUri);
-            uploadProfileImage(profileImageUri, GET_PROFILE_IMAGE);
-        } else if (requestCode == GET_COVER_IMAGE && data != null) {
-            Uri coverImageUri = data.getParcelableExtra(EXTRA_OUTPUT_URI);
-            Timber.e("onActivityResult %s", coverImageUri);
-            uploadProfileImage(coverImageUri, GET_COVER_IMAGE);
-        }
 
+        if (resultCode != RESULT_CANCELED) {
+            if (requestCode == GET_PROFILE_IMAGE && data != null) {
+                Uri profileImageUri = data.getParcelableExtra(EXTRA_OUTPUT_URI);
+                Timber.e("onActivityResult %s", profileImageUri);
+                uploadProfileImage(profileImageUri, GET_PROFILE_IMAGE);
+                finish();
+            } else if (requestCode == GET_COVER_IMAGE && data != null) {
+                Uri coverImageUri = data.getParcelableExtra(EXTRA_OUTPUT_URI);
+                Timber.e("onActivityResult %s", coverImageUri);
+                uploadProfileImage(coverImageUri, GET_COVER_IMAGE);
+                finish();
+            }
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(final Menu menu) {
-        Timber.e("onPrepareOptionsMenu %s", isDataChanged);
-        SpannableString s = new SpannableString("SAVE");
-        if (isDataChanged) {
-            s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimary, getTheme()))
-                    , 0, s.length(), 0);
-
-            menu.getItem(0).setTitle(s);
-            menu.getItem(0).setEnabled(true);
-        } else {
-            s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.md_grey_700, getTheme()))
-                    , 0, s.length(), 0);
-
-            menu.getItem(0).setTitle(s);
-            menu.getItem(0).setEnabled(false);
+    public void onBackPressed() {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.root);
+        if (fragment instanceof EditProfileFragment) {
+            finish();
         }
-        return true;
+
+        super.onBackPressed();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
-        if (item.getItemId() == R.id.save) {
-            updateAccount();
-        }
-        return true;
-    }
-
-    void init() {
-        userInterface = new Api(this).getClient().create(UserInterface.class);
-        userDataProvider = UserDataProvider.getInstance(this);
-
-        binding.coverImage.setOutlineProvider(new ViewOutlineProvider() {
-            @Override
-            public void getOutline(final View view, final Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), (int) (view.getHeight() + 40F), 40F);
-            }
-        });
-        binding.coverImage.setClipToOutline(true);
-
-        setSupportActionBar(binding.topAppBar);
-        binding.topAppBar.setNavigationOnClickListener(listener -> {
-            if (isDataChanged) {
-                new MaterialAlertDialogBuilder(this)
-                        .setCancelable(false)
-                        .setTitle("Unsaved Changes")
-                        .setMessage("You have unsaved changes. Are you sure you want to cancel?")
-                        .setNeutralButton("Cancel", null)
-                        .setNegativeButton("Discard", (dialogInterface, i) -> finish())
-                        .setPositiveButton("Save", (dialogInterface, i) -> updateAccount())
-                        .show();
-            } else {
-                finish();
-            }
-        });
-
-        Glide.with(this)
-                .load(userDataProvider.getUserProfileImage())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.color.md_grey_400)
-                .transition(withCrossFade(factory))
-                .into(binding.profileImage);
-
-        Glide.with(this)
-                .load(userDataProvider.getUserCoverImage())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.color.md_grey_200)
-                .transition(withCrossFade(factory))
-                .into(binding.coverImage);
-
-        userFirstName = userDataProvider.getUserFirstName();
-        userLastName = userDataProvider.getUserLastName();
-        userBio = userDataProvider.getUserBio();
-
-        binding.firstNameTxt.setText(userFirstName);
-//        binding.lastNameTxt.setText(userLastName);
-        binding.bioTxt.setText(userBio);
-
-        userInterface.getInterest().enqueue(new Callback<ArrayList<Category>>() {
-            @Override
-            public void onResponse(final Call<ArrayList<Category>> call,
-                    final Response<ArrayList<Category>> response) {
-                if (response.isSuccessful()) {
-
-                    Timber.e("getInterest");
-                    ArrayList<Category> interestList = response.body();
-
-                    if (interestList.size() > 0) {
-                        for (int i = 0; i < interestList.size(); i++) {
-                            Timber.e(interestList.get(i).getTitle());
-
-                            Chip chip = new Chip(EditProfileActivity.this);
-                            chip.setText(interestList.get(i).getTitle());
-                            binding.categoryChipGroup.addView(chip);
-                        }
-                    }
-
-                    Chip editChip = new Chip(EditProfileActivity.this);
-                    editChip.setChipBackgroundColorResource(R.color.colorPrimary);
-                    editChip.setTextColor(getResources().getColor(R.color.white, getTheme()));
-                    editChip.setText("Edit Interests");
-                    editChip.setCheckable(true);
-                    editChip.setChecked(true);
-                    editChip.setCheckedIcon(getDrawable(R.drawable.ic_add_mono));
-                    editChip.setOnClickListener(view -> {
-                        Intent editInterest = new Intent(EditProfileActivity.this, ChooseCategoryActivity.class);
-                        startActivity(editInterest);
-                    });
-                    binding.categoryChipGroup.addView(editChip);
-//                    Paris.style(editChip).apply(R.style.Widget_MaterialComponents_Chip_Choice);
-
-                } else {
-                    try {
-                        Timber.e("getInterest ERROR %s", response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(final Call<ArrayList<Category>> call, final Throwable t) {
-
-                Timber.e("getInterest onFailure");
-            }
-        });
-
-        binding.editDpBtn.setOnClickListener(view -> {
-            ArrayList<BottomSheetOption> optionList = new ArrayList<>();
-            optionList.add(new BottomSheetOption(OPTION_CHOOSE_PHOTO, "Choose Profile Photo",
-                    ContextCompat.getDrawable(this, R.drawable.ic_upload_mono)));
-            optionList.add(new BottomSheetOption(OPTION_CLICK_PHOTO, "Take new Profile Photo",
-                    ContextCompat.getDrawable(this, R.drawable.ic_camera_mono)));
-            BottomSheetOptionsDialog bottomSheet = new BottomSheetOptionsDialog(null, optionList);
-            bottomSheet.show(getSupportFragmentManager(), "ModalBottomSheet");
-        });
-
-        binding.editCoverBtn.setOnClickListener(view -> {
-            ArrayList<BottomSheetOption> optionList = new ArrayList<>();
-            optionList.add(new BottomSheetOption(OPTION_CHOOSE_PHOTO_COVER, "Choose Cover Photo",
-                    ContextCompat.getDrawable(this, R.drawable.ic_upload_mono)));
-            optionList.add(new BottomSheetOption(OPTION_CLICK_PHOTO_COVER, "Take new Cover Photo",
-                    ContextCompat.getDrawable(this, R.drawable.ic_camera_mono)));
-            BottomSheetOptionsDialog bottomSheet = new BottomSheetOptionsDialog(null, optionList);
-            bottomSheet.show(getSupportFragmentManager(), "ModalBottomSheet");
-        });
-    }
-
-    void setupTextBox() {
-        binding.firstNameTxt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
-                userFirstName = charSequence.toString();
-                verifyChanges();
-            }
-
-            @Override
-            public void afterTextChanged(final Editable editable) {
-
-            }
-        });
-
-//        binding.lastNameTxt.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
+//    @Override
+//    public boolean onPrepareOptionsMenu(final Menu menu) {
+//        Timber.e("onPrepareOptionsMenu %s", isDataChanged);
+//        SpannableString s = new SpannableString("SAVE");
+//        if (isDataChanged) {
+//            s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.colorPrimary, getTheme()))
+//                    , 0, s.length(), 0);
 //
-//            }
+//            menu.getItem(0).setTitle(s);
+//            menu.getItem(0).setEnabled(true);
+//        } else {
+//            s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.md_grey_700, getTheme()))
+//                    , 0, s.length(), 0);
 //
-//            @Override
-//            public void onTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
-//                userLastName = charSequence.toString();
-//                verifyChanges();
-//            }
+//            menu.getItem(0).setTitle(s);
+//            menu.getItem(0).setEnabled(false);
+//        }
+//        return true;
+//    }
+
+
+//    void init() {
 //
-//            @Override
-//            public void afterTextChanged(final Editable editable) {
-//
+//        setSupportActionBar(binding.topAppBar);
+//        binding.topAppBar.setNavigationOnClickListener(listener -> {
+//            if (isDataChanged) {
+//                new MaterialAlertDialogBuilder(this)
+//                        .setCancelable(false)
+//                        .setTitle("Unsaved Changes")
+//                        .setMessage("You have unsaved changes. Are you sure you want to cancel?")
+//                        .setNeutralButton("Cancel", null)
+//                        .setNegativeButton("Discard", (dialogInterface, i) -> finish())
+////                        .setPositiveButton("Save", (dialogInterface, i) -> updateAccount())
+//                        .show();
+//            } else {
+//                finish();
 //            }
 //        });
+//
+//        userInterface.getInterest().enqueue(new Callback<ArrayList<Category>>() {
+//            @Override
+//            public void onResponse(final Call<ArrayList<Category>> call,
+//                                   final Response<ArrayList<Category>> response) {
+//                if (response.isSuccessful()) {
+//
+//                    Timber.e("getInterest");
+//                    ArrayList<Category> interestList = response.body();
+//
+//                    if (interestList.size() > 0) {
+//                        for (int i = 0; i < interestList.size(); i++) {
+//                            Timber.e(interestList.get(i).getTitle());
+//
+//                            Chip chip = new Chip(EditProfileActivity.this);
+//                            chip.setText(interestList.get(i).getTitle());
+////                            binding.categoryChipGroup.addView(chip);
+//                        }
+//                    }
+//
+//                    Chip editChip = new Chip(EditProfileActivity.this);
+//                    editChip.setChipBackgroundColorResource(R.color.colorPrimary);
+//                    editChip.setTextColor(getResources().getColor(R.color.white, getTheme()));
+//                    editChip.setText("Edit Interests");
+//                    editChip.setCheckable(true);
+//                    editChip.setChecked(true);
+//                    editChip.setCheckedIcon(getDrawable(R.drawable.ic_add_mono));
+//                    editChip.setOnClickListener(view -> {
+//                        Intent editInterest = new Intent(EditProfileActivity.this, ChooseCategoryActivity.class);
+//                        startActivity(editInterest);
+//                    });
+////                    binding.categoryChipGroup.addView(editChip);
+////                    Paris.style(editChip).apply(R.style.Widget_MaterialComponents_Chip_Choice);
+//
+//                } else {
+//                    try {
+//                        Timber.e("getInterest ERROR %s", response.errorBody().string());
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(final Call<ArrayList<Category>> call, final Throwable t) {
+//
+//                Timber.e("getInterest onFailure");
+//            }
+//        });
+//
+//    }
 
-        binding.bioTxt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {
-                userBio = charSequence.toString();
-                verifyChanges();
-            }
-
-            @Override
-            public void afterTextChanged(final Editable editable) {
-
-            }
-        });
+    public void setFragment(Fragment frag) {
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction().replace(R.id.root, frag).commit();
     }
 
-    void verifyChanges() {
-        if (!userFirstName.equals(userDataProvider.getUserFirstName())
-                || !userBio.equals(userDataProvider.getUserBio())) {
-            isDataChanged = true;
-        } else {
-            isDataChanged = false;
+    public void switchFragment(int step, String tag, String data) {
+        Fragment fragment;
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+        fragment = getSupportFragmentManager().findFragmentByTag(tag);
+
+        switch (step) {
+            case FRAGMENT_EDIT_PROFILE:
+                if (fragment == null) {
+                    fragment = new EditProfileFragment();
+                }
+                break;
+            case FRAGMENT_CHANGE_PASSWORD:
+                if (fragment == null) {
+                    fragment = new ChangePasswordFragment();
+                }
+                break;
+
         }
-        invalidateOptionsMenu();
-    }
 
-    void updateAccount() {
-        binding.progress.setIndeterminate(true);
-        binding.progress.setVisibility(View.VISIBLE);
-        binding.progress.show();
-        userInterface.updateUser(
-                new User()
-                        .setFirstName(userFirstName)
-                        .setLastName(userLastName)
-                        .setBio(userBio))
-                .enqueue(new Callback<HashMap<String, String>>() {
-                    @Override
-                    public void onResponse(final Call<HashMap<String, String>> call, final Response<HashMap<String, String>> response) {
-                        if (response.isSuccessful()) {
-                            User currUser = userDataProvider.getCurrentUser();
-                            currUser.setFirstName(userFirstName);
-                            currUser.setLastName(userLastName);
-                            currUser.setBio(userBio);
-                            userDataProvider.saveUserData(currUser);
+        fragmentTransaction.replace(R.id.root, fragment, tag);
 
-                            binding.progress.hide();
-                            finish();
-                            Timber.e("SUCCESS");
-                        } else {
-                            binding.progress.hide();
-                            try {
-                                Timber.e("SUCCESS ERROR %s", response.errorBody().string());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(final Call<HashMap<String, String>> call, final Throwable t) {
-                        binding.progress.setVisibility(View.GONE);
-                        t.printStackTrace();
-                        Timber.e("FAIL");
-                    }
-                });
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     void uploadProfileImage(@NotNull Uri image, @NotNull int imageType) {
-        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(this);
         progressDialog.create();
         progressDialog.setProgress(0);
         progressDialog.setCancelable(false);
@@ -416,32 +318,26 @@ public class EditProfileActivity extends AppCompatActivity implements BottomShee
                 userInterface.updateProfileImage(profileImageBody).enqueue(new Callback<HashMap<String, String>>() {
                     @Override
                     public void onResponse(final @NotNull Call<HashMap<String, String>> call,
-                            final @NotNull Response<HashMap<String, String>> response) {
+                                           final @NotNull Response<HashMap<String, String>> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             User currUser = userDataProvider.getCurrentUser();
                             currUser.setProfilePhoto(response.body().get("url"));
                             userDataProvider.saveUserData(currUser);
-
-                            Glide.with(EditProfileActivity.this)
-                                    .load(response.body().get("url"))
-                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                    .into(binding.profileImage);
+                            Toast.makeText(EditProfileActivity.this, "Profile photo updated", Toast.LENGTH_SHORT).show();
                         } else {
-                            try {
-                                Timber.e("updateProfileImage ERROR %s", response.errorBody().string());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            Toast.makeText(EditProfileActivity.this, "Failed to update profile photo", Toast.LENGTH_SHORT).show();
                         }
-                        progressDialog.dismiss();
+//                        progressDialog.dismiss();
+                        finish();
                     }
 
                     @Override
                     public void onFailure(final @NotNull Call<HashMap<String, String>> call,
-                            final @NotNull Throwable t) {
+                                          final @NotNull Throwable t) {
 
                         progressDialog.dismiss();
-                        Timber.e("updateProfileImage FAIL");
+                        Toast.makeText(EditProfileActivity.this, "Failed to update profile photo", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 });
                 break;
@@ -451,40 +347,31 @@ public class EditProfileActivity extends AppCompatActivity implements BottomShee
                 userInterface.updateCoverImage(profileImageBody).enqueue(new Callback<HashMap<String, String>>() {
                     @Override
                     public void onResponse(final @NotNull Call<HashMap<String, String>> call,
-                            final @NotNull Response<HashMap<String, String>> response) {
+                                           final @NotNull Response<HashMap<String, String>> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             User currUser = userDataProvider.getCurrentUser();
                             currUser.setCoverPhoto(response.body().get("url"));
                             userDataProvider.saveUserData(currUser);
 
-                            Glide.with(EditProfileActivity.this)
-                                    .load(response.body().get("url"))
-                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                    .into(binding.coverImage);
+                            Toast.makeText(EditProfileActivity.this, "Cover photo updated", Toast.LENGTH_SHORT).show();
                         } else {
-                            try {
-                                Timber.e("updateCoverImage ERROR %s", response.errorBody().string());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            Toast.makeText(EditProfileActivity.this, "Failed to update cover photo", Toast.LENGTH_SHORT).show();
                         }
                         progressDialog.dismiss();
+                        finish();
                     }
 
                     @Override
                     public void onFailure(final @NotNull Call<HashMap<String, String>> call,
-                            final @NotNull Throwable t) {
+                                          final @NotNull Throwable t) {
 
                         progressDialog.dismiss();
-                        Timber.e("updateProfileImage FAIL");
+                        Toast.makeText(EditProfileActivity.this, "Failed to update cover photo", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 });
                 break;
         }
 
-    }
-
-    boolean isDataValid() {
-        return false;
     }
 }

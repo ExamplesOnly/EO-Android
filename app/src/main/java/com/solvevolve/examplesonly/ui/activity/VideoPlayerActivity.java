@@ -20,6 +20,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -54,6 +58,7 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
+import com.solvevolve.examplesonly.worker.VStretchLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,9 +83,9 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     private int currentWindow = 0;
     private long playbackPosition = 0;
     private CountDownTimer viewTimer;
-    private Handler vStretchHandler;
-    private Runnable vStretchRunnable;
+    private long millisVideoPlayed = 0;
     private long millisUntilView = 10000;
+    private String currentViewId = null;
 
     private final ArrayList<Video> exampleList = new ArrayList<>();
     private VideoInterface videoInterface;
@@ -113,6 +118,47 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     }
 
     @Override
+    protected void onResume() {
+        Timber.e("Resume %s %s", currentVideo.getVideoId(), currentViewId);
+        super.onResume();
+        if (player == null) {
+            loadPlayer();
+        }
+        playVideo(currentVideo);
+        loadState();
+    }
+
+    @Override
+    public void onPause() {
+        Timber.e("Pause %s %s", currentVideo.getVideoId(), currentViewId);
+        this.millisVideoPlayed = player.getContentPosition();
+        super.onPause();
+        if (viewTimer != null)
+            viewTimer.cancel();
+        if (Util.SDK_INT < 24) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        Timber.e("Stop %s %s", currentVideo.getVideoId(), currentViewId);
+        super.onStop();
+        if (viewTimer != null)
+            viewTimer.cancel();
+        if (Util.SDK_INT >= 24) {
+            releasePlayer();
+        }
+        LogVStretch();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Timber.e("Destroy %s %s", currentVideo.getVideoId(), currentViewId);
+        super.onDestroy();
+    }
+
+    @Override
     public void onVideoClicked(final Video video) {
         playVideo(video);
     }
@@ -129,7 +175,6 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     void init() {
         userDataProvider = UserDataProvider.getInstance(this);
         videoInterface = new Api(this).getClient().create(VideoInterface.class);
-        vStretchHandler = new Handler();
 
         titleText = findViewById(R.id.exo_text);
         fullScreenBtn = findViewById(R.id.bt_fullscreen);
@@ -208,36 +253,6 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (player == null) {
-            loadPlayer();
-        }
-        playVideo(currentVideo);
-        loadState();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (viewTimer != null)
-            viewTimer.cancel();
-        if (Util.SDK_INT < 24) {
-            releasePlayer();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (viewTimer != null)
-            viewTimer.cancel();
-        if (Util.SDK_INT >= 24) {
-            releasePlayer();
-        }
-    }
-
     private void releasePlayer() {
         if (player != null) {
             playWhenReady = player.getPlayWhenReady();
@@ -261,6 +276,16 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         player.addListener(new EventListener() {
             @Override
             public void onPlaybackStateChanged(final int state) {
+                Timber.e("State %s", state);
+                // keep screen on when video is playing
+//                if (state == Player.STATE_IDLE || state == Player.STATE_ENDED ||
+//                        !playWhenReady) {
+//                    binding.exoplayer.setKeepScreenOn(false);
+//                } else {
+//                    binding.exoplayer.setKeepScreenOn(true);
+//                }
+
+                // setup loading
                 switch (state) {
                     case Player.STATE_IDLE:
                     case Player.STATE_READY:
@@ -270,6 +295,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
                         exoPause.setVisibility(View.VISIBLE);
                         break;
                     case Player.STATE_BUFFERING:
+                        binding.exoplayer.setKeepScreenOn(true);
                         binding.videoLoading.setVisibility(View.VISIBLE);
                         exoPlay.setVisibility(View.GONE);
                         exoPause.setVisibility(View.GONE);
@@ -280,7 +306,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
                 if (isPlaying) {
-                    Timber.e("Playing");
+                    binding.exoplayer.setKeepScreenOn(true);
                     viewTimer = new CountDownTimer(millisUntilView, 1000) {
                         @Override
                         public void onTick(long millisUntilFinished) {
@@ -294,7 +320,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
                     };
                     viewTimer.start();
                 } else {
-                    Timber.e("Not Playing");
+                    binding.exoplayer.setKeepScreenOn(false);
                     viewTimer.cancel();
                 }
             }
@@ -311,6 +337,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     }
 
     private void playVideo(Video video) {
+        LogVStretch();
+        this.currentViewId = null;
         this.currentVideo = video;
         this.millisUntilView = 10000;
 
@@ -456,12 +484,36 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         videoInterface.postView(videoId, userDataProvider.getUserUuid()).enqueue(new Callback<HashMap<String, String>>() {
             @Override
             public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
+                if (response.isSuccessful()) {
+                    currentViewId = response.body().get("uuid");
+                }
             }
 
             @Override
             public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
             }
         });
+    }
+
+    void LogVStretch() {
+        if (player != null) {
+            this.millisVideoPlayed = player.getContentPosition();
+        }
+
+        if (currentViewId != null) {
+            WorkRequest stretchPostRequest =
+                    new OneTimeWorkRequest.Builder(VStretchLogger.class)
+                            .setInputData(new Data.Builder()
+                                    .putString("videoId", currentVideo.getVideoId())
+                                    .putString("viewId", currentViewId)
+                                    .putLong("stretch", millisVideoPlayed)
+                                    .build())
+                            .build();
+            WorkManager
+                    .getInstance(this)
+                    .enqueue(stretchPostRequest);
+
+        }
     }
 
 }
