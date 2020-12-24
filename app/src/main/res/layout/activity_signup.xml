@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true">
 
-    <com.solvevolve.examplesonly.ui.view.KeyboardSensitiveRelativeLayout
+    <com.examplesonly.android.ui.view.KeyboardSensitiveRelativeLayout
         android:id="@+id/signup_realtive_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -352,6 +352,6 @@
 
         </LinearLayout>
 
-    </com.solvevolve.examplesonly.ui.view.KeyboardSensitiveRelativeLayout>
+    </com.examplesonly.android.ui.view.KeyboardSensitiveRelativeLayout>
 
 </ScrollView>

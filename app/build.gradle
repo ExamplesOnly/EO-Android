@@ -16,11 +16,11 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "com.solvevolve.examplesonly"
+        applicationId "com.examplesonly.android"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 6
-        versionName "1.0.1"
+        versionCode 7
+        versionName "1.0.2"
 
         buildConfigField "String", "API_URL", "\"https://api.examplesonly.com/\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

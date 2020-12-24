@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.solvevolve.examplesonly">
+    package="com.examplesonly.android">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="com.solvevolve.examplesonly.ExamplesOnly"
+        android:name="com.examplesonly.android.ExamplesOnly"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -17,12 +17,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.solvevolve.examplesonly.ui.videoSwipe.VideoSwipeActivity"/>
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.ProfileImageActivity" />
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.EditProfileActivity" />
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.NotificationActivity" />
+        <activity android:name="com.examplesonly.android.ui.videoSwipe.VideoSwipeActivity"/>
+        <activity android:name="com.examplesonly.android.ui.activity.ProfileImageActivity" />
+        <activity android:name="com.examplesonly.android.ui.activity.EditProfileActivity" />
+        <activity android:name="com.examplesonly.android.ui.activity.NotificationActivity" />
         <activity android:name="org.buffer.android.thumby.ThumbyActivity" />
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.ChooseCategoryActivity">
+        <activity android:name="com.examplesonly.android.ui.activity.ChooseCategoryActivity">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
@@ -31,12 +31,12 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.SettingsActivity" />
+        <activity android:name="com.examplesonly.android.ui.activity.SettingsActivity" />
         <activity
-            android:name="com.solvevolve.examplesonly.ui.activity.VideoPlayerActivity"
+            android:name="com.examplesonly.android.ui.activity.VideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.VerificationActivity" />
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.DynamicLinkActivity">
+        <activity android:name="com.examplesonly.android.ui.activity.VerificationActivity" />
+        <activity android:name="com.examplesonly.android.ui.activity.DynamicLinkActivity">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -51,21 +51,21 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.LoginActivity" />
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.LaunchActivity">
+        <activity android:name="com.examplesonly.android.ui.activity.LoginActivity" />
+        <activity android:name="com.examplesonly.android.ui.activity.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.MainActivity" />
-        <activity android:name="com.solvevolve.examplesonly.ui.activity.NewEoActivity" />
+        <activity android:name="com.examplesonly.android.ui.activity.MainActivity" />
+        <activity android:name="com.examplesonly.android.ui.activity.NewEoActivity" />
         <activity
-            android:name="com.solvevolve.examplesonly.ui.activity.SignupActivity"
+            android:name="com.examplesonly.android.ui.activity.SignupActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name="com.solvevolve.examplesonly.ui.activity.EmailLoginActivity"
+            android:name="com.examplesonly.android.ui.activity.EmailLoginActivity"
             android:windowSoftInputMode="adjustResize" />
 
         <meta-data

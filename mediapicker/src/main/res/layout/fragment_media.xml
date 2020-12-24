@@ -81,7 +81,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <com.solvevolve.gallerypicker.utils.scroll.FastScrollRecyclerView
+    <com.examplesonly.gallerypicker.utils.scroll.FastScrollRecyclerView
         android:id="@+id/imageGrid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
