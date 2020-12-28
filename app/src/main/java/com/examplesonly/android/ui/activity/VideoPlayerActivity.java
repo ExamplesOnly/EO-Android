@@ -5,12 +5,14 @@ import static com.examplesonly.android.adapter.ExampleAdapter.VIEW_TYPE_EXAMPLE_
 
 import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,8 +20,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.work.Constraints;
 import androidx.work.Data;
+import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
@@ -91,6 +96,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     private ExampleAdapter mExampleAdapter;
     private UserDataProvider userDataProvider;
     private TextView titleText, viewCount, bowCount;
+    private RelativeLayout controllerParent;
     private ImageButton fullScreenBtn;
     private ImageButton exoPlay;
     private ImageButton exoPause;
@@ -101,6 +107,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
             new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
     private Video currentVideo;
+    private String currentVideoId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +116,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         View view = binding.getRoot();
         setContentView(view);
 
-        currentVideo = getIntent().getParcelableExtra(VIDEO_DATA);
+        Video newVideo = getIntent().getParcelableExtra(VIDEO_DATA);
+        currentVideoId = newVideo.getVideoId();
 
         init();
         setupExamples();
@@ -118,18 +126,16 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
 
     @Override
     protected void onResume() {
-        Timber.e("Resume %s %s", currentVideo.getVideoId(), currentViewId);
         super.onResume();
         if (player == null) {
             loadPlayer();
         }
-        playVideo(currentVideo);
+        playVideo(currentVideo, true);
         loadState();
     }
 
     @Override
     public void onPause() {
-        Timber.e("Pause %s %s", currentVideo.getVideoId(), currentViewId);
         this.millisVideoPlayed = player.getContentPosition();
         super.onPause();
         if (viewTimer != null)
@@ -137,11 +143,11 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         if (Util.SDK_INT < 24) {
             releasePlayer();
         }
+        LogVStretch();
     }
 
     @Override
     public void onStop() {
-        Timber.e("Stop %s %s", currentVideo.getVideoId(), currentViewId);
         super.onStop();
         if (viewTimer != null)
             viewTimer.cancel();
@@ -153,13 +159,13 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
 
     @Override
     protected void onDestroy() {
-        Timber.e("Destroy %s %s", currentVideo.getVideoId(), currentViewId);
         super.onDestroy();
     }
 
     @Override
     public void onVideoClicked(final Video video) {
-        playVideo(video);
+        clearUI();
+        getVideoAndPlay(video.getVideoId());
     }
 
     @Override
@@ -175,6 +181,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         userDataProvider = UserDataProvider.getInstance(this);
         videoInterface = new Api(this).getClient().create(VideoInterface.class);
 
+        controllerParent = findViewById(R.id.controller_parent);
         titleText = findViewById(R.id.exo_text);
         fullScreenBtn = findViewById(R.id.bt_fullscreen);
         exoPlay = findViewById(R.id.exo_play);
@@ -228,6 +235,10 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
             }
         });
 
+        binding.bookmarkBtn.setOnClickListener(v -> {
+            toggleBookmark();
+        });
+
         defaultConstrains.clone(binding.playerParent);
 
         fullScreenBtn.setOnClickListener(v -> {
@@ -239,7 +250,9 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         });
 
         loadPlayer();
-        playVideo(currentVideo);
+
+        clearUI();
+        getVideoAndPlay(currentVideoId);
     }
 
     @SuppressLint("InlinedApi")
@@ -335,11 +348,23 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         }
     }
 
-    private void playVideo(Video video) {
+    private void playVideo(Video video, boolean isResume) {
+
+        if (currentVideo == null) {
+            return;
+        }
+
         LogVStretch();
-        this.currentViewId = null;
         this.currentVideo = video;
         this.millisUntilView = 10000;
+
+        if (!isResume) {
+            this.currentViewId = null;
+        }
+
+        controllerParent.setVisibility(View.VISIBLE);
+        binding.relatedVideos.setVisibility(View.VISIBLE);
+        binding.buttonParent.setVisibility(View.VISIBLE);
 
         Uri uri = Uri.parse(currentVideo.getUrl());
         MediaSource mediaSource = buildMediaSource(uri);
@@ -355,10 +380,12 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         if (bowCount != null)
             bowCount.setText(String.valueOf(currentVideo.getBow()));
 
-        if (currentVideo.isUserBowed() == 1) {
-            binding.bowBtn.setLiked(true);
+        binding.bowBtn.setLiked(currentVideo.isUserBowed());
+
+        if (currentVideo.isUserBookmarked()) {
+            setBookmarkIcon(true);
         } else {
-            binding.bowBtn.setLiked(false);
+            setBookmarkIcon(false);
         }
 
         Glide.with(this)
@@ -494,14 +521,69 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         });
     }
 
+    void toggleBookmark() {
+        boolean currentStatus;
+        binding.bookmarkBtn.setEnabled(false);
+
+        if (currentVideo.isUserBookmarked()) {
+            setBookmarkIcon(false);
+            currentStatus = false;
+        } else {
+            setBookmarkIcon(true);
+            currentStatus = true;
+        }
+
+        videoInterface.postBookmark(currentVideo.getVideoId()).enqueue(new Callback<HashMap<String, String>>() {
+            @Override
+            public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
+                if (response.isSuccessful()) {
+                    Timber.e("Bookmark %s", response.body().toString());
+                    currentVideo.setUserBookmarked(currentVideo.isUserBookmarked() ? 0 : 1);
+                } else {
+                    try {
+                        Timber.e("Bookmark %s", response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    setBookmarkIcon(!currentStatus);
+                }
+                binding.bookmarkBtn.setEnabled(true);
+            }
+
+            @Override
+            public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
+                setBookmarkIcon(!currentStatus);
+                binding.bookmarkBtn.setEnabled(true);
+                Timber.e("Bookmark fail");
+                t.printStackTrace();
+            }
+        });
+    }
+
+    void setBookmarkIcon(boolean status) {
+        if (status) {
+            binding.bookmarkBtn.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark_post_fill, getTheme()));
+            binding.bookmarkBtn.setColorFilter(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()));
+        } else {
+            binding.bookmarkBtn.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark_post, getTheme()));
+            binding.bookmarkBtn.setColorFilter(ResourcesCompat.getColor(getResources(), R.color.dark, getTheme()));
+        }
+    }
+
     void LogVStretch() {
+        Timber.e("LogVStretch");
         if (player != null) {
+            Timber.e("LogVStretch player");
             this.millisVideoPlayed = player.getContentPosition();
         }
 
         if (currentViewId != null) {
+            Timber.e("LogVStretch currentViewId");
             WorkRequest stretchPostRequest =
                     new OneTimeWorkRequest.Builder(VStretchLogger.class)
+                            .setConstraints(new Constraints.Builder()
+                                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                                    .build())
                             .setInputData(new Data.Builder()
                                     .putString("videoId", currentVideo.getVideoId())
                                     .putString("viewId", currentViewId)
@@ -513,6 +595,40 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
                     .enqueue(stretchPostRequest);
 
         }
+    }
+
+    void getVideoAndPlay(String videoId) {
+        videoInterface.getVideo(videoId).enqueue(new Callback<Video>() {
+            @Override
+            public void onResponse(@NotNull Call<Video> call, @NotNull Response<Video> response) {
+                if (response.isSuccessful()) {
+                    Timber.e("getVideoAndPlay %s", response.body().toString());
+                    currentVideo = response.body();
+                    playVideo(currentVideo, false);
+                } else {
+                    try {
+                        Timber.e("getVideoAndPlay error %s", response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<Video> call, @NotNull Throwable t) {
+
+                Timber.e("getVideoAndPlay fail");
+                t.printStackTrace();
+            }
+        });
+    }
+
+    void clearUI() {
+        player.stop(true);
+        controllerParent.setVisibility(View.GONE);
+        binding.relatedVideos.setVisibility(View.GONE);
+        binding.buttonParent.setVisibility(View.GONE);
+        binding.videoLoading.setVisibility(View.VISIBLE);
     }
 
 }

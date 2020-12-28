@@ -35,7 +35,7 @@ public interface VideoInterface {
     @GET("/v1/video/list")
     Call<ArrayList<Video>> getVideos();
 
-    @POST("/v1/video/{uuid}")
+    @GET("/v1/video/{uuid}")
     Call<Video> getVideo(@Path("uuid") String videoId);
 
     @FormUrlEncoded
@@ -56,6 +56,10 @@ public interface VideoInterface {
     @FormUrlEncoded
     @POST("/v1/video/postBow")
     Call<HashMap<String, String>> postBow(@Field("videoId") String videoId, @Field("userId") String userId);
+
+    @FormUrlEncoded
+    @POST("/v1/video/bookmark")
+    Call<HashMap<String, String>> postBookmark(@Field("videoId") String videoId);
 
     @FormUrlEncoded
     @POST("/v1/video/delete")

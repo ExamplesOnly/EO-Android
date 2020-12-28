@@ -20,6 +20,7 @@ public class Video implements Parcelable {
     int bow;
     int view;
     int userBowed;
+    int userBookmarked;
     String createdAt;
     int demandId;
 
@@ -58,6 +59,7 @@ public class Video implements Parcelable {
         bow = in.readInt();
         view = in.readInt();
         userBowed = in.readInt();
+        userBookmarked = in.readInt();
         createdAt = in.readString();
         demandId = in.readInt();
         demand = in.readParcelable(Demand.class.getClassLoader());
@@ -96,6 +98,7 @@ public class Video implements Parcelable {
         parcel.writeInt(bow);
         parcel.writeInt(view);
         parcel.writeInt(userBowed);
+        parcel.writeInt(userBookmarked);
         parcel.writeString(createdAt);
         parcel.writeInt(demandId);
         parcel.writeParcelable(demand, i);
@@ -210,12 +213,21 @@ public class Video implements Parcelable {
         return this;
     }
 
-    public int isUserBowed() {
-        return userBowed;
+    public boolean isUserBowed() {
+        return userBowed == 1;
     }
 
     public Video setUserBowed(int userBowed) {
         this.userBowed = userBowed;
+        return this;
+    }
+
+    public boolean isUserBookmarked() {
+        return userBookmarked == 1;
+    }
+
+    public Video setUserBookmarked(int userBookmarked) {
+        this.userBookmarked = userBookmarked;
         return this;
     }
 
