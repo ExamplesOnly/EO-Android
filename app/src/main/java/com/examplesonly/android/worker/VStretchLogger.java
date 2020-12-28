@@ -40,6 +40,7 @@ public class VStretchLogger extends Worker {
         stretch = getInputData().getLong("stretch", 0);
 
         if (viewId == null || stretch == 0) {
+            Timber.e("VStretchLogger failure");
             return Result.failure();
         }
 

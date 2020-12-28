@@ -1,5 +1,6 @@
 package com.examplesonly.android.ui.auth;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.SharedElementCallback;
 import androidx.fragment.app.Fragment;
 import androidx.transition.Transition;
@@ -41,6 +43,8 @@ public class LoginFragment extends Fragment {
     private AuthInterface mAuthInterface;
     private UserInterface mUserInterface;
     private UserDataProvider mUserDataProvider;
+
+    private Context mContext;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -77,9 +81,15 @@ public class LoginFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
     private void init() {
-        mAuthInterface = new Api(getContext()).getClient().create(AuthInterface.class);
-        mUserInterface = new Api(getContext()).getClient().create(UserInterface.class);
+        mAuthInterface = new Api(mContext).getClient().create(AuthInterface.class);
+        mUserInterface = new Api(mContext).getClient().create(UserInterface.class);
         mUserDataProvider = UserDataProvider.getInstance(getContext());
 
         binding.loginBtn.setOnClickListener(v -> signIn());
@@ -144,7 +154,7 @@ public class LoginFragment extends Fragment {
                     });
                 } else {
                     isLoading(false);
-                    Toast.makeText(getContext(), "Email or password incorrect", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "Email or password incorrect", Toast.LENGTH_LONG).show();
                 }
             }
 
