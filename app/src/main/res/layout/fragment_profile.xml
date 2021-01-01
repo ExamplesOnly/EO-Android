@@ -120,6 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="User Bio"
+                android:fontFamily="@font/poppins"
                 android:textColor="@color/md_grey_900"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -433,6 +434,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:text="Saved"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins_bold"
                         android:text="E"
                         android:textColor="@color/dark"
@@ -446,13 +455,6 @@
                         android:textColor="@color/colorPrimary"
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:fontFamily="@font/poppins_semibold"
-                        android:text="Stats"
-                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -499,28 +501,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/devider_three" />
 
-        <LinearLayout
-            android:id="@+id/stat_parent"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/save_list"
             android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:gravity="center"
+            android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/devider_three">
+            app:layout_constraintTop_toBottomOf="@+id/devider_three" />
 
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/animation_view"
-                android:layout_width="250dp"
-                android:layout_height="250dp"
-                android:layout_gravity="center"
-
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true"
-                app:lottie_rawRes="@raw/man_with_graphs" />
-
-        </LinearLayout>
-
+        <TextView
+            android:id="@+id/no_examples"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Examples Here!"
+            android:visibility="gone"
+            android:fontFamily="@font/poppins_bold"
+            android:textColor="@color/dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/devider_two" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

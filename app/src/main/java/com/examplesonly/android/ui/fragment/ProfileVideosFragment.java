@@ -5,8 +5,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import com.examplesonly.android.adapter.ProfileVideosAdapter;
 import com.examplesonly.android.databinding.FragmentProfileVideosBinding;
 import com.examplesonly.android.handler.VideoClickListener;
@@ -15,8 +17,11 @@ import com.examplesonly.android.model.Video;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.ui.view.ProfileGridDecoration;
+
 import java.util.ArrayList;
+
 import org.jetbrains.annotations.NotNull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,7 +59,7 @@ public class ProfileVideosFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentProfileVideosBinding.inflate(inflater, container, false);
 
@@ -82,11 +87,12 @@ public class ProfileVideosFragment extends Fragment {
         mUserInterface.myVideos().enqueue(new Callback<ArrayList<Video>>() {
             @Override
             public void onResponse(final @NotNull Call<ArrayList<Video>> call,
-                    final @NotNull Response<ArrayList<Video>> response) {
+                                   final @NotNull Response<ArrayList<Video>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     mExampleListList.clear();
                     mExampleListList.addAll(response.body());
                     profileVideosAdapter.notifyDataSetChanged();
+
                 } else {
                 }
             }

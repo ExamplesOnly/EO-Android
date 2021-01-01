@@ -49,6 +49,9 @@ public interface UserInterface {
     @GET("v1/user/myDemands")
     Call<ArrayList<Demand>> getDemands();
 
+    @GET("v1/user/myVideoBookmarks")
+    Call<ArrayList<Video>> getBookmarks();
+
     @GET("v1/user/getProfile/{uuid}")
     Call<User> getUserProfile(@Path("uuid") String uuid);
 

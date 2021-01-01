@@ -5,16 +5,19 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 import android.content.Intent;
 import android.graphics.Outline;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.viewpager.widget.PagerAdapter;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
@@ -30,12 +33,15 @@ import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.ui.activity.EditProfileActivity;
 import com.examplesonly.android.ui.activity.SettingsActivity;
 import com.examplesonly.android.ui.view.ProfileGridDecoration;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
+
 import org.jetbrains.annotations.NotNull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,13 +50,18 @@ import timber.log.Timber;
 public class ProfileFragment extends Fragment {
 
     private static final String ARG_USER = "user";
+    private static final int TAB_USER_VIDEOS = 1;
+    private static final int TAB_SAVED_VIDEOS = 2;
 
     private FragmentProfileBinding binding;
-    private ProfileVideosAdapter profileVideosAdapter;
+    private ProfileVideosAdapter profileVideosAdapter, savedVideosAdapter;
     private UserDataProvider userDataProvider;
     private UserInterface mUserInterface;
     private String interests = "";
-    private final ArrayList<Video> mExampleListList = new ArrayList<>();
+    private int currentTab = TAB_USER_VIDEOS;
+    private boolean exampleLoaded = false, saveLoaded = false;
+    private final ArrayList<Video> mExampleList = new ArrayList<>();
+    private final ArrayList<Video> mSaveList = new ArrayList<>();
 
     DrawableCrossFadeFactory factory =
             new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
@@ -82,7 +93,7 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 
         binding = FragmentProfileBinding.inflate(inflater, container, false);
 
@@ -120,14 +131,25 @@ public class ProfileFragment extends Fragment {
             startActivity(settings);
         });
 
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2,
+        StaggeredGridLayoutManager exampleLayoutManager = new StaggeredGridLayoutManager(2,
                 StaggeredGridLayoutManager.VERTICAL);
-        binding.exampleList.setLayoutManager(layoutManager);
+
+        StaggeredGridLayoutManager savedLayoutManager = new StaggeredGridLayoutManager(2,
+                StaggeredGridLayoutManager.VERTICAL);
+
+        binding.exampleList.setLayoutManager(exampleLayoutManager);
         binding.exampleList.addItemDecoration(new ProfileGridDecoration(10, 2));
 
-        profileVideosAdapter = new ProfileVideosAdapter(mExampleListList, getContext(),
+        profileVideosAdapter = new ProfileVideosAdapter(mExampleList, getContext(),
                 (VideoClickListener) getActivity());
         binding.exampleList.setAdapter(profileVideosAdapter);
+
+        binding.saveList.setLayoutManager(savedLayoutManager);
+        binding.saveList.addItemDecoration(new ProfileGridDecoration(10, 2));
+
+        savedVideosAdapter = new ProfileVideosAdapter(mSaveList, getContext(),
+                (VideoClickListener) getActivity());
+        binding.saveList.setAdapter(savedVideosAdapter);
 
         List<Fragment> profileFragments = new Vector<Fragment>();
         profileFragments.add(ProfileVideosFragment.newInstance(currentUser));
@@ -147,20 +169,36 @@ public class ProfileFragment extends Fragment {
             }
         };
 
-        binding.statParent.setVisibility(View.GONE);
+//        binding.statParent.setVisibility(View.GONE);
         binding.exampleList.setVisibility(View.VISIBLE);
 
         binding.clipsTab.setOnClickListener(view -> {
-            binding.statParent.setVisibility(View.GONE);
-            binding.exampleList.setVisibility(View.VISIBLE);
+            currentTab = TAB_USER_VIDEOS;
+
+            binding.saveList.setVisibility(View.GONE);
+
+            if (exampleLoaded && mExampleList.size() == 0) {
+                binding.noExamples.setVisibility(View.VISIBLE);
+            } else {
+                binding.exampleList.setVisibility(View.VISIBLE);
+            }
+
             binding.clipSelected.setBackground(
                     ResourcesCompat.getDrawable(getResources(), R.color.md_grey_600, getActivity().getTheme()));
             binding.statSelected.setBackground(
                     ResourcesCompat.getDrawable(getResources(), R.color.transparent, getActivity().getTheme()));
         });
         binding.statsTab.setOnClickListener(view -> {
-            binding.statParent.setVisibility(View.VISIBLE);
+            currentTab = TAB_SAVED_VIDEOS;
+
             binding.exampleList.setVisibility(View.GONE);
+
+            if (saveLoaded && mSaveList.size() == 0) {
+                binding.noExamples.setVisibility(View.VISIBLE);
+            } else {
+                binding.saveList.setVisibility(View.VISIBLE);
+            }
+
             binding.statSelected.setBackground(
                     ResourcesCompat.getDrawable(getResources(), R.color.md_grey_600, getActivity().getTheme()));
             binding.clipSelected.setBackground(
@@ -185,96 +223,47 @@ public class ProfileFragment extends Fragment {
                 Intent editProfile = new Intent(getActivity(), EditProfileActivity.class);
                 startActivity(editProfile);
             });
-//
-//            mUserInterface.myVideos().enqueue(new Callback<ArrayList<Video>>() {
-//                @Override
-//                public void onResponse(final @NotNull Call<ArrayList<Video>> call,
-//                        final @NotNull Response<ArrayList<Video>> response) {
-//                    if (response.isSuccessful() && response.body() != null) {
-//                        mExampleListList.clear();
-//                        mExampleListList.addAll(response.body());
-//                        profileVideosAdapter.notifyDataSetChanged();
-//                    } else {
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(final Call<ArrayList<Video>> call, final Throwable t) {
-//                    Log.e("PROFILE", "FAIL");
-//                }
-//            });
-//
-//            mUserInterface.getInterest().enqueue(new Callback<ArrayList<Category>>() {
-//                @Override
-//                public void onResponse(final @NotNull Call<ArrayList<Category>> call,
-//                        final @NotNull Response<ArrayList<Category>> response) {
-//                    if (response.isSuccessful()) {
-//
-//                        Timber.e("getInterest");
-//                        ArrayList<Category> interestList = response.body();
-//
-//                        if (interestList.size() > 0) {
-//                            interests = "";
-//                            for (int i = 0; i < interestList.size(); i++) {
-//                                Timber.e(interestList.get(i).getTitle());
-//                                if (interests.length() > 0) {
-//                                    interests += ", ";
-//                                }
-//                                interests += interestList.get(i).getTitle();
-//                            }
-//                            binding.interest.setText(interests);
-//                            binding.interest.setVisibility(View.VISIBLE);
-//                        }
-//
-//                    } else {
-//                        try {
-//                            Timber.e("getInterest ERROR %s", response.errorBody().string());
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(final @NotNull Call<ArrayList<Category>> call, final @NotNull Throwable t) {
-//                    t.printStackTrace();
-//                    Timber.e("getInterest onFailure");
-//                }
-//            });
         } else {
-
+            binding.profileActionButton
+                    .setVisibility(View.GONE);
+            binding.statsTab.setVisibility(View.GONE);
         }
 
         mUserInterface.getUserProfile(currentUser.getUuid()).enqueue(new Callback<User>() {
-                @Override
-                public void onResponse(final @NotNull Call<User> call, final @NotNull Response<User> response) {
-                    if (response.isSuccessful()) {
-                        mExampleListList.clear();
-                        mExampleListList.addAll(response.body().getVideos());
-                        profileVideosAdapter.notifyDataSetChanged();
+            @Override
+            public void onResponse(final @NotNull Call<User> call, final @NotNull Response<User> response) {
+                if (response.isSuccessful()) {
+                    mExampleList.clear();
+                    mExampleList.addAll(response.body().getVideos());
+                    profileVideosAdapter.notifyDataSetChanged();
 
-                        Glide.with(getActivity())
-                                .load(response.body().getCoverPhoto())
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .placeholder(R.color.md_grey_200)
-                                .transition(withCrossFade(factory))
-                                .into(binding.coverImage);
-                    } else {
-                        try {
-                            Timber.e(response.errorBody().string());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                    Glide.with(getActivity())
+                            .load(response.body().getCoverPhoto())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .placeholder(R.color.md_grey_200)
+                            .transition(withCrossFade(factory))
+                            .into(binding.coverImage);
+                    exampleLoaded = true;
+
+                    if (mExampleList.size() == 0 && currentTab == TAB_USER_VIDEOS) {
+                        binding.noExamples.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    try {
+                        Timber.e(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
+            }
 
-                @Override
-                public void onFailure(final @NotNull Call<User> call, final @NotNull Throwable t) {
-                    t.printStackTrace();
-                    Timber.e("getUserProfile onFailure");
-                    Timber.e(t.getMessage());
-                }
-            });
+            @Override
+            public void onFailure(final @NotNull Call<User> call, final @NotNull Throwable t) {
+                t.printStackTrace();
+                Timber.e("getUserProfile onFailure");
+                Timber.e(t.getMessage());
+            }
+        });
 
         binding.name.setText(currentUser.getFirstName());
         binding.bio.setText(currentUser.getBio());
@@ -292,7 +281,33 @@ public class ProfileFragment extends Fragment {
                 .placeholder(R.color.md_grey_200)
                 .transition(withCrossFade(factory))
                 .into(binding.coverImage);
+
+        updateVideos();
     }
 
+
+    void updateVideos() {
+        mUserInterface.getBookmarks().enqueue(new Callback<ArrayList<Video>>() {
+            @Override
+            public void onResponse(final @NotNull Call<ArrayList<Video>> call,
+                                   final @NotNull Response<ArrayList<Video>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    mSaveList.clear();
+                    mSaveList.addAll(response.body());
+                    savedVideosAdapter.notifyDataSetChanged();
+
+                    if (mSaveList.size() == 0 && currentTab == TAB_SAVED_VIDEOS) {
+                        binding.noExamples.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                }
+            }
+
+            @Override
+            public void onFailure(final Call<ArrayList<Video>> call, final Throwable t) {
+                Log.e("PROFILE", "FAIL");
+            }
+        });
+    }
 
 }

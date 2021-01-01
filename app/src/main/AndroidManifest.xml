@@ -17,25 +17,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.examplesonly.android.ui.videoSwipe.VideoSwipeActivity"/>
+        <activity android:name="com.examplesonly.android.ui.videoSwipe.VideoSwipeActivity" />
         <activity android:name="com.examplesonly.android.ui.activity.ProfileImageActivity" />
         <activity android:name="com.examplesonly.android.ui.activity.EditProfileActivity" />
         <activity android:name="com.examplesonly.android.ui.activity.NotificationActivity" />
         <activity android:name="org.buffer.android.thumby.ThumbyActivity" />
-        <activity android:name="com.examplesonly.android.ui.activity.ChooseCategoryActivity">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+        <activity android:name="com.examplesonly.android.ui.activity.ChooseCategoryActivity"/>
         <activity android:name="com.examplesonly.android.ui.activity.SettingsActivity" />
         <activity
             android:name="com.examplesonly.android.ui.activity.VideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name="com.examplesonly.android.ui.activity.VerificationActivity" />
+        <activity android:name="com.examplesonly.android.ui.activity.VerificationActivity">
+<!--             <intent-filter>-->
+<!--                 <action android:name="android.intent.action.MAIN" />-->
+
+
+<!--                 <category android:name="android.intent.category.LAUNCHER" />-->
+<!--             </intent-filter>-->
+        </activity>
         <activity android:name="com.examplesonly.android.ui.activity.DynamicLinkActivity">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
