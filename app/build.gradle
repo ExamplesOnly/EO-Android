@@ -65,6 +65,7 @@ dependencies {
 
     // UI components
     implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation project(':mediapicker')
     implementation project(path: ':thumbnail-chooser')

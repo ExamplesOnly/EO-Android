@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <Preference
+        app:key="feedback"
+        app:summary="Report technical issues or suggest new features"
+        app:title="Send feedback" />
+    <Preference
+        app:key="version"
+        app:summary="1.0"
+        app:title="App Version" />
+    <Preference
+        app:key="logout"
+        app:title="Logout" />
+</PreferenceScreen>
