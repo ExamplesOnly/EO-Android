@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -45,76 +46,6 @@ public class LaunchActivity extends AppCompatActivity {
         main = new Intent(this, MainActivity.class);
 
         launch();
-
-//        fetchConfig();
-//        latestVersion = mFirebaseRemoteConfig.getDouble(LATEST_VERSION_KEY);
-//        forceUpdateVersion = mFirebaseRemoteConfig.getDouble(FORCE_UPDATE_MIN_VERSION_KEY);
-//        forceUpdate = mFirebaseRemoteConfig.getBoolean(FORCE_UPDATE_KEY);
-//        showUpdateDialog = mFirebaseRemoteConfig.getBoolean(SHOW_UPDATE_DIALOG_KEY);
-//        updateUrl = mFirebaseRemoteConfig.getString(LATEST_UPDATE_URL);
-//
-//        FirebaseApp.initializeApp(getApplication());
-//        FirebaseDynamicLinks.getInstance()
-//                .getDynamicLink(getIntent())
-//                .addOnSuccessListener(this, pendingDynamicLinkData -> {
-//                    Uri deepLink = null;
-//                    if (pendingDynamicLinkData != null) {
-//                        deepLink = pendingDynamicLinkData.getLink();
-//                        verify.putExtra(VerificationActivity.VERIFICATION_LINK, deepLink.getPath());
-//                        startActivity(verify);
-//                        finish();
-//                    } else {
-//                        launchProcedure();
-//                    }
-//                })
-//                .addOnFailureListener(this, e -> {
-//                    launchProcedure();
-//                });
-    }
-
-    public void launchProcedure() {
-
-        PackageInfo pInfo = null;
-        try {
-            pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
-        } catch (NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        if (pInfo == null) {
-            launch();
-        }
-
-        int versionCode = pInfo.versionCode;
-
-        mFirebaseRemoteConfig.fetchAndActivate()
-                .addOnCompleteListener(this, task -> {
-                    if (forceUpdate && versionCode < (int) forceUpdateVersion) {
-                        new MaterialAlertDialogBuilder(LaunchActivity.this).setTitle("Update required")
-                                .setMessage("There is a new version of ExamplesOnly available for download.")
-                                .setPositiveButton(
-                                        "Update", (dialogInterface, i) -> {
-                                            Uri uri = Uri.parse(updateUrl);
-                                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                            startActivity(Intent.createChooser(intent, "Open with"));
-                                        })
-                                .setNegativeButton("Quit", (dialogInterface, i) -> finish())
-                                .setCancelable(false).show();
-                    } else if (showUpdateDialog && versionCode < (int) latestVersion) {
-                        new MaterialAlertDialogBuilder(LaunchActivity.this).setTitle("Update required")
-                                .setMessage("There is a new makeup available. ")
-                                .setPositiveButton(
-                                        "Update", (dialogInterface, i) -> {
-                                            Uri uri = Uri.parse(updateUrl);
-                                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                            startActivity(Intent.createChooser(intent, "Open with"));
-                                        })
-                                .setNegativeButton("Cancel", (dialogInterface, i) -> launch())
-                                .setCancelable(false).show();
-                    } else {
-                        launch();
-                    }
-                });
     }
 
     public void launch() {

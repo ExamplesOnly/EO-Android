@@ -19,8 +19,8 @@ android {
         applicationId "com.examplesonly.android"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 7
-        versionName "1.0.2"
+        versionCode 10
+        versionName "1.0.5"
 
         buildConfigField "String", "API_URL", "\"https://api.examplesonly.com/\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

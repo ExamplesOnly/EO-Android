@@ -25,9 +25,9 @@ public class DynamicLinkActivity extends AppCompatActivity {
                     Uri deepLink = null;
                     if (pendingDynamicLinkData != null) {
                         deepLink = pendingDynamicLinkData.getLink();
-                        Timber.e("getDynamicLink:deepLink: %s", deepLink.getPath());
+                        Timber.e("getDynamicLink:deepLink: %s %s", deepLink, deepLink.getQueryParameter("token"));
                         Intent main = new Intent(this, VerificationActivity.class);
-                        main.putExtra(VerificationActivity.VERIFICATION_LINK, deepLink.getPath());
+                        main.putExtra(VerificationActivity.VERIFICATION_LINK, deepLink.toString());
                         startActivity(main);
                         finish();
 

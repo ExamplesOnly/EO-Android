@@ -1,20 +1,30 @@
 package com.examplesonly.android.ui.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.transition.TransitionManager;
+
 import com.examplesonly.android.databinding.ActivityVerificationBinding;
 import com.examplesonly.android.model.User;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.account.UserDataProvider;
 import com.examplesonly.android.network.user.UserInterface;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.HashMap;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class VerificationActivity extends AppCompatActivity {
 
@@ -36,8 +46,12 @@ public class VerificationActivity extends AppCompatActivity {
 
         String verificationLink = getIntent().getStringExtra(VERIFICATION_LINK);
         if (verificationLink != null) {
-            String token = verificationLink.split("/")[4];
-            Log.e("VERIFY LINK", token);
+
+            Uri verifyUri = Uri.parse(verificationLink);
+            String token = verifyUri.getQueryParameter("token");
+
+            Timber.e("Token %s %s", verificationLink, token);
+
             verifyLink(token);
         } else {
             updateUser();
@@ -47,42 +61,47 @@ public class VerificationActivity extends AppCompatActivity {
     void init() {
         mUserInterface = new Api(this).getClient().create(UserInterface.class);
         mUserDataProvider = UserDataProvider.getInstance(this);
+
+        binding.refreshBtn.setOnClickListener(v -> {
+            updateUser();
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateUser();
+//        updateUser();
 
     }
 
     void updateUser() {
+        isVerifying(true);
         mUserInterface.me().enqueue(new Callback<User>() {
             @Override
             public void onResponse(final Call<User> call,
-                    final Response<User> response) {
+                                   final Response<User> response) {
                 if (response.isSuccessful()) {
                     mUserDataProvider.saveUserData(response.body());
                     if (mUserDataProvider.isVerified()) {
                         Intent main = new Intent(getApplicationContext(), ChooseCategoryActivity.class);
                         startActivity(main);
                         finish();
+                    } else {
+                        isVerifying(false);
+                        Toast.makeText(VerificationActivity.this, "Ops! You are still not verified.", Toast.LENGTH_SHORT).show();
                     }
-                    Log.e(TAG, response.body().toString());
                 } else {
-                    try {
-                        Log.e(TAG, "updateUser NOT SUCCESS" + response.errorBody().string());
-                    } catch (IOException e) {
-                        Log.e("VerificationActivity", "updateUser ERROR");
-                        e.printStackTrace();
-                    }
+                    isVerifying(false);
+                    Toast.makeText(VerificationActivity.this, "Ops! You are still not verified.", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(final Call<User> call, final Throwable t) {
-                Log.e("VerificationActivity", "updateUser FAIL");
                 t.printStackTrace();
+                isVerifying(false);
+
+                Toast.makeText(VerificationActivity.this, "Ops! Something went wrong.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -90,17 +109,14 @@ public class VerificationActivity extends AppCompatActivity {
     void verifyLink(String token) {
         mUserInterface.verifyAccount(token).enqueue(new Callback<HashMap<String, String>>() {
             @Override
-            public void onResponse(final Call<HashMap<String, String>> call,
-                    final Response<HashMap<String, String>> response) {
-
+            public void onResponse(final @NotNull Call<HashMap<String, String>> call,
+                                   final @NotNull Response<HashMap<String, String>> response) {
                 if (response.isSuccessful()) {
-//                    String token = response.body().get("token");
-//                    mUserDataProvider.saveToken(token);
                     updateUser();
-                    Log.e("VerificationActivity", "verifyLink SUCCESS");
+                    Timber.tag("VerificationActivity").e("verifyLink SUCCESS");
                 } else {
                     try {
-                        Log.e("VerificationActivity", "verifyLink ERROR " + response.errorBody().string());
+                        Timber.tag("VerificationActivity").e("verifyLink ERROR %s", response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -109,10 +125,24 @@ public class VerificationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(final Call<HashMap<String, String>> call, final Throwable t) {
-                Log.e("VerificationActivity", "verifyLink FAIL");
+            public void onFailure(final @NotNull Call<HashMap<String, String>> call, final @NotNull Throwable t) {
+                Timber.tag("VerificationActivity").e("verifyLink FAIL");
                 t.printStackTrace();
             }
         });
+    }
+
+    void isVerifying(boolean status) {
+        if (status) {
+            TransitionManager.beginDelayedTransition(binding.refreshParent);
+            binding.loadingProgress.setVisibility(View.VISIBLE);
+            binding.refreshBtn.setVisibility(View.GONE);
+            binding.loadingText.setVisibility(View.GONE);
+        } else {
+            TransitionManager.beginDelayedTransition(binding.refreshParent);
+            binding.loadingProgress.setVisibility(View.GONE);
+            binding.refreshBtn.setVisibility(View.VISIBLE);
+            binding.loadingText.setVisibility(View.VISIBLE);
+        }
     }
 }
