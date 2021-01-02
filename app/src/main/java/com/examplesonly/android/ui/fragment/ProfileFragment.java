@@ -2,6 +2,7 @@ package com.examplesonly.android.ui.fragment;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Outline;
 import android.os.Bundle;
@@ -53,6 +54,7 @@ public class ProfileFragment extends Fragment {
     private static final int TAB_USER_VIDEOS = 1;
     private static final int TAB_SAVED_VIDEOS = 2;
 
+    Activity parentActivity;
     private FragmentProfileBinding binding;
     private ProfileVideosAdapter profileVideosAdapter, savedVideosAdapter;
     private UserDataProvider userDataProvider;
@@ -83,6 +85,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        parentActivity = getActivity();
+
         if (getArguments() != null) {
             currentUser = getArguments().getParcelable(ARG_USER);
         } else {
@@ -125,11 +129,6 @@ public class ProfileFragment extends Fragment {
             }
         });
         binding.coverImage.setClipToOutline(true);
-
-        binding.settings.setOnClickListener(view -> {
-            Intent settings = new Intent(getActivity(), SettingsActivity.class);
-            startActivity(settings);
-        });
 
         StaggeredGridLayoutManager exampleLayoutManager = new StaggeredGridLayoutManager(2,
                 StaggeredGridLayoutManager.VERTICAL);
@@ -229,6 +228,10 @@ public class ProfileFragment extends Fragment {
             binding.statsTab.setVisibility(View.GONE);
         }
 
+
+        binding.saveList.setVisibility(View.GONE);
+        binding.noExamples.setVisibility(View.GONE);
+
         mUserInterface.getUserProfile(currentUser.getUuid()).enqueue(new Callback<User>() {
             @Override
             public void onResponse(final @NotNull Call<User> call, final @NotNull Response<User> response) {
@@ -237,12 +240,13 @@ public class ProfileFragment extends Fragment {
                     mExampleList.addAll(response.body().getVideos());
                     profileVideosAdapter.notifyDataSetChanged();
 
-                    Glide.with(getActivity())
-                            .load(response.body().getCoverPhoto())
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(R.color.md_grey_200)
-                            .transition(withCrossFade(factory))
-                            .into(binding.coverImage);
+                    if (parentActivity != null && isAdded())
+                        Glide.with(requireActivity())
+                                .load(response.body().getCoverPhoto())
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .placeholder(R.color.md_grey_200)
+                                .transition(withCrossFade(factory))
+                                .into(binding.coverImage);
                     exampleLoaded = true;
 
                     if (mExampleList.size() == 0 && currentTab == TAB_USER_VIDEOS) {
@@ -268,19 +272,21 @@ public class ProfileFragment extends Fragment {
         binding.name.setText(currentUser.getFirstName());
         binding.bio.setText(currentUser.getBio());
 
-        Glide.with(Objects.requireNonNull(getActivity()))
-                .load(currentUser.getProfilePhoto())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.ic_user)
-                .transition(withCrossFade(factory))
-                .into(binding.profileImage);
+        if (parentActivity != null && isAdded()) {
+            Glide.with(requireActivity())
+                    .load(currentUser.getProfilePhoto())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.ic_user)
+                    .transition(withCrossFade(factory))
+                    .into(binding.profileImage);
 
-        Glide.with(Objects.requireNonNull(getActivity()))
-                .load(currentUser.getCoverPhoto())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.color.md_grey_200)
-                .transition(withCrossFade(factory))
-                .into(binding.coverImage);
+            Glide.with(requireActivity())
+                    .load(currentUser.getCoverPhoto())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.color.md_grey_200)
+                    .transition(withCrossFade(factory))
+                    .into(binding.coverImage);
+        }
 
         updateVideos();
     }

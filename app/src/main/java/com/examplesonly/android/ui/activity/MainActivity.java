@@ -34,11 +34,14 @@ import com.examplesonly.android.model.Video;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.network.video.VideoInterface;
+import com.examplesonly.android.ui.fragment.AddDemandFragment;
+import com.examplesonly.android.ui.fragment.CameraFragment;
 import com.examplesonly.android.ui.fragment.DemandDetailsFragment;
 import com.examplesonly.android.ui.fragment.DemandFragment;
 import com.examplesonly.android.ui.fragment.ExploreFragment;
 import com.examplesonly.android.ui.fragment.HomeFragment;
 import com.examplesonly.android.ui.fragment.ProfileFragment;
+import com.examplesonly.gallerypicker.view.VideosFragment;
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavController.RootFragmentListener;
 import com.ncapdevi.fragnav.tabhistory.UniqueTabHistoryStrategy;
@@ -47,6 +50,8 @@ import java.util.ArrayList;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
         implements VideoClickListener, RootFragmentListener, BottomSheetOptionChooseListener, FragmentChangeListener,
@@ -111,6 +116,8 @@ public class MainActivity extends AppCompatActivity
             } else if (itemId == R.id.profile) {
                 fragNavController.switchTab(INDEX_PROFILE);
             }
+
+            invalidateOptionsMenu();
             return item.getItemId() != R.id.add;
         });
 
@@ -221,6 +228,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.home_menu, menu);
+
+        MenuItem settingsMenu = menu.findItem(R.id.settings);
+        MenuItem notificationMenu = menu.findItem(R.id.notification);
+
+        if (fragNavController.getCurrentFrag() instanceof ProfileFragment) {
+            settingsMenu.setVisible(true);
+            notificationMenu.setVisible(false);
+        } else {
+            settingsMenu.setVisible(false);
+            notificationMenu.setVisible(true);
+        }
+
         return true;
     }
 
@@ -230,8 +249,16 @@ public class MainActivity extends AppCompatActivity
         if (itemId == R.id.notification) {
             Intent notification = new Intent(MainActivity.this, NotificationActivity.class);
             startActivity(notification);
+        } else if (itemId == R.id.settings) {
+            Intent notification = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(notification);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void invalidateOptionsMenu() {
+        super.invalidateOptionsMenu();
     }
 
     @Override

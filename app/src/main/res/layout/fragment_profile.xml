@@ -26,19 +26,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@color/md_grey_200" />
 
-        <ImageButton
-            android:id="@+id/settings"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="?selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/ic_setting"
-            app:layout_constraintEnd_toEndOf="@+id/cover_image"
-            app:layout_constraintTop_toTopOf="@+id/cover_image" />
-
         <androidx.cardview.widget.CardView
             android:id="@+id/profile_image_card"
             android:layout_width="90dp"

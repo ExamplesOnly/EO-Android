@@ -11,4 +11,9 @@
         android:title="Notification"
         app:showAsAction="always"
         android:icon="@drawable/ic_notification_mono"/>
+    <item
+        android:id="@+id/settings"
+        android:title="Settings"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_settings_mono"/>
 </menu>
