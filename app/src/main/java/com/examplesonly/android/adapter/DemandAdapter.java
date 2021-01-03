@@ -7,10 +7,12 @@ import static com.examplesonly.android.ui.activity.MainActivity.OPTION_RECORD_VI
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.examplesonly.android.R;
 import com.examplesonly.android.component.BottomSheetOptionsDialog;
 import com.examplesonly.android.databinding.ViewDemandItemBinding;
@@ -19,7 +21,14 @@ import com.examplesonly.android.model.BottomSheetOption;
 import com.examplesonly.android.model.Demand;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.demand.DemandInterface;
+import com.examplesonly.gallerypicker.utils.DateUtil;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class DemandAdapter extends RecyclerView.Adapter<DemandAdapter.ViewHolder> {
 
@@ -65,6 +74,10 @@ public class DemandAdapter extends RecyclerView.Adapter<DemandAdapter.ViewHolder
         void bind(Demand demand) {
             binding.title.setText(demand.getTitle());
 
+            if (demand.getCreatedAt() != null)
+                binding.time.setText(new DateUtil()
+                        .getPrettyDateString(StringToDate(demand.getCreatedAt()).getTime()));
+
             if (demand.getVideoCount() > 0) {
                 binding.exampleCount.setText(demand.getVideoCount() + " Example");
             } else {
@@ -91,6 +104,18 @@ public class DemandAdapter extends RecyclerView.Adapter<DemandAdapter.ViewHolder
 //            binding.bookmarkDemand.setOnClickListener(view -> {
 //                demandInterface.bookmarkDemand(demand.getUuid()).enqueue();
 //            });
+        }
+    }
+
+
+    static public Date StringToDate(String dateString) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'", Locale.getDefault());
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        try {
+            return format.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

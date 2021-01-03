@@ -2,8 +2,11 @@ package com.examplesonly.android.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
+
 public class Demand implements Parcelable {
 
     String uuid;
@@ -11,6 +14,7 @@ public class Demand implements Parcelable {
     String description;
     int categoryId;
     int videoCount;
+    String createdAt;
     ArrayList<Video> videos;
     @SerializedName("Category")
     Category category;
@@ -24,6 +28,8 @@ public class Demand implements Parcelable {
         title = in.readString();
         description = in.readString();
         categoryId = in.readInt();
+        videoCount = in.readInt();
+        createdAt = in.readString();
         category = in.readParcelable(Category.class.getClassLoader());
         user = in.readParcelable(User.class.getClassLoader());
     }
@@ -51,6 +57,8 @@ public class Demand implements Parcelable {
         parcel.writeString(title);
         parcel.writeString(description);
         parcel.writeInt(categoryId);
+        parcel.writeInt(videoCount);
+        parcel.writeString(createdAt);
         parcel.writeParcelable(category, i);
         parcel.writeParcelable(user, i);
     }
@@ -98,6 +106,14 @@ public class Demand implements Parcelable {
     public Demand setVideoCount(final int videoCount) {
         this.videoCount = videoCount;
         return this;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
     public ArrayList<Video> getVideos() {
