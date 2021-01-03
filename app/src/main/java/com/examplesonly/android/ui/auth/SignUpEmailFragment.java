@@ -52,8 +52,8 @@ public class SignUpEmailFragment extends Fragment {
         }
 
         binding.emailTxt.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+//        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
         binding.emailTxt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(final CharSequence charSequence, final int i, final int i1, final int i2) {

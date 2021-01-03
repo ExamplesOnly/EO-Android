@@ -10,12 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
+
 import androidx.core.app.SharedElementCallback;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.transition.Transition;
 import androidx.transition.TransitionInflater;
+
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
 import com.examplesonly.android.databinding.FragmentSignUpBinding;
@@ -26,11 +28,13 @@ import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.ui.activity.LoginActivity;
 import com.examplesonly.android.ui.activity.VerificationActivity;
 import com.robinhood.ticker.TickerUtils;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -58,7 +62,7 @@ public class SignUpFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentSignUpBinding.inflate(getLayoutInflater());
 
@@ -87,7 +91,7 @@ public class SignUpFragment extends Fragment {
         mAuthInterface = new Api(getContext()).getClient().create(AuthInterface.class);
         mUserInterface = new Api(getContext()).getClient().create(UserInterface.class);
 
-        binding.closeBtn.setOnClickListener(v -> Objects.requireNonNull(getActivity()).onBackPressed());
+        binding.closeBtn.setOnClickListener(v -> requireActivity().onBackPressed());
         binding.backFab.hide();
 
         binding.descText.setAnimationInterpolator(new FastOutSlowInInterpolator());
@@ -153,6 +157,7 @@ public class SignUpFragment extends Fragment {
                 currentStep = step;
                 break;
             case 6:
+                currentStep = 5;
                 createAccount(userData);
                 break;
         }
@@ -163,47 +168,27 @@ public class SignUpFragment extends Fragment {
             case 1:
                 binding.greetingText.setText("Welcome,", true);
                 binding.descText.setText("What can we call you?", true);
-                if (TextUtils.isEmpty(userData.getFirstName()) || userData.getFirstName().length() < 3) {
-                    binding.nextFab.setEnabled(false);
-                } else {
-                    binding.nextFab.setEnabled(true);
-                }
+                binding.nextFab.setEnabled(!TextUtils.isEmpty(userData.getFirstName()) && userData.getFirstName().length() >= 3);
                 break;
             case 2:
                 binding.greetingText.setText("Great, " + userData.getFirstName().split(" ")[0], true);
                 binding.descText.setText("What is your email id?", true);
                 String email = userData.getEmail();
-                if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    binding.nextFab.setEnabled(false);
-                } else {
-                    binding.nextFab.setEnabled(true);
-                }
+                binding.nextFab.setEnabled(!TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches());
                 break;
             case 3:
                 binding.descText.setText("What is your gender identity?", true);
                 String gender = userData.getGender();
-                if (TextUtils.isEmpty(gender)) {
-                    binding.nextFab.setEnabled(false);
-                } else {
-                    binding.nextFab.setEnabled(true);
-                }
+                binding.nextFab.setEnabled(!TextUtils.isEmpty(gender));
                 break;
             case 4:
                 binding.descText.setText("When were you born?", true);
-                if (!setDOb) {
-                    binding.nextFab.setEnabled(false);
-                } else {
-                    binding.nextFab.setEnabled(true);
-                }
+                binding.nextFab.setEnabled(setDOb);
                 break;
             case 5:
                 binding.descText.setText("Lets make it secure!", true);
                 String pass = userData.getPassword();
-                if (TextUtils.isEmpty(pass) || !(pass.length() >= 8)) {
-                    binding.nextFab.setEnabled(false);
-                } else {
-                    binding.nextFab.setEnabled(true);
-                }
+                binding.nextFab.setEnabled(!TextUtils.isEmpty(pass) && pass.length() >= 8);
                 break;
         }
     }
@@ -234,11 +219,12 @@ public class SignUpFragment extends Fragment {
     }
 
     public void createAccount(User user) {
+        Timber.e("createAccount");
         isLoading(true);
         mAuthInterface.signUp(user).enqueue(new Callback<HashMap<String, String>>() {
             @Override
             public void onResponse(final Call<HashMap<String, String>> call,
-                    final Response<HashMap<String, String>> response) {
+                                   final Response<HashMap<String, String>> response) {
 
                 if (response.isSuccessful()) {
                     String token = response.body().get(TOKEN_KEY);
@@ -288,11 +274,10 @@ public class SignUpFragment extends Fragment {
     }
 
     void isLoading(Boolean loading) {
+        Timber.e("isLoading");
         LoginActivity loginActivity = (LoginActivity) getActivity();
         loginActivity.isLoading(loading);
 
         binding.nextFab.setEnabled(!loading);
-        binding.nextFab.setEnabled(!loading);
-
     }
 }
