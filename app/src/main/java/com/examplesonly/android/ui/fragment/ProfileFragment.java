@@ -105,9 +105,9 @@ public class ProfileFragment extends Fragment {
         updateProfile();
 
         binding.esmIcon.setImageDrawable(
-                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_esm_1, getActivity().getTheme()));
+                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_esm_4, getActivity().getTheme()));
         binding.eoiIcon.setImageDrawable(
-                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_eoi_1, getActivity().getTheme()));
+                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_eye_3, getActivity().getTheme()));
 
         // Inflate the layout for this fragment
         return binding.getRoot();
@@ -141,6 +141,7 @@ public class ProfileFragment extends Fragment {
 
         profileVideosAdapter = new ProfileVideosAdapter(mExampleList, getContext(),
                 (VideoClickListener) getActivity());
+        profileVideosAdapter.setIsLoggedInUser(currentUser.getUuid().equals(userDataProvider.getUserUuid()));
         binding.exampleList.setAdapter(profileVideosAdapter);
 
         binding.saveList.setLayoutManager(savedLayoutManager);
@@ -148,6 +149,7 @@ public class ProfileFragment extends Fragment {
 
         savedVideosAdapter = new ProfileVideosAdapter(mSaveList, getContext(),
                 (VideoClickListener) getActivity());
+        savedVideosAdapter.setIsLoggedInUser(false);
         binding.saveList.setAdapter(savedVideosAdapter);
 
         List<Fragment> profileFragments = new Vector<Fragment>();

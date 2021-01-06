@@ -8,6 +8,7 @@ import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_NEW_DE
 import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_DATA;
 
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.Menu;
@@ -42,6 +43,18 @@ import com.examplesonly.android.ui.fragment.ExploreFragment;
 import com.examplesonly.android.ui.fragment.HomeFragment;
 import com.examplesonly.android.ui.fragment.ProfileFragment;
 import com.examplesonly.gallerypicker.view.VideosFragment;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.InstallState;
+import com.google.android.play.core.install.InstallStateUpdatedListener;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.InstallStatus;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.tasks.Task;
+import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavController.RootFragmentListener;
 import com.ncapdevi.fragnav.tabhistory.UniqueTabHistoryStrategy;
@@ -57,6 +70,7 @@ public class MainActivity extends AppCompatActivity
         implements VideoClickListener, RootFragmentListener, BottomSheetOptionChooseListener, FragmentChangeListener,
         FragNavController.TransactionListener {
 
+    private final int UPDATE_REQUEST_CODE = 1010;
     private final int INDEX_HOME = 0;
     private final int INDEX_EXPLORE = 1;
     private final int INDEX_EOD = 2;
@@ -77,6 +91,8 @@ public class MainActivity extends AppCompatActivity
     private FragNavController fragNavController;
     private final ArrayList<Fragment> fragments = new ArrayList<>();
 
+    InstallStateUpdatedListener updateListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +110,7 @@ public class MainActivity extends AppCompatActivity
 
         init();
         setupFragments();
+        checkUpdate();
 
         binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
@@ -153,6 +170,17 @@ public class MainActivity extends AppCompatActivity
                                     @NonNull final PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         fragNavController.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == UPDATE_REQUEST_CODE) {
+            if (resultCode != RESULT_OK) {
+                Timber.e("Update failed");
+            }
+        }
     }
 
     @Override
@@ -317,5 +345,48 @@ public class MainActivity extends AppCompatActivity
         } else {
             binding.eoTitle.setVisibility(View.GONE);
         }
+    }
+
+    // check for in app update
+    private void checkUpdate() {
+        updateListener = state -> {
+            if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                Snackbar.make(binding.getRoot(),
+                        "App updated. Restart the app to continue.", BaseTransientBottomBar.LENGTH_INDEFINITE)
+                        .setAction("Restart", v -> {
+                            ProcessPhoenix.triggerRebirth(this);
+                        });
+            }
+        };
+
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
+
+        // Returns an intent object that you use to check for an update.
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+        // Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // For a flexible update, use AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                // Request the update.
+
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            // Pass the intent that is returned by 'getAppUpdateInfo()'.
+                            appUpdateInfo,
+                            AppUpdateType.FLEXIBLE,
+                            // The current activity making the update request.
+                            this,
+                            // Include a request code to later monitor this update request.
+                            UPDATE_REQUEST_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                Timber.e("MAIN: Update not available");
+            }
+        });
     }
 }

@@ -4,10 +4,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.examplesonly.android.databinding.FragmentBottomSheetDialogBinding;
 import com.examplesonly.android.model.BottomSheetOption;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import java.util.ArrayList;
+
 import org.jetbrains.annotations.NotNull;
 
 public class BottomSheetOptionsDialog extends BottomSheetDialogFragment {
@@ -15,6 +18,8 @@ public class BottomSheetOptionsDialog extends BottomSheetDialogFragment {
     private FragmentBottomSheetDialogBinding binding;
     private String title;
     private final ArrayList<BottomSheetOption> optionList = new ArrayList<>();
+
+    private BottomSheetOptionChooseListener optionChooseListener;
 
     public BottomSheetOptionsDialog() {
         // Required empty public constructor
@@ -33,9 +38,9 @@ public class BottomSheetOptionsDialog extends BottomSheetDialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!(getActivity() instanceof BottomSheetOptionChooseListener)) {
+        if (optionChooseListener == null || !(getActivity() instanceof BottomSheetOptionChooseListener)) {
             try {
-                throw new Exception("Parent activity must listen to BottomSheetOptionChooseListener");
+                throw new Exception("Either set BottomSheetOptionChooseListener or parent activity must listen to BottomSheetOptionChooseListener");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -44,7 +49,7 @@ public class BottomSheetOptionsDialog extends BottomSheetDialogFragment {
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
         binding = FragmentBottomSheetDialogBinding.inflate(getLayoutInflater(), container, false);
@@ -67,7 +72,9 @@ public class BottomSheetOptionsDialog extends BottomSheetDialogFragment {
             binding.titleContainer.setVisibility(View.GONE);
         }
 
-        BottomSheetOptionChooseListener optionChooseListener = (BottomSheetOptionChooseListener) getActivity();
+        if (optionChooseListener == null)
+            optionChooseListener = (BottomSheetOptionChooseListener) getActivity();
+
         binding.firstCard
                 .setOnClickListener(view1 -> {
                     optionChooseListener
@@ -98,6 +105,11 @@ public class BottomSheetOptionsDialog extends BottomSheetDialogFragment {
 
     public void setTitle(String title) {
         binding.title.setText(title);
+    }
+
+    public BottomSheetOptionsDialog setOptionChooseListener(BottomSheetOptionChooseListener optionChooseListener) {
+        this.optionChooseListener = optionChooseListener;
+        return this;
     }
 
     public interface BottomSheetOptionChooseListener {

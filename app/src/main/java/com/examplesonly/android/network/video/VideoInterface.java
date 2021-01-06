@@ -64,4 +64,8 @@ public interface VideoInterface {
     @FormUrlEncoded
     @POST("/v1/video/delete")
     Call<HashMap<String, String>> deleteVideo(@Field("videoId") String videoId);
+
+    @FormUrlEncoded
+    @POST("/v1/video/report")
+    Call<HashMap<String, String>> reportVideo(@Field("videoId") String videoId);
 }

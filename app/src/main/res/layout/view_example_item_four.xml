@@ -39,6 +39,35 @@
             app:layout_constraintTop_toTopOf="@+id/thumbnail" />
 
         <TextView
+            android:id="@+id/under_review"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_bold"
+            android:text="Under Review"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:visibility="gone"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+<!--        <TextView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="6dp"-->
+<!--            android:layout_marginEnd="6dp"-->
+<!--            android:text="May contain sensitive or inappropriate content"-->
+<!--            android:textAlignment="center"-->
+<!--            android:textColor="#72FFFFFF"-->
+<!--            android:textSize="12sp"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/under_review" />-->
+
+        <TextView
             android:id="@+id/answer_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -160,18 +189,7 @@
         </com.google.android.material.card.MaterialCardView>
 
 
-
-        <View
-            android:id="@+id/unverified"
-            android:layout_width="14dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="10dp"
-            android:background="@color/md_red_600"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/thumbnail"
-            app:layout_constraintTop_toTopOf="@+id/thumbnail" />
-
-<!--        <TextView-->
+        <!--        <TextView-->
         <!--            android:layout_width="wrap_content"-->
         <!--            android:layout_height="wrap_content"-->
         <!--            android:rotation="-90"-->

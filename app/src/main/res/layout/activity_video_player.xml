@@ -29,6 +29,20 @@
             app:resize_mode="fit"
             app:use_controller="true" />
 
+        <TextView
+            android:id="@+id/not_found"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins"
+            android:text="@string/could_not_load_video"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/exoplayer"
+            app:layout_constraintEnd_toEndOf="@+id/exoplayer"
+            app:layout_constraintStart_toStartOf="@+id/exoplayer"
+            app:layout_constraintTop_toTopOf="@+id/exoplayer" />
+
 
         <!--    <ProgressBar android:id="@id/exo_buffering"-->
         <!--        android:layout_width="wrap_content"-->

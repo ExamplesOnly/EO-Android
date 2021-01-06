@@ -8,50 +8,64 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="70dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginBottom="10dp"
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white">
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/dialog_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="10dp"
+                app:tint="@color/colorPrimary" />
 
             <TextView
                 android:id="@+id/title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="18dp"
                 android:fontFamily="@font/poppins_bold"
-                android:text="Confirm"
+                android:text="Confirm?"
                 android:textColor="@color/dark"
-                android:textSize="22sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/description"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="18dp"
+                android:fontFamily="@font/poppins"
                 android:text="Do you want to delete?"
-                android:textColor="@color/dark"
-                android:textSize="14sp"
+                android:textColor="@color/md_grey_600"
+                android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/title" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="18dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +74,7 @@
                 <Button
                     android:id="@+id/negative_btn"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="5dp"
@@ -69,11 +83,14 @@
                     android:fontFamily="@font/poppins_semibold"
                     android:text="Cancel"
                     android:textAllCaps="false"
-                    app:cornerRadius="10dp" />
+                    android:textColor="@color/md_grey_600"
+                    app:backgroundTint="@color/md_grey_100"
+                    app:cornerRadius="6dp"
+                    app:strokeWidth="0dp" />
 
                 <Button
                     android:id="@+id/positive_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="20dp"
@@ -83,11 +100,11 @@
                     android:text="Delete"
                     android:textAllCaps="false"
                     android:textStyle="bold"
-                    app:cornerRadius="10dp" />
+                    app:cornerRadius="6dp" />
 
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

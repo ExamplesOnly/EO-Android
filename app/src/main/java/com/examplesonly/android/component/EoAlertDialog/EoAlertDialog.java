@@ -1,19 +1,33 @@
 package com.examplesonly.android.component.EoAlertDialog;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
+
+import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ViewAlertDialogBinding;
+
 public class EoAlertDialog extends AlertDialog {
 
     private String title;
     private String description;
     private String positiveText;
     private String negativeText;
+    private Drawable dialogIcon;
+    private int iconTint = -1;
     private ClickListener mPositiveClickListener;
     private ClickListener mNegativeClickListener;
 
@@ -37,6 +51,18 @@ public class EoAlertDialog extends AlertDialog {
     }
 
     private void setView() {
+
+        if (dialogIcon != null) {
+            binding.dialogIcon.setImageDrawable(dialogIcon);
+            binding.dialogIcon.setVisibility(View.VISIBLE);
+        } else {
+            binding.dialogIcon.setVisibility(View.GONE);
+        }
+
+        if (iconTint != -1) {
+            ImageViewCompat.setImageTintList(binding.dialogIcon, ColorStateList.valueOf(iconTint));
+        }
+
         if (title != null) {
             binding.title.setText(title);
         }
@@ -48,7 +74,16 @@ public class EoAlertDialog extends AlertDialog {
         }
         if (negativeText != null) {
             binding.negativeBtn.setText(negativeText);
+        } else {
+            binding.negativeBtn.setVisibility(View.GONE);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(pxToDp(20), 0, pxToDp(20), pxToDp(14));
+            binding.positiveBtn.setLayoutParams(params);
         }
+
         if (mNegativeClickListener != null) {
             binding.negativeBtn.setOnClickListener(v -> {
                 mNegativeClickListener.onClick(this);
@@ -60,6 +95,24 @@ public class EoAlertDialog extends AlertDialog {
 
             });
         }
+    }
+
+    public Drawable getDialogIcon() {
+        return this.dialogIcon;
+    }
+
+    public EoAlertDialog setDialogIcon(Drawable dialogIcon) {
+        this.dialogIcon = dialogIcon;
+        return this;
+    }
+
+    public int getIconTint() {
+        return this.iconTint;
+    }
+
+    public EoAlertDialog setIconTint(int iconTint) {
+        this.iconTint = iconTint;
+        return this;
     }
 
     public String getTitle() {
@@ -114,5 +167,10 @@ public class EoAlertDialog extends AlertDialog {
     public EoAlertDialog setNegativeClickListener(final ClickListener negativeClickListener) {
         mNegativeClickListener = negativeClickListener;
         return this;
+    }
+
+    private int pxToDp(int dp) {
+        float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5f);
     }
 }

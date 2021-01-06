@@ -2,8 +2,13 @@ package com.examplesonly.android.ui.activity;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static com.examplesonly.android.adapter.ExampleAdapter.VIEW_TYPE_EXAMPLE_THREE;
+import static com.examplesonly.android.ui.activity.MainActivity.INDEX_PROFILE;
+import static com.examplesonly.android.ui.activity.MainActivity.OPTION_CHOOSE_VIDEO_EOD;
+import static com.examplesonly.android.ui.activity.MainActivity.OPTION_RECORD_VIDEO_EOD;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -11,15 +16,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialog;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.work.Constraints;
@@ -30,6 +42,7 @@ import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
@@ -37,8 +50,12 @@ import com.bumptech.glide.request.transition.Transition;
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
 import com.examplesonly.android.adapter.ExampleAdapter;
+import com.examplesonly.android.component.BottomSheetOptionsDialog;
+import com.examplesonly.android.component.EoAlertDialog.EoAlertDialog;
 import com.examplesonly.android.databinding.ActivityVideoPlayerBinding;
+import com.examplesonly.android.handler.FragmentChangeListener;
 import com.examplesonly.android.handler.VideoClickListener;
+import com.examplesonly.android.model.BottomSheetOption;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.video.VideoInterface;
@@ -80,6 +97,9 @@ import timber.log.Timber;
 public class VideoPlayerActivity extends AppCompatActivity implements VideoClickListener {
 
     public static final String VIDEO_DATA = "video_data";
+    public static final int OPTION_REPORT = 1;
+    public static final int OPTION_COPY_LINK = 2;
+    public static final int OPTION_SHARE = 3;
 
     private ActivityVideoPlayerBinding binding;
     private SimpleExoPlayer player;
@@ -95,11 +115,11 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
     private VideoInterface videoInterface;
     private ExampleAdapter mExampleAdapter;
     private UserDataProvider userDataProvider;
-    private TextView titleText, viewCount, bowCount;
+    private TextView titleText, viewCount, bowCount, profileName;
     private RelativeLayout controllerParent;
-    private ImageButton fullScreenBtn;
-    private ImageButton exoPlay;
-    private ImageButton exoPause;
+    private ImageButton fullScreenBtn, exoPlay, exoPause, videoOptions;
+    private ImageView profileImage;
+    private CardView profileCard;
     private boolean isFullScreen = false;
     ConstraintSet defaultConstrains = new ConstraintSet();
 
@@ -116,7 +136,20 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         View view = binding.getRoot();
         setContentView(view);
 
+        Window window = this.getWindow();
+
+        int flags = view.getSystemUiVisibility();
+        flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        window.getDecorView().setSystemUiVisibility(flags);
+        window.setStatusBarColor(Color.BLACK);
+
         Video newVideo = getIntent().getParcelableExtra(VIDEO_DATA);
+
+        if (newVideo == null) {
+            binding.notFound.setVisibility(View.VISIBLE);
+            return;
+        }
+
         currentVideoId = newVideo.getVideoId();
 
         init();
@@ -188,10 +221,37 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         exoPause = findViewById(R.id.exo_pause);
         viewCount = findViewById(R.id.view_count);
         bowCount = findViewById(R.id.bow_count);
+        profileImage = findViewById(R.id.profile_image);
+        profileName = findViewById(R.id.profile_name);
+        profileCard = findViewById(R.id.profile_card);
+        videoOptions = findViewById(R.id.video_options);
 
         binding.videoLoading.setVisibility(View.GONE);
         exoPlay.setVisibility(View.GONE);
         exoPause.setVisibility(View.GONE);
+
+        videoOptions.setOnClickListener(v -> {
+            ArrayList<BottomSheetOption> optionList = new ArrayList<>();
+            optionList.add(new BottomSheetOption(OPTION_REPORT, "Report",
+                    ContextCompat.getDrawable(this, R.drawable.ic_report_mono), currentVideo));
+            optionList.add(new BottomSheetOption(OPTION_SHARE, "Copy Link",
+                    ContextCompat.getDrawable(this, R.drawable.ic_link_h), currentVideo));
+
+            BottomSheetOptionsDialog optionsDialog = new BottomSheetOptionsDialog(currentVideo.getTitle(), optionList);
+
+            optionsDialog.setOptionChooseListener((index, id, data) -> {
+                switch (id) {
+                    case OPTION_REPORT:
+                        reportVideo((Video) data);
+                        optionsDialog.dismiss();
+                        break;
+                    case OPTION_SHARE:
+                        copyVideoLink((Video) data);
+                        optionsDialog.dismiss();
+                        break;
+                }
+            }).show(getSupportFragmentManager(), "VideoBottomSheet");
+        });
 
         binding.bowBtn.setOnLikeListener(new OnLikeListener() {
             @Override
@@ -368,7 +428,6 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
 
         Uri uri = Uri.parse(currentVideo.getUrl());
         MediaSource mediaSource = buildMediaSource(uri);
-//        player.setMediaSource(mediaSource, false);
         player.prepare(mediaSource, false, false);
 
         if (titleText != null)
@@ -379,6 +438,22 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
 
         if (bowCount != null)
             bowCount.setText(String.valueOf(currentVideo.getBow()));
+
+        if (profileName != null && currentVideo.getUser() != null)
+            profileName.setText(currentVideo.getUser().getFirstName());
+
+        if (profileImage != null && currentVideo.getUser() != null)
+            Glide.with(this)
+                    .load(video.getUser().getProfilePhoto())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.ic_user)
+                    .transition(withCrossFade(factory))
+                    .into(profileImage);
+
+        profileCard.setOnClickListener(v -> {
+//            FragmentChangeListener fragmentChangeListener = (FragmentChangeListener) this;
+//            fragmentChangeListener.switchFragment(INDEX_PROFILE, video.getUser());
+        });
 
         binding.bowBtn.setLiked(currentVideo.isUserBowed());
 
@@ -623,12 +698,45 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         });
     }
 
+    /* When a video is provided to play, all video controls must be
+        hidden until The video data is loaded.
+    */
     void clearUI() {
         player.stop(true);
         controllerParent.setVisibility(View.GONE);
         binding.relatedVideos.setVisibility(View.GONE);
         binding.buttonParent.setVisibility(View.GONE);
         binding.videoLoading.setVisibility(View.VISIBLE);
+    }
+
+    // Report a video
+    void reportVideo(Video video) {
+        videoInterface.reportVideo(video.getVideoId()).enqueue(new Callback<HashMap<String, String>>() {
+            @Override
+            public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
+                EoAlertDialog deleteDialog = new EoAlertDialog(VideoPlayerActivity.this)
+                        .setDialogIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_shield_exclamation, getTheme()))
+                        .setIconTint(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
+                        .setTitle("Example Reported")
+                        .setDescription("Thanks for reporting this example. We'll review it shortly.")
+                        .setPositiveText("Got it!")
+                        .setPositiveClickListener(AppCompatDialog::dismiss);
+                deleteDialog.show();
+            }
+
+            @Override
+            public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
+//                optionsDialog.dismiss();
+
+            }
+        });
+    }
+
+    void copyVideoLink(Video video) {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("video link", "https://examplesonly.com/watch?v=" + video.getVideoId());
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(this, "Example link copied!", Toast.LENGTH_SHORT).show();
     }
 
 }

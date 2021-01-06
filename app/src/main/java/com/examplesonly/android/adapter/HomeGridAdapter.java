@@ -5,15 +5,19 @@ import static com.examplesonly.android.ui.activity.MainActivity.INDEX_PROFILE;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ViewExampleItemFourBinding;
@@ -28,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHolder> {
 
@@ -84,11 +90,24 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
                         .transition(withCrossFade(factory))
                         .into(binding.profileImage);
             }
-            Glide.with(context)
-                    .load(video.getThumbUrl())
+            RequestManager loadImage = Glide.with(context);
+
+//            if (Math.random() < 0.5) {
+//                binding.underReview.setVisibility(View.VISIBLE);
+//                binding.overlay.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.bg_example_grid_fill, context.getTheme()));
+//                loadImage.load(video.getThumbUrl()).apply(RequestOptions.bitmapTransform(new BlurTransformation(25, 3)))
+//                        .placeholder(R.color.md_grey_100)
+//                        .transition(withCrossFade(factory))
+//                        .into(binding.thumbnail);
+//            } else {
+            binding.underReview.setVisibility(View.GONE);
+            binding.overlay.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.bg_example_grid, context.getTheme()));
+            loadImage.load(video.getThumbUrl())
                     .placeholder(R.color.md_grey_100)
                     .transition(withCrossFade(factory))
                     .into(binding.thumbnail);
+//            }
+
             binding.duration.setText(new DateUtil().millisToTime(Long.parseLong(video.getDuration())));
 
             if (video.getDemand() != null) {
@@ -112,12 +131,6 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
                     fragmentChangeListener.switchFragment(INDEX_PROFILE, video.getUser());
                 }
             });
-
-            if (Math.random() < 0.5) {
-                binding.unverified.setVisibility(View.GONE);
-            } else {
-                binding.unverified.setVisibility(View.GONE);
-            }
         }
     }
 

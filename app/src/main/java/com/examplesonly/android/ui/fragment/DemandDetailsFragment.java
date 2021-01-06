@@ -24,6 +24,8 @@ import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.demand.DemandInterface;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -85,11 +87,11 @@ public class DemandDetailsFragment extends Fragment {
         binding.postExample.setOnClickListener(view -> {
             ArrayList<BottomSheetOption> optionList = new ArrayList<>();
             optionList.add(new BottomSheetOption(OPTION_CHOOSE_VIDEO_EOD, "Upload from device",
-                    ContextCompat.getDrawable(getActivity(), R.drawable.ic_upload_mono), demand));
+                    ContextCompat.getDrawable(requireActivity(), R.drawable.ic_upload_mono), demand));
             optionList.add(new BottomSheetOption(OPTION_RECORD_VIDEO_EOD, "Record a video",
-                    ContextCompat.getDrawable(getActivity(), R.drawable.ic_camera_mono), demand));
+                    ContextCompat.getDrawable(requireActivity(), R.drawable.ic_camera_mono), demand));
             BottomSheetOptionsDialog bottomSheet = new BottomSheetOptionsDialog("Post Example", optionList);
-            bottomSheet.show(((FragmentActivity) getActivity()).getSupportFragmentManager(), "EdoVideoBottomSheet");
+            bottomSheet.show(requireActivity().getSupportFragmentManager(), "EdoVideoBottomSheet");
         });
         return binding.getRoot();
     }

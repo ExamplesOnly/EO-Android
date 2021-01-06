@@ -142,7 +142,8 @@
                     android:id="@+id/eoi_icon"
                     android:layout_width="48sp"
                     android:layout_height="48sp"
-                    android:src="@drawable/ic_eoi_3" />
+                    android:src="@drawable/ic_eoi_3"
+                    app:tint="@color/colorPrimary"  />
 
                 <TextView
                     android:layout_width="wrap_content"
