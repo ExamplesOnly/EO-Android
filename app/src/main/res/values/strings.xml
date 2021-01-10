@@ -27,6 +27,15 @@
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="next">Next</string>
-    <string name="related_videos">Related Videos</string>
-    <string name="could_not_load_video">Could not load video</string>
+    <string name="related_videos">Related Examples</string>
+    <string name="could_not_load_video">Could not load example</string>
+    <string name="default_notification_channel_id">Default</string>
+    <string name="btn_retry">Retry</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="message_upload_failed">Example is not uploaded. Please try again</string>
+    <string name="error_upload_failed">Example upload failed</string>
+    <string name="video_uploading">Uploading your example</string>
+    <string name="in_progress">in progress</string>
+    <string name="message_upload_success">Example uploaded successfully</string>
+    <string name="message_upload_success_desc">Tap here to see your example</string>
 </resources>

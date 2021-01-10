@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class ExploreContentFragment extends Fragment {
 
@@ -70,11 +71,11 @@ public class ExploreContentFragment extends Fragment {
             @Override
             public void onResponse(final Call<ArrayList<Video>> call, final Response<ArrayList<Video>> response) {
                 if (response.isSuccessful()) {
-                    Log.e(TAG, "REQ SUCCESS " + response.body());
+                    Timber.e("REQ SUCCESS " + response.body());
                     videoList = response.body();
 
                     for (Video video : videoList) {
-                        Log.e(TAG, video.getTitle());
+                        Timber.e(video.getTitle());
                     }
                     exploreAdapter.notifyDataSetChanged();
 
@@ -87,7 +88,7 @@ public class ExploreContentFragment extends Fragment {
 
                     }
                 } else {
-                    Log.e(TAG, "REQ ERROR " + response.errorBody());
+                    Timber.e("REQ ERROR " + response.errorBody());
                 }
             }
 

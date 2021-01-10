@@ -7,24 +7,36 @@ import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_CHOOSE
 import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_NEW_DEMAND;
 import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_DATA;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialog;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.examplesonly.android.BuildConfig;
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
 import com.examplesonly.android.component.BottomSheetOptionsDialog;
 import com.examplesonly.android.component.BottomSheetOptionsDialog.BottomSheetOptionChooseListener;
+import com.examplesonly.android.component.EoAlertDialog.EoAlertDialog;
 import com.examplesonly.android.databinding.ActivityMainBinding;
 import com.examplesonly.android.handler.FragmentChangeListener;
 import com.examplesonly.android.handler.VideoClickListener;
@@ -60,6 +72,7 @@ import com.ncapdevi.fragnav.FragNavController.RootFragmentListener;
 import com.ncapdevi.fragnav.tabhistory.UniqueTabHistoryStrategy;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -92,6 +105,7 @@ public class MainActivity extends AppCompatActivity
     private final ArrayList<Fragment> fragments = new ArrayList<>();
 
     InstallStateUpdatedListener updateListener;
+    AppUpdateManager appUpdateManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +170,14 @@ public class MainActivity extends AppCompatActivity
             startActivity(login);
             finish();
         }
+
+        appUpdateManager
+                .getAppUpdateInfo()
+                .addOnSuccessListener(appUpdateInfo -> {
+                    if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                        popupSnackbarForCompleteUpdate();
+                    }
+                });
     }
 
     @Override
@@ -175,7 +197,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == UPDATE_REQUEST_CODE) {
             if (resultCode != RESULT_OK) {
                 Timber.e("Update failed");
@@ -304,8 +325,11 @@ public class MainActivity extends AppCompatActivity
     private void init() {
         userInterface = new Api(this).getClient().create(UserInterface.class);
         videoInterface = new Api(this).getClient().create(VideoInterface.class);
-
         userDataProvider = UserDataProvider.getInstance(this);
+        appUpdateManager = AppUpdateManagerFactory.create(this);
+
+        validateToken();
+
         fragNavController = new FragNavController(fm, R.id.frame_container);
         fragNavController.setTransactionListener(this);
 //        fragNavController.setDefaultTransactionOptions(new Builder()
@@ -349,27 +373,26 @@ public class MainActivity extends AppCompatActivity
 
     // check for in app update
     private void checkUpdate() {
+
         updateListener = state -> {
             if (state.installStatus() == InstallStatus.DOWNLOADED) {
-                Snackbar.make(binding.getRoot(),
-                        "App updated. Restart the app to continue.", BaseTransientBottomBar.LENGTH_INDEFINITE)
-                        .setAction("Restart", v -> {
-                            ProcessPhoenix.triggerRebirth(this);
-                        });
+                popupSnackbarForCompleteUpdate();
+                appUpdateManager.unregisterListener(updateListener);
             }
         };
 
-        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(this);
 
         // Returns an intent object that you use to check for an update.
         Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
 
+        appUpdateManager.registerListener(updateListener);
+
         // Checks that the platform will allow the specified type of update.
         appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    // For a flexible update, use AppUpdateType.FLEXIBLE
-                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
                 // Request the update.
+
+                Timber.e("%s %s", BuildConfig.VERSION_CODE, appUpdateInfo.availableVersionCode());
 
                 try {
                     appUpdateManager.startUpdateFlowForResult(
@@ -388,5 +411,43 @@ public class MainActivity extends AppCompatActivity
                 Timber.e("MAIN: Update not available");
             }
         });
+    }
+
+    private void validateToken() {
+        String token = userDataProvider.getToken();
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            if (jwt.getExpiresAt().before(new Date())) {
+                EoAlertDialog logoutDialog = new EoAlertDialog(MainActivity.this)
+                        .setDialogIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sign_in_alt, getTheme()))
+                        .setIconTint(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
+                        .setTitle("Session Expired")
+                        .setDescription("Your login session has expired. Please login again to keep enjoying the excitement!")
+                        .setPositiveText("Login")
+                        .setPositiveClickListener(dialog -> {
+                            dialog.dismiss();
+                            userDataProvider.logout();
+                            Intent reLaunch = new Intent(MainActivity.this, LaunchActivity.class);
+                            startActivity(reLaunch);
+                            this.finish();
+
+                        });
+
+                logoutDialog.setCancelable(false);
+                logoutDialog.show();
+            }
+        } catch (JWTDecodeException exception) {
+            //Invalid token
+        }
+    }
+
+    void popupSnackbarForCompleteUpdate() {
+        Snackbar updateSnackBar = Snackbar.make(binding.getRoot(),
+                "A new update of ExamplesOnly is downloaded.", BaseTransientBottomBar.LENGTH_INDEFINITE)
+                .setAction("Install", v -> appUpdateManager.completeUpdate());
+
+        updateSnackBar.setAnchorView(binding.bottomNavigation);
+
+        updateSnackBar.show();
     }
 }

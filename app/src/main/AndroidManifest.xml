@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name="com.examplesonly.android.ExamplesOnly"
@@ -26,7 +27,7 @@
         <activity android:name="com.examplesonly.android.ui.activity.SettingsActivity" />
         <activity
             android:name="com.examplesonly.android.ui.activity.VideoPlayerActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|navigation" />
         <activity android:name="com.examplesonly.android.ui.activity.VerificationActivity" />
         <activity android:name="com.examplesonly.android.ui.activity.DynamicLinkActivity">
             <intent-filter android:autoVerify="true">
@@ -60,9 +61,45 @@
             android:name="com.examplesonly.android.ui.activity.EmailLoginActivity"
             android:windowSoftInputMode="adjustResize" />
 
+        <service
+            android:name=".service.NotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".network.video.VideoUploadService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver android:name=".network.video.UploadProgressReceiver">
+            <intent-filter>
+                <action android:name="com.examplesonly.ACTION_CLEAR_NOTIFICATION" />
+                <action android:name="com.examplesonly.ACTION_PROGRESS_NOTIFICATION" />
+                <action android:name="com.examplesonly.ACTION_UPLOADED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".network.video.UploadRetryReceiver">
+            <intent-filter>
+                <action android:name="com.examplesonly.ACTION_RETRY" />
+                <action android:name="com.examplesonly.ACTION_CLEAR" />
+            </intent-filter>
+        </receiver>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_icon" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimary" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
     </application>
 
 </manifest>

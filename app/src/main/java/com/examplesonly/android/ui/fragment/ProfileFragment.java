@@ -182,6 +182,7 @@ public class ProfileFragment extends Fragment {
                 binding.noExamples.setVisibility(View.VISIBLE);
             } else {
                 binding.exampleList.setVisibility(View.VISIBLE);
+                binding.noExamples.setVisibility(View.GONE);
             }
 
             binding.clipSelected.setBackground(
@@ -198,6 +199,7 @@ public class ProfileFragment extends Fragment {
                 binding.noExamples.setVisibility(View.VISIBLE);
             } else {
                 binding.saveList.setVisibility(View.VISIBLE);
+                binding.noExamples.setVisibility(View.GONE);
             }
 
             binding.statSelected.setBackground(
@@ -303,6 +305,7 @@ public class ProfileFragment extends Fragment {
                     mSaveList.clear();
                     mSaveList.addAll(response.body());
                     savedVideosAdapter.notifyDataSetChanged();
+                    saveLoaded = true;
 
                     if (mSaveList.size() == 0 && currentTab == TAB_SAVED_VIDEOS) {
                         binding.noExamples.setVisibility(View.VISIBLE);

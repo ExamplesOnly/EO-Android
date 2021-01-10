@@ -16,6 +16,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.examplesonly.android.BuildConfig;
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 
 public class MainSettings extends PreferenceFragmentCompat {
 
@@ -35,7 +36,12 @@ public class MainSettings extends PreferenceFragmentCompat {
         });
 
         getPreferenceManager().findPreference("logout").setOnPreferenceClickListener(preference -> {
-            Logout();
+            logout();
+            return false;
+        });
+
+        getPreferenceManager().findPreference("oss_licenses").setOnPreferenceClickListener(preference -> {
+            openSourceLicences();
             return false;
         });
 
@@ -58,8 +64,12 @@ public class MainSettings extends PreferenceFragmentCompat {
         }
     }
 
-    void Logout() {
+    void logout() {
         UserDataProvider.getInstance(getContext()).logout();
         getActivity().finish();
+    }
+
+    void openSourceLicences() {
+        startActivity(new Intent(requireActivity(), OssLicensesMenuActivity.class));
     }
 }

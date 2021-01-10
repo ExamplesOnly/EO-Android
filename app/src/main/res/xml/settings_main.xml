@@ -2,14 +2,23 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <Preference
+        android:icon="@drawable/ic_feedback_mono"
         app:key="feedback"
         app:summary="Report technical issues or suggest new features"
         app:title="Send feedback" />
     <Preference
+        android:icon="@drawable/ic_update_mono"
         app:key="version"
         app:summary="1.0"
         app:title="App Version" />
+
     <Preference
+        android:icon="@drawable/ic_file_mono"
+        app:key="oss_licenses"
+        app:title="Open source licenses" />
+
+    <Preference
+        android:icon="@drawable/ic_sign_out_mono"
         app:key="logout"
         app:title="Logout" />
 </PreferenceScreen>

@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -207,6 +208,18 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
             clearFullScreenVideo();
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        int orientation = newConfig.orientation;
+
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            clearFullScreenVideo();
+        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            fullScreenVideo();
         }
     }
 
