@@ -78,10 +78,9 @@ public class VideoUploadService extends JobIntentService {
         videoInterface = new Api(getApplication()).getClient().create(VideoInterface.class);
         String convertedFile = getApplication().getCacheDir().getPath() + "/" + System
                 .currentTimeMillis() + ".mp4";
-        String videoFileName = videoData.getVideoFilePath().replace(" ", "\\ ");
 
         int compress = FFmpeg.execute(
-                "-y -i \"" + videoFileName + "\" -c:v libx264 -crf 23 "
+                "-y -i \"" + videoData.getVideoFilePath() + "\" -c:v libx264 -crf 23 "
                         + "-vf scale=\"480:-2\" "
                         + "-preset ultrafast "
                         + "-x264-params opencl=true "
