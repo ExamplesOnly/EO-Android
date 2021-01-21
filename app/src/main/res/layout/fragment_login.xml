@@ -90,6 +90,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="6dp"
                     android:layout_marginEnd="16dp"
+                    app:helperText="Minimum 8 characters"
                     android:hint="Password"
                     app:endIconMode="password_toggle"
                     app:startIconDrawable="@drawable/ic_password">
@@ -101,7 +102,6 @@
                         android:inputType="textPassword" />
 
                 </com.google.android.material.textfield.TextInputLayout>
-
 
                 <Button
                     android:id="@+id/login_btn"
@@ -117,6 +117,24 @@
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     app:backgroundTint="@color/colorPrimary" />
+
+
+                <Button
+                    android:id="@+id/sign_up_btn"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:fontFamily="@font/poppins"
+                    android:text="@string/create_account"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark"
+                    app:backgroundTint="@color/transparent"
+                    app:rippleColor="#34202020"
+                    app:strokeColor="@color/white"
+                    app:strokeWidth="0dp" />
 
             </LinearLayout>
 

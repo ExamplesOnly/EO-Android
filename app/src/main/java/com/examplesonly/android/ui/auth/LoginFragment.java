@@ -2,7 +2,9 @@ package com.examplesonly.android.ui.auth;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.SharedElementCallback;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.Transition;
 import androidx.transition.TransitionInflater;
 
@@ -93,7 +96,32 @@ public class LoginFragment extends Fragment {
         mUserDataProvider = UserDataProvider.getInstance(getContext());
 
         binding.loginBtn.setOnClickListener(v -> signIn());
-        binding.closeBtn.setOnClickListener(v -> Objects.requireNonNull(getActivity()).onBackPressed());
+        binding.closeBtn.setOnClickListener(v -> requireActivity().onBackPressed());
+        binding.signUpBtn.setOnClickListener(v -> launchSignUp());
+
+        String userAgent = System.getProperty("http.agent");
+        Timber.e("userAgent %s", userAgent);
+
+        mAuthInterface.googleLogin("", "").enqueue(new Callback<HashMap<String, String>>() {
+            @Override
+            public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Timber.e("SOCIAL %s", response.body().toString());
+                } else {
+                    try {
+                        Timber.e("SOCIAL ERROR %s", response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
+                Timber.e("SOCIAL FAIL");
+                t.printStackTrace();
+            }
+        });
     }
 
     private void signIn() {
@@ -106,16 +134,18 @@ public class LoginFragment extends Fragment {
             @Override
             public void onResponse(@NotNull final Call<HashMap<String, String>> call,
                                    @NotNull final Response<HashMap<String, String>> response) {
-                if (response.isSuccessful()) {
-                    String token = response.body().get("token");
-                    Timber.e("login token: %s", token);
-                    mUserDataProvider.saveToken(token);
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().containsKey("accessToken")
+                        && response.body().containsKey("refreshToken")) {
+
+                    HashMap<String, String> body = response.body();
+                    mUserDataProvider.saveToken(body.get("accessToken"), body.get("refreshToken"));
 
                     mUserInterface = new Api(getContext()).getClient().create(UserInterface.class);
                     mUserInterface.me().enqueue(new Callback<User>() {
                         @Override
-                        public void onResponse(final Call<User> call,
-                                               final Response<User> response) {
+                        public void onResponse(final @NotNull Call<User> call,
+                                               final @NotNull Response<User> response) {
                             if (response.isSuccessful()) {
                                 mUserDataProvider.saveUserData(response.body());
                                 Timber.e(response.body().toString());
@@ -134,23 +164,8 @@ public class LoginFragment extends Fragment {
 
                         @Override
                         public void onFailure(final Call<User> call, final Throwable t) {
-
+                            Toast.makeText(getContext(), "Something went wrong. Please try again.", Toast.LENGTH_LONG).show();
                         }
-//                        @Override
-//                        public void onResponse(final Call<User> call, final Response<HashMap<String, String>> response) {
-//                            mUserDataProvider.saveUserData(response.body());
-//                            Log.e(TAG, response.body().getFirstName() + " " + response.body().getLastName() + " "
-//                                    + response.body().getEmail());
-//
-//                            Intent main = new Intent(getApplicationContext(), MainActivity.class);
-//                            startActivity(main);
-//                            finish();
-//                        }
-//
-//                        @Override
-//                        public void onFailure(final Call<User> call, final Throwable t) {
-//
-//                        }
                     });
                 } else {
                     isLoading(false);
@@ -161,6 +176,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onFailure(final Call<HashMap<String, String>> call, final Throwable t) {
                 isLoading(false);
+                Toast.makeText(getContext(), "Something went wrong. Please try again.", Toast.LENGTH_LONG).show();
                 t.printStackTrace();
             }
         });
@@ -170,5 +186,15 @@ public class LoginFragment extends Fragment {
         binding.emailTextField.setEnabled(!loading);
         binding.passwordTextField.setEnabled(!loading);
         binding.loginBtn.setEnabled(!loading);
+    }
+
+
+    public void launchSignUp() {
+        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+        ft.setReorderingAllowed(true)
+                .addSharedElement(binding.cardView,
+                        binding.cardView.getTransitionName())
+                .replace(R.id.login_root, new SignUpFragment())
+                .addToBackStack(null).commit();
     }
 }

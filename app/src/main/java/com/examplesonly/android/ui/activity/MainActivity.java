@@ -7,36 +7,25 @@ import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_CHOOSE
 import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_NEW_DEMAND;
 import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_DATA;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDialog;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.examplesonly.android.BuildConfig;
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
 import com.examplesonly.android.component.BottomSheetOptionsDialog;
 import com.examplesonly.android.component.BottomSheetOptionsDialog.BottomSheetOptionChooseListener;
-import com.examplesonly.android.component.EoAlertDialog.EoAlertDialog;
 import com.examplesonly.android.databinding.ActivityMainBinding;
 import com.examplesonly.android.handler.FragmentChangeListener;
 import com.examplesonly.android.handler.VideoClickListener;
@@ -47,32 +36,26 @@ import com.examplesonly.android.model.Video;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.network.video.VideoInterface;
-import com.examplesonly.android.ui.fragment.AddDemandFragment;
-import com.examplesonly.android.ui.fragment.CameraFragment;
 import com.examplesonly.android.ui.fragment.DemandDetailsFragment;
 import com.examplesonly.android.ui.fragment.DemandFragment;
 import com.examplesonly.android.ui.fragment.ExploreFragment;
 import com.examplesonly.android.ui.fragment.HomeFragment;
 import com.examplesonly.android.ui.fragment.ProfileFragment;
-import com.examplesonly.gallerypicker.view.VideosFragment;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
-import com.google.android.play.core.install.InstallState;
 import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.tasks.Task;
-import com.jakewharton.processphoenix.ProcessPhoenix;
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavController.RootFragmentListener;
 import com.ncapdevi.fragnav.tabhistory.UniqueTabHistoryStrategy;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -328,13 +311,8 @@ public class MainActivity extends AppCompatActivity
         userDataProvider = UserDataProvider.getInstance(this);
         appUpdateManager = AppUpdateManagerFactory.create(this);
 
-        validateToken();
-
         fragNavController = new FragNavController(fm, R.id.frame_container);
         fragNavController.setTransactionListener(this);
-//        fragNavController.setDefaultTransactionOptions(new Builder()
-//                .customAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left, R.anim.slide_in_from_left,
-//                        R.anim.slide_out_to_right).build());
         fragNavController.setNavigationStrategy(new UniqueTabHistoryStrategy((i, fragNavTransactionOptions) -> {
         }));
     }
@@ -413,33 +391,35 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void validateToken() {
-        String token = userDataProvider.getToken();
-        try {
-            DecodedJWT jwt = JWT.decode(token);
-            if (jwt.getExpiresAt().before(new Date())) {
-                EoAlertDialog logoutDialog = new EoAlertDialog(MainActivity.this)
-                        .setDialogIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sign_in_alt, getTheme()))
-                        .setIconTint(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
-                        .setTitle("Session Expired")
-                        .setDescription("Your login session has expired. Please login again to keep enjoying the excitement!")
-                        .setPositiveText("Login")
-                        .setPositiveClickListener(dialog -> {
-                            dialog.dismiss();
-                            userDataProvider.logout();
-                            Intent reLaunch = new Intent(MainActivity.this, LaunchActivity.class);
-                            startActivity(reLaunch);
-                            this.finish();
-
-                        });
-
-                logoutDialog.setCancelable(false);
-                logoutDialog.show();
-            }
-        } catch (JWTDecodeException exception) {
-            //Invalid token
-        }
-    }
+//    private void validateToken() {
+//        String token = userDataProvider.getToken();
+//        try {
+//            DecodedJWT jwt = JWT.decode(token);
+//            if (jwt.getExpiresAt().before(new Date())) {
+//                EoAlertDialog logoutDialog = new EoAlertDialog(MainActivity.this)
+//                        .setDialogIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sign_in_alt, getTheme()))
+//                        .setIconTint(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
+//                        .setTitle("Session Expired")
+//                        .setDescription("Your login session has expired. Please login again to keep enjoying the excitement!")
+//                        .setPositiveText("Login")
+//                        .setPositiveClickListener(dialog -> {
+//                            dialog.dismiss();
+//                            userDataProvider.clearUserData();
+//                            Intent reLaunch = new Intent(MainActivity.this, LaunchActivity.class);
+//                            startActivity(reLaunch);
+//                            this.finish();
+//
+//                        });
+//
+//                logoutDialog.setCancelable(false);
+//                logoutDialog.show();
+//            }
+//        } catch (Exception exception) {
+//
+////            if(exception instanceof JWTDecodeException)
+//            //Invalid token
+//        }
+//    }
 
     void popupSnackbarForCompleteUpdate() {
         Snackbar updateSnackBar = Snackbar.make(binding.getRoot(),

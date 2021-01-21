@@ -25,7 +25,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:transitionName="signup_transition"
+            android:transitionName="login_transition"
             app:cardCornerRadius="10dp"
             app:layout_behavior="@string/bottom_sheet_behavior"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -62,15 +62,15 @@
                     android:textColor="@color/md_grey_500"
                     android:textSize="20sp" />
 
-<!--                <TextView-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginStart="16dp"-->
-<!--                    android:layout_marginEnd="16dp"-->
-<!--                    android:fontFamily="@font/poppins_semibold"-->
-<!--                    android:text="What can we call you?"-->
-<!--                    android:textColor="@color/md_grey_500"-->
-<!--                    android:textSize="20sp" />-->
+                <!--                <TextView-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_marginStart="16dp"-->
+                <!--                    android:layout_marginEnd="16dp"-->
+                <!--                    android:fontFamily="@font/poppins_semibold"-->
+                <!--                    android:text="What can we call you?"-->
+                <!--                    android:textColor="@color/md_grey_500"-->
+                <!--                    android:textSize="20sp" />-->
 
                 <FrameLayout
                     android:id="@+id/field_container"

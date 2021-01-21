@@ -19,6 +19,92 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <!--        <LinearLayout-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content">-->
+
+        <!--            -->
+
+        <!--        </LinearLayout>-->
+
+
+        <!--        <Button-->
+        <!--            android:id="@+id/apple_login_btn"-->
+        <!--            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="56dp"-->
+        <!--            android:layout_marginStart="16dp"-->
+        <!--            android:layout_marginEnd="16dp"-->
+        <!--            android:layout_weight="1"-->
+        <!--            android:fontFamily="@font/poppins_semibold"-->
+        <!--            android:text="@string/sign_in_apple"-->
+        <!--            android:textAllCaps="false"-->
+        <!--            android:textColor="@color/white"-->
+        <!--            app:backgroundTint="@color/md_black_1000"-->
+        <!--            app:icon="@drawable/ic_apple_logo"-->
+        <!--            app:iconGravity="start"-->
+        <!--            app:iconSize="22dp"-->
+        <!--            app:iconTint="@android:color/white"-->
+        <!--            app:iconTintMode="src_atop"-->
+        <!--            app:rippleColor="#34202020" />-->
+
+        <Button
+            android:id="@+id/google_login_btn"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="@string/sign_in_google"
+            android:textAllCaps="false"
+            android:textColor="@color/dark"
+            app:backgroundTint="#FFFFFF"
+            app:icon="@drawable/google_logo"
+            app:iconGravity="start"
+            app:iconSize="20dp"
+            app:iconTint="@android:color/transparent"
+            app:iconTintMode="add"
+            app:rippleColor="#34202020" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:background="#CDFFFFFF" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_semibold"
+                android:text="OR"
+                android:textColor="#CDFFFFFF" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:background="#CDFFFFFF" />
+
+
+        </LinearLayout>
+
         <Button
             android:id="@+id/login_btn"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -26,8 +112,10 @@
             android:layout_height="56dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="10dp"
             android:layout_weight="1"
-            android:text="@string/sign_in"
+            android:fontFamily="@font/poppins_semibold"
+            android:text="@string/sign_in_email"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:transitionName="login_transition"
@@ -36,20 +124,48 @@
             app:strokeColor="@color/white"
             app:strokeWidth="2dp" />
 
-        <Button
-            android:id="@+id/sign_up_btn"
-            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:layout_weight="1"
-            android:text="@string/sign_up"
-            android:textAllCaps="false"
-            android:textColor="@color/dark"
-            android:transitionName="signup_transition"
-            app:backgroundTint="@color/white" />
+
+        <!--        <LinearLayout-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:orientation="horizontal">-->
+
+        <!--            <Button-->
+        <!--                android:id="@+id/login_btn"-->
+        <!--                style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="56dp"-->
+        <!--                android:layout_marginStart="16dp"-->
+        <!--                android:layout_marginEnd="8dp"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:fontFamily="@font/poppins_semibold"-->
+        <!--                android:text="@string/sign_in"-->
+        <!--                android:textAllCaps="false"-->
+        <!--                android:textColor="@color/white"-->
+        <!--                android:transitionName="login_transition"-->
+        <!--                app:backgroundTint="#34000000"-->
+        <!--                app:rippleColor="@color/white"-->
+        <!--                app:strokeColor="@color/white"-->
+        <!--                app:strokeWidth="2dp" />-->
+
+        <!--            <Button-->
+        <!--                android:id="@+id/sign_up_btn"-->
+        <!--                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="56dp"-->
+        <!--                android:layout_marginStart="8dp"-->
+        <!--                android:layout_marginEnd="16dp"-->
+        <!--                android:layout_marginBottom="16dp"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:fontFamily="@font/poppins_semibold"-->
+        <!--                android:text="@string/sign_up"-->
+        <!--                android:textAllCaps="false"-->
+        <!--                android:textColor="@color/dark"-->
+        <!--                android:transitionName="signup_transition"-->
+        <!--                app:backgroundTint="#FFFFFF"-->
+        <!--                app:rippleColor="#34202020" />-->
+
+        <!--        </LinearLayout>-->
 
         <TextView
             android:id="@+id/policy_text"

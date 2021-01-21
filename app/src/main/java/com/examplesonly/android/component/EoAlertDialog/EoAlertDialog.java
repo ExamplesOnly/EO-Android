@@ -17,8 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 
-import com.examplesonly.android.R;
-import com.examplesonly.android.databinding.ViewAlertDialogBinding;
+import com.examplesonly.android.databinding.ViewDialogAlertBinding;
 
 public class EoAlertDialog extends AlertDialog {
 
@@ -30,8 +29,9 @@ public class EoAlertDialog extends AlertDialog {
     private int iconTint = -1;
     private ClickListener mPositiveClickListener;
     private ClickListener mNegativeClickListener;
+    private Boolean isCenterText = false;
 
-    private ViewAlertDialogBinding binding;
+    private ViewDialogAlertBinding binding;
     private Context context;
 
     public EoAlertDialog(@NonNull final Context context) {
@@ -43,7 +43,7 @@ public class EoAlertDialog extends AlertDialog {
     protected void onCreate(final Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        binding = ViewAlertDialogBinding.inflate(getLayoutInflater());
+        binding = ViewDialogAlertBinding.inflate(getLayoutInflater());
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         setContentView(binding.getRoot());
 
@@ -166,6 +166,15 @@ public class EoAlertDialog extends AlertDialog {
 
     public EoAlertDialog setNegativeClickListener(final ClickListener negativeClickListener) {
         mNegativeClickListener = negativeClickListener;
+        return this;
+    }
+
+    public Boolean getCenterText() {
+        return isCenterText;
+    }
+
+    public EoAlertDialog setCenterText(Boolean centerText) {
+        isCenterText = centerText;
         return this;
     }
 

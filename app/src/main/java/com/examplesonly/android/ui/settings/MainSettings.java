@@ -16,9 +16,20 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.examplesonly.android.BuildConfig;
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
+import com.examplesonly.android.component.EoLoadingDialog;
+import com.examplesonly.android.handler.UserAccountHandler;
+import com.examplesonly.android.network.Api;
+import com.examplesonly.android.network.auth.AuthInterface;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 
 public class MainSettings extends PreferenceFragmentCompat {
+
+
+    EoLoadingDialog loadingDialog;
+    AuthInterface authInterface;
+    UserDataProvider userDataProvider;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -28,6 +39,8 @@ public class MainSettings extends PreferenceFragmentCompat {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+        authInterface = new Api(requireActivity()).getClient().create(AuthInterface.class);
+        userDataProvider = UserDataProvider.getInstance(requireActivity());
 
         getPreferenceManager().findPreference("version").setSummary(BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
         getPreferenceManager().findPreference("feedback").setOnPreferenceClickListener(preference -> {
@@ -59,14 +72,25 @@ public class MainSettings extends PreferenceFragmentCompat {
             startActivity(intent);
         } catch (android.content.ActivityNotFoundException ex) {
             Toast.makeText(getActivity(),
-                    "There are no email client found on your device. Kindly email us at dev@examplesonly.com",
+                    "No email client found on your device. Kindly email us at dev@examplesonly.com",
                     Toast.LENGTH_LONG).show();
         }
     }
 
     void logout() {
-        UserDataProvider.getInstance(getContext()).logout();
-        getActivity().finish();
+        loadingDialog = new EoLoadingDialog(requireActivity()).setLoadingText(getString(R.string.logging_out));
+        loadingDialog.setCancelable(false);
+        loadingDialog.show();
+        UserDataProvider.getInstance(getContext()).logout(authInterface, (isSuccess) -> {
+            userDataProvider.getGoogleSignInClient().signOut();
+            loadingDialog.dismiss();
+            requireActivity().finish();
+
+            if (isSuccess)
+                requireActivity().finish();
+            else
+                Toast.makeText(requireActivity(), "Could not logout. Are you connected to internet?", Toast.LENGTH_LONG).show();
+        });
     }
 
     void openSourceLicences() {

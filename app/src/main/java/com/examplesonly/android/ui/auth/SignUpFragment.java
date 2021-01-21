@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.core.app.SharedElementCallback;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.transition.Transition;
@@ -27,7 +28,10 @@ import com.examplesonly.android.network.auth.AuthInterface;
 import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.ui.activity.LoginActivity;
 import com.examplesonly.android.ui.activity.VerificationActivity;
+import com.examplesonly.android.ui.fragment.CameraFragment;
 import com.robinhood.ticker.TickerUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -42,6 +46,8 @@ import timber.log.Timber;
 
 public class SignUpFragment extends Fragment {
 
+    private static final String ARG_TRANSITION_NAME = "transition_name";
+
     private FragmentSignUpBinding binding;
     private AuthInterface mAuthInterface;
     private UserInterface mUserInterface;
@@ -50,6 +56,7 @@ public class SignUpFragment extends Fragment {
     private int currentStep = 0;
     private final User userData = new User();
     private boolean setDOb = false;
+    private String transitionName = "";
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -223,12 +230,16 @@ public class SignUpFragment extends Fragment {
         isLoading(true);
         mAuthInterface.signUp(user).enqueue(new Callback<HashMap<String, String>>() {
             @Override
-            public void onResponse(final Call<HashMap<String, String>> call,
-                                   final Response<HashMap<String, String>> response) {
+            public void onResponse(final @NotNull Call<HashMap<String, String>> call,
+                                   final @NotNull Response<HashMap<String, String>> response) {
 
-                if (response.isSuccessful()) {
-                    String token = response.body().get(TOKEN_KEY);
-                    mUserDataProvider.saveToken(token);
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().containsKey("accessToken")
+                        && response.body().containsKey("refreshToken")) {
+
+                    HashMap<String, String> body = response.body();
+                    mUserDataProvider.saveToken(body.get("accessToken"), body.get("refreshToken"));
+
                     mUserInterface.me().enqueue(new Callback<User>() {
                         @Override
                         public void onResponse(final Call<User> call, final Response<User> response) {

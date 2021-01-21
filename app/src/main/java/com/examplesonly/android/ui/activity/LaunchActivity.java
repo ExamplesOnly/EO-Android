@@ -17,6 +17,8 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
+import timber.log.Timber;
+
 public class LaunchActivity extends AppCompatActivity {
 
     // Remote Config keys
@@ -45,6 +47,7 @@ public class LaunchActivity extends AppCompatActivity {
         verify = new Intent(this, VerificationActivity.class);
         main = new Intent(this, MainActivity.class);
 
+        Timber.e(mUserDataProvider.toString());
         launch();
     }
 
@@ -62,8 +65,7 @@ public class LaunchActivity extends AppCompatActivity {
     }
 
     public boolean isLoggedIn() {
-        String token = mUserDataProvider.getToken();
-        return (token != null);
+        return mUserDataProvider.isAuthorized();
     }
 
     public boolean isVerified() {

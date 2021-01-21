@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.transition.TransitionManager;
 
+import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ActivityVerificationBinding;
 import com.examplesonly.android.model.User;
 import com.examplesonly.android.network.Api;
@@ -62,6 +63,10 @@ public class VerificationActivity extends AppCompatActivity {
         mUserInterface = new Api(this).getClient().create(UserInterface.class);
         mUserDataProvider = UserDataProvider.getInstance(this);
 
+        Timber.tag("VerificationActivity").e(mUserDataProvider.toString());
+
+        binding.verifyTextTitle.setText(getResources().getString(R.string.verify_email_title, mUserDataProvider.getUserEmail()));
+
         binding.refreshBtn.setOnClickListener(v -> {
             updateUser();
         });
@@ -81,6 +86,9 @@ public class VerificationActivity extends AppCompatActivity {
             public void onResponse(final Call<User> call,
                                    final Response<User> response) {
                 if (response.isSuccessful()) {
+
+                    Timber.e("updateUser %s %s", response.body().getEmail(), response.body().getFirstName());
+
                     mUserDataProvider.saveUserData(response.body());
                     if (mUserDataProvider.isVerified()) {
                         Intent main = new Intent(getApplicationContext(), ChooseCategoryActivity.class);
@@ -91,6 +99,14 @@ public class VerificationActivity extends AppCompatActivity {
                         Toast.makeText(VerificationActivity.this, "Ops! You are still not verified.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
+
+                    try {
+                        Timber.e(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Timber.e("updateUser Not Successful");
+
                     isVerifying(false);
                     Toast.makeText(VerificationActivity.this, "Ops! You are still not verified.", Toast.LENGTH_SHORT).show();
                 }

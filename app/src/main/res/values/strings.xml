@@ -2,7 +2,7 @@
     <string name="app_name">ExamplesOnly</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="create_account_policy">By creating an account, you accept ExamplesOnly\'s <a href="https://examplesonly.com/legal/terms">Terms of Service</a> and <a href="https://examplesonly.com/legal/privacy-policy">Privacy Policy.</a></string>
-    <string name="verify_email_title">You are one step away from the excitement!</string>
+    <string name="verify_email_title">We\'ve sent an email to <b>%s</b>. Open your email app to verify.</string>
     <string name="verify_email">Verify your email to continue.</string>
     <string name="login_with_google">Continue with Google</string>
     <string name="login_with_linkedin">Continue with LinkedIn</string>
@@ -24,8 +24,12 @@
     <string name="no_example_yet">No examples yet</string>
     <string name="answer">Answer</string>
     <string name="categories">Categories</string>
-    <string name="sign_in">Sign In</string>
-    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_in_google">Continue with Google</string>
+    <string name="sign_in_apple">Sign In with Apple</string>
+    <string name="sign_in_email">Continue with Email</string>
+    <string name="create_account">Don\'t have an account? <b>Create Now!</b></string>
+    <string name="sign_up">Sign up</string>
     <string name="next">Next</string>
     <string name="related_videos">Related Examples</string>
     <string name="could_not_load_video">Could not load example</string>
@@ -38,4 +42,7 @@
     <string name="in_progress">in progress</string>
     <string name="message_upload_success">Example uploaded successfully</string>
     <string name="message_upload_success_desc">Tap here to see your example</string>
+    <string name="google_server_client_id">44367283781-cqb8fg2tibjfh6ij2su1n54gcmrsrv4b.apps.googleusercontent.com</string>
+    <string name="logging_out">Logging out…</string>
+    <string name="logging_in">Logging in…</string>
 </resources>

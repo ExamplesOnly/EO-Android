@@ -30,7 +30,6 @@ import timber.log.Timber;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    private ExampleAdapter mExampleAdapter;
     private HomeGridAdapter mHomeGridAdapter;
     private VideoInterface videoInterface;
     private ArrayList<Video> mExampleList = new ArrayList<>();
