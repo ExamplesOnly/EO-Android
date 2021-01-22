@@ -34,7 +34,7 @@ public class EoAlertDialog extends AlertDialog {
     private ViewDialogAlertBinding binding;
     private Context context;
 
-    public EoAlertDialog(@NonNull final Context context) {
+    private EoAlertDialog(@NonNull final Context context) {
         super(context);
         this.context = context;
     }
@@ -51,7 +51,6 @@ public class EoAlertDialog extends AlertDialog {
     }
 
     private void setView() {
-
         if (dialogIcon != null) {
             binding.dialogIcon.setImageDrawable(dialogIcon);
             binding.dialogIcon.setVisibility(View.VISIBLE);
@@ -97,85 +96,143 @@ public class EoAlertDialog extends AlertDialog {
         }
     }
 
-    public Drawable getDialogIcon() {
+    private Drawable getDialogIcon() {
         return this.dialogIcon;
     }
 
-    public EoAlertDialog setDialogIcon(Drawable dialogIcon) {
+    private void setDialogIcon(Drawable dialogIcon) {
         this.dialogIcon = dialogIcon;
-        return this;
     }
 
-    public int getIconTint() {
+    private int getIconTint() {
         return this.iconTint;
     }
 
-    public EoAlertDialog setIconTint(int iconTint) {
+    private void setIconTint(int iconTint) {
         this.iconTint = iconTint;
-        return this;
     }
 
-    public String getTitle() {
+    private String getTitle() {
         return title;
     }
 
-    public EoAlertDialog setTitle(final String title) {
+    private void setTitle(final String title) {
         this.title = title;
-        return this;
     }
 
-    public String getDescription() {
+    private String getDescription() {
         return description;
     }
 
-    public EoAlertDialog setDescription(final String description) {
+    private void setDescription(final String description) {
         this.description = description;
-        return this;
     }
 
-    public String getPositiveText() {
+    private String getPositiveText() {
         return positiveText;
     }
 
-    public EoAlertDialog setPositiveText(final String positiveText) {
+    private void setPositiveText(final String positiveText) {
         this.positiveText = positiveText;
-        return this;
     }
 
-    public String getNegativeText() {
+    private String getNegativeText() {
         return negativeText;
     }
 
-    public EoAlertDialog setNegativeText(final String negativeText) {
+    private void setNegativeText(final String negativeText) {
         this.negativeText = negativeText;
-        return this;
     }
 
-    public ClickListener getPositiveClickListener() {
+    private ClickListener getPositiveClickListener() {
         return mPositiveClickListener;
     }
 
-    public EoAlertDialog setPositiveClickListener(final ClickListener positiveClickListener) {
+    private void setPositiveClickListener(final ClickListener positiveClickListener) {
         mPositiveClickListener = positiveClickListener;
-        return this;
     }
 
-    public ClickListener getNegativeClickListener() {
+    private ClickListener getNegativeClickListener() {
         return mNegativeClickListener;
     }
 
-    public EoAlertDialog setNegativeClickListener(final ClickListener negativeClickListener) {
+    private void setNegativeClickListener(final ClickListener negativeClickListener) {
         mNegativeClickListener = negativeClickListener;
-        return this;
     }
 
-    public Boolean getCenterText() {
+    private Boolean getCenterText() {
         return isCenterText;
     }
 
-    public EoAlertDialog setCenterText(Boolean centerText) {
+    private void setCenterText(Boolean centerText) {
         isCenterText = centerText;
-        return this;
+    }
+
+    public static class Builder {
+        private EoAlertDialog alertDialog;
+
+        public Builder(Context context) {
+            this.alertDialog = new EoAlertDialog(context);
+        }
+
+        public Builder setDialogIcon(Drawable dialogIcon) {
+            this.alertDialog.setDialogIcon(dialogIcon);
+            return this;
+        }
+
+        public Builder setIconTint(int iconTint) {
+            this.alertDialog.setIconTint(iconTint);
+            return this;
+        }
+
+        public Builder setTitle(String title) {
+            this.alertDialog.setTitle(title);
+            return this;
+        }
+
+        public Builder setDescription(String description) {
+            this.alertDialog.setDescription(description);
+            return this;
+        }
+
+        public Builder setPositiveText(String positiveText) {
+            this.alertDialog.setPositiveText(positiveText);
+            return this;
+        }
+
+        public Builder setNegativeText(String negativeText) {
+            this.alertDialog.setNegativeText(negativeText);
+            return this;
+        }
+
+        public Builder setPositiveClickListener(final ClickListener positiveClickListener) {
+            this.alertDialog.setPositiveClickListener(positiveClickListener);
+            return this;
+        }
+
+        public Builder setNegativeClickListener(final ClickListener negativeClickListener) {
+            this.alertDialog.setNegativeClickListener(negativeClickListener);
+            return this;
+        }
+
+        public Builder setCenterText(boolean centerText) {
+            this.alertDialog.setCenterText(centerText);
+            return this;
+        }
+
+        public Builder setCancelable(boolean cancelable) {
+            this.alertDialog.setCancelable(cancelable);
+            return this;
+        }
+
+        public Builder setCanceledOnTouchOutside(boolean canceledOnTouchOutside) {
+            this.alertDialog.setCanceledOnTouchOutside(canceledOnTouchOutside);
+            return this;
+        }
+
+        public EoAlertDialog create() {
+            return this.alertDialog;
+        }
     }
 
     private int pxToDp(int dp) {

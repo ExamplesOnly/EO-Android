@@ -107,7 +107,7 @@ public class ProfileVideosAdapter extends Adapter<ProfileVideosAdapter.VIewHolde
 
             if (isLoggedInUser)
                 mChooseCategoryBinding.imageCard.setOnLongClickListener(v -> {
-                    EoAlertDialog deleteDialog = new EoAlertDialog(context)
+                    EoAlertDialog deleteDialog = new EoAlertDialog.Builder(context)
                             .setTitle("Delete")
                             .setPositiveText("Delete")
                             .setNegativeText("Cancel")
@@ -137,7 +137,8 @@ public class ProfileVideosAdapter extends Adapter<ProfileVideosAdapter.VIewHolde
                                             }
                                         });
                             })
-                            .setNegativeClickListener(AppCompatDialog::dismiss);
+                            .setNegativeClickListener(AppCompatDialog::dismiss)
+                            .create();
 
                     deleteDialog.show();
                     return false;

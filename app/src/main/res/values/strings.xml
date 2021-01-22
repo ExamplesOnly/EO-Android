@@ -45,4 +45,8 @@
     <string name="google_server_client_id">44367283781-cqb8fg2tibjfh6ij2su1n54gcmrsrv4b.apps.googleusercontent.com</string>
     <string name="logging_out">Logging out…</string>
     <string name="logging_in">Logging in…</string>
+    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="enter_email_to_continue">Enter you email address and we\'ll send you a link to get back into your account.</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="new_password">New Password</string>
 </resources>

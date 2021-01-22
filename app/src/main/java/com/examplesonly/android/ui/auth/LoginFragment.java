@@ -98,30 +98,7 @@ public class LoginFragment extends Fragment {
         binding.loginBtn.setOnClickListener(v -> signIn());
         binding.closeBtn.setOnClickListener(v -> requireActivity().onBackPressed());
         binding.signUpBtn.setOnClickListener(v -> launchSignUp());
-
-        String userAgent = System.getProperty("http.agent");
-        Timber.e("userAgent %s", userAgent);
-
-        mAuthInterface.googleLogin("", "").enqueue(new Callback<HashMap<String, String>>() {
-            @Override
-            public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Timber.e("SOCIAL %s", response.body().toString());
-                } else {
-                    try {
-                        Timber.e("SOCIAL ERROR %s", response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
-                Timber.e("SOCIAL FAIL");
-                t.printStackTrace();
-            }
-        });
+        binding.forgotPassword.setOnClickListener(v -> launchForgotPass());
     }
 
     private void signIn() {
@@ -188,13 +165,21 @@ public class LoginFragment extends Fragment {
         binding.loginBtn.setEnabled(!loading);
     }
 
-
     public void launchSignUp() {
         FragmentTransaction ft = getParentFragmentManager().beginTransaction();
         ft.setReorderingAllowed(true)
                 .addSharedElement(binding.cardView,
                         binding.cardView.getTransitionName())
                 .replace(R.id.login_root, new SignUpFragment())
+                .addToBackStack(null).commit();
+    }
+
+    public void launchForgotPass() {
+        FragmentTransaction ft = getParentFragmentManager().beginTransaction();
+        ft.setReorderingAllowed(true)
+                .addSharedElement(binding.cardView,
+                        binding.cardView.getTransitionName())
+                .replace(R.id.login_root, new ForgotPassFragment())
                 .addToBackStack(null).commit();
     }
 }

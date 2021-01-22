@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name="com.examplesonly.android.ExamplesOnly"
+        android:name=".ExamplesOnly"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -18,18 +18,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.examplesonly.android.ui.videoSwipe.VideoSwipeActivity" />
-        <activity android:name="com.examplesonly.android.ui.activity.ProfileImageActivity" />
-        <activity android:name="com.examplesonly.android.ui.activity.EditProfileActivity" />
-        <activity android:name="com.examplesonly.android.ui.activity.NotificationActivity" />
+        <activity android:name=".ui.videoSwipe.VideoSwipeActivity" />
+        <activity android:name=".ui.activity.ProfileImageActivity" />
+        <activity android:name=".ui.activity.EditProfileActivity" />
+        <activity android:name=".ui.activity.NotificationActivity" />
         <activity android:name="org.buffer.android.thumby.ThumbyActivity" />
-        <activity android:name="com.examplesonly.android.ui.activity.ChooseCategoryActivity" />
-        <activity android:name="com.examplesonly.android.ui.activity.SettingsActivity" />
+        <activity android:name=".ui.activity.ChooseCategoryActivity" />
+        <activity android:name=".ui.activity.SettingsActivity" />
         <activity
-            android:name="com.examplesonly.android.ui.activity.VideoPlayerActivity"
+            android:name=".ui.activity.VideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|navigation" />
-        <activity android:name="com.examplesonly.android.ui.activity.VerificationActivity" />
-        <activity android:name="com.examplesonly.android.ui.activity.DynamicLinkActivity">
+        <activity android:name=".ui.activity.VerificationActivity" />
+        <activity android:name=".ui.activity.DynamicLinkActivity">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -44,22 +44,16 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
-        <activity android:name="com.examplesonly.android.ui.activity.LoginActivity" />
-        <activity android:name="com.examplesonly.android.ui.activity.LaunchActivity">
+        <activity android:name=".ui.activity.LoginActivity" />
+        <activity android:name=".ui.activity.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.examplesonly.android.ui.activity.MainActivity" />
-        <activity android:name="com.examplesonly.android.ui.activity.NewEoActivity" />
-        <activity
-            android:name="com.examplesonly.android.ui.activity.SignupActivity"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name="com.examplesonly.android.ui.activity.EmailLoginActivity"
-            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.activity.MainActivity" />
+        <activity android:name=".ui.activity.NewEoActivity" />
 
         <service
             android:name=".service.NotificationService"
@@ -89,14 +83,12 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_icon" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />

@@ -31,6 +31,17 @@ public interface AuthInterface {
             @Field("newPassword") String newPassword);
 
     @FormUrlEncoded
+    @POST("v1/auth/forgotPassword")
+    Call<HashMap<String, String>> forgotPassword(
+            @Field("email") String email);
+
+    @FormUrlEncoded
+    @POST("v1/auth/resetPassword")
+    Call<HashMap<String, String>> resetPassword(
+            @Field("password") String password,
+            @Field("token") String token);
+
+    @FormUrlEncoded
     @POST("v1/auth/refreshToken")
     Call<HashMap<String, String>> refreshToken(
             @Field("refreshToken") String refreshToken);

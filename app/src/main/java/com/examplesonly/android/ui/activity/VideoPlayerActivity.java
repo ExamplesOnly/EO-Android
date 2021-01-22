@@ -727,13 +727,14 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         videoInterface.reportVideo(video.getVideoId()).enqueue(new Callback<HashMap<String, String>>() {
             @Override
             public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
-                EoAlertDialog deleteDialog = new EoAlertDialog(VideoPlayerActivity.this)
+                EoAlertDialog deleteDialog = new EoAlertDialog.Builder(VideoPlayerActivity.this)
                         .setDialogIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_shield_exclamation, getTheme()))
                         .setIconTint(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
                         .setTitle("Example Reported")
                         .setDescription("Thanks for reporting this example. We'll review it shortly.")
                         .setPositiveText("Got it!")
-                        .setPositiveClickListener(AppCompatDialog::dismiss);
+                        .setPositiveClickListener(AppCompatDialog::dismiss)
+                        .create();
                 deleteDialog.show();
             }
 

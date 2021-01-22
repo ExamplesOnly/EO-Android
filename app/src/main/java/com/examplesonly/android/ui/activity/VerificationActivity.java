@@ -27,9 +27,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
+import static com.examplesonly.android.ui.activity.DynamicLinkActivity.VERIFICATION_TOKEN;
+
 public class VerificationActivity extends AppCompatActivity {
 
-    public static String VERIFICATION_LINK = "verification_link";
     private final String TAG = VerificationActivity.class.getCanonicalName();
     private ActivityVerificationBinding binding;
     private UserInterface mUserInterface;
@@ -45,7 +46,7 @@ public class VerificationActivity extends AppCompatActivity {
 
         init();
 
-        String verificationLink = getIntent().getStringExtra(VERIFICATION_LINK);
+        String verificationLink = getIntent().getStringExtra(VERIFICATION_TOKEN);
         if (verificationLink != null) {
 
             Uri verifyUri = Uri.parse(verificationLink);

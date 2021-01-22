@@ -209,18 +209,19 @@ public class PostVideoFragment extends Fragment implements ThumbnailChooseListen
                 .setThumbFilePath(MediaUtil.bitmapToFile(thumbnail, getContext()).getPath()));
         VideoUploadService.enqueueWork(requireActivity(), uploadIntent);
 
-        EoAlertDialog uploadingDialog = new EoAlertDialog(getContext())
+        EoAlertDialog uploadingDialog = new EoAlertDialog.Builder(getContext())
                 .setDialogIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_upload, getActivity().getTheme()))
                 .setIconTint(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getActivity().getTheme()))
                 .setTitle("Uploading Example")
                 .setDescription("We are processing your example. You can keep using ExamplesOnly till we process and upload.")
+                .setCancelable(false)
                 .setPositiveText("Got it!")
                 .setPositiveClickListener(appCompatDialog -> {
                     appCompatDialog.dismiss();
                     getActivity().finish();
-                });
+                })
+                .create();
 
-        uploadingDialog.setCancelable(false);
         uploadingDialog.show();
     }
 
