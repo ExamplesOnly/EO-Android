@@ -3,23 +3,29 @@ package com.examplesonly.android.adapter;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.examplesonly.android.databinding.ViewChooseCategoryBinding;
 import com.examplesonly.android.model.Category;
+
+import java.util.ArrayList;
 import java.util.List;
+
 public class InterestChooserAdapter extends Adapter<InterestChooserAdapter.VIewHolder> {
 
-    private List<Category> categories;
-    private Context context;
-    private LayoutInflater inflater;
-    private CategorySelectionListener mCategorySelectionListener;
+    private final List<Category> categories;
+    private final Context context;
+    private final LayoutInflater inflater;
+    private final CategorySelectionListener mCategorySelectionListener;
+    private final ArrayList<Category> preSelectedCategories = new ArrayList<>();
 
     public InterestChooserAdapter(List<Category> mList, Context context,
-            CategorySelectionListener mCategorySelectionListener) {
+                                  CategorySelectionListener mCategorySelectionListener) {
         this.categories = mList;
         this.context = context;
         this.mCategorySelectionListener = mCategorySelectionListener;
@@ -58,12 +64,10 @@ public class InterestChooserAdapter extends Adapter<InterestChooserAdapter.VIewH
                     .into(mChooseCategoryBinding.thumbImage);
             mChooseCategoryBinding.title.setText(category.getTitle());
             mChooseCategoryBinding.imageCard.setChecked(category.isSelected());
-            mChooseCategoryBinding.imageCard.setOnClickListener(v -> {
-                mCategorySelectionListener.onCategorySelection(categories.indexOf(category));
-            });
-            mChooseCategoryBinding.parent.setOnClickListener(v -> {
-                mCategorySelectionListener.onCategorySelection(categories.indexOf(category));
-            });
+            mChooseCategoryBinding.imageCard.setOnClickListener(v ->
+                    mCategorySelectionListener.onCategorySelection(categories.indexOf(category)));
+            mChooseCategoryBinding.parent.setOnClickListener(v ->
+                    mCategorySelectionListener.onCategorySelection(categories.indexOf(category)));
         }
     }
 

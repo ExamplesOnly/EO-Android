@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
@@ -18,6 +19,8 @@ import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.auth.AuthInterface;
 import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.ui.auth.AuthFragment;
+import com.examplesonly.android.ui.auth.ForgotPassFragment;
+import com.examplesonly.android.ui.auth.SetPasswordFragment;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -124,17 +127,16 @@ public class LoginActivity extends AppCompatActivity {
                         userInterface.me().enqueue(new Callback<User>() {
                             @Override
                             public void onResponse(final @NotNull Call<User> call, final @NotNull Response<User> response) {
-                                Intent main;
                                 if (response.isSuccessful() && response.body() != null) {
+                                    loadingDialog.dismiss();
                                     userDataProvider.saveUserData(response.body());
                                     if (authResponse.body().containsKey("newAccount")) {
-                                        main = new Intent(LoginActivity.this, ChooseCategoryActivity.class);
+                                        launchSetPass();
                                     } else {
-                                        main = new Intent(LoginActivity.this, MainActivity.class);
+                                        Intent main = new Intent(LoginActivity.this, MainActivity.class);
+                                        startActivity(main);
+                                        finish();
                                     }
-                                    loadingDialog.dismiss();
-                                    startActivity(main);
-                                    finish();
                                 } else {
                                     loadingDialog.dismiss();
                                     Snackbar.make(binding.getRoot(), "Something went wrong. Please try again.",
@@ -170,5 +172,8 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
+    public void launchSetPass() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.login_root, new SetPasswordFragment()).commit();
+    }
 }

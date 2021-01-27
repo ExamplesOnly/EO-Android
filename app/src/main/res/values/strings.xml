@@ -8,7 +8,7 @@
     <string name="login_with_linkedin">Continue with LinkedIn</string>
 
     <string name="user_full_name">%s %s</string>
-    <string name="choose_category">Voilà! I\'m interested in…</string>
+    <string name="choose_category">What are you interested in?</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="publish">Publish</string>
     <string name="question">Question</string>
@@ -45,8 +45,15 @@
     <string name="google_server_client_id">44367283781-cqb8fg2tibjfh6ij2su1n54gcmrsrv4b.apps.googleusercontent.com</string>
     <string name="logging_out">Logging out…</string>
     <string name="logging_in">Logging in…</string>
+    <string name="loading">Loading…</string>
+    <string name="updating">Updating…</string>
     <string name="forgot_your_password">Forgot your password?</string>
     <string name="enter_email_to_continue">Enter you email address and we\'ll send you a link to get back into your account.</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="new_password">New Password</string>
+    <string name="one_more_to_go">1 more to go…</string>
+    <string name="get_started">Get Started</string>
+    <string name="refresh">Refresh</string>
+    <string name="pattern_capital_letter">^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$</string>
+    <string name="something_went_wrong">Something went wrong. Please try again.</string>
 </resources>

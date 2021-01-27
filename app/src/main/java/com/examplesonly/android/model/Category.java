@@ -2,6 +2,9 @@ package com.examplesonly.android.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.annotation.Nullable;
+
 public class Category implements Parcelable {
 
     int id;
@@ -45,6 +48,17 @@ public class Category implements Parcelable {
         parcel.writeString(thumbUrl);
         parcel.writeString(slug);
         parcel.writeByte((byte) (selected ? 1 : 0));
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        boolean equal = false;
+
+        if (obj instanceof Category) {
+            Category category = (Category) obj;
+            equal = this.id == category.id;
+        }
+        return equal;
     }
 
     public int getId() {
