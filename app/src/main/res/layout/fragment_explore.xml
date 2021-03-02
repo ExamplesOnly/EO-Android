@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragment.HomeFragment">
 
 
@@ -21,45 +21,49 @@
     </LinearLayout>
 
 
-    <com.google.android.material.tabs.TabLayout
+    <com.ogaclejapan.smarttablayout.SmartTabLayout
         android:id="@+id/tab"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
+        android:clipToPadding="false"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tabIndicatorColor="@color/dark"
-        app:tabIndicatorFullWidth="true"
-        app:tabMaxWidth="300dp"
-        app:tabMode="scrollable" />
+        app:stl_defaultTabTextColor="@color/md_grey_600"
+        app:stl_defaultTabTextHorizontalPadding="18dp"
+        app:stl_dividerColor="@color/transparent"
+        app:stl_dividerThickness="0dp"
+        app:stl_indicatorColor="@color/md_grey_300"
+        app:stl_indicatorCornerRadius="18dp"
+        app:stl_indicatorGravity="center"
+        app:stl_indicatorInterpolation="smart"
+        app:stl_indicatorThickness="36dp"
+        app:stl_underlineColor="@color/transparent"
+        app:stl_underlineThickness="0dp" />
+
+    <!--    <com.google.android.material.tabs.TabLayout-->
+    <!--        android:id="@+id/tab"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:tabIndicatorColor="@color/dark"-->
+    <!--        app:tabIndicatorFullWidth="true"-->
+    <!--        app:tabMaxWidth="300dp"-->
+    <!--        app:tabMode="scrollable" />-->
 
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tab"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_constraintTop_toBottomOf="@+id/tab" />
 
-    <!--    <ScrollView-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
-    <!--        <LinearLayout-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:orientation="vertical">-->
-
-    <!--            <include layout="@layout/view_explore_item_big_thumb"/>-->
-
-    <!--            <include-->
-    <!--                layout="@layout/view_explore_item_small_thumb"/>-->
-    <!--            <include-->
-    <!--                layout="@layout/view_explore_item_small_thumb"/>-->
-
-    <!--        </LinearLayout>-->
-    <!--    </ScrollView>-->
 </androidx.constraintlayout.widget.ConstraintLayout>

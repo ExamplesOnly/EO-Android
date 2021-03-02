@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
@@ -102,12 +103,36 @@ public class ProfileFragment extends Fragment {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
 
         init();
-        updateProfile();
+        updateProfile(currentUser, true);
+
+
+        mUserInterface.getUserProfile(currentUser.getUuid()).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(final @NotNull Call<User> call, final @NotNull Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    currentUser = response.body();
+                    updateProfile(currentUser, false);
+                } else {
+                    try {
+                        Timber.e(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(final @NotNull Call<User> call, final @NotNull Throwable t) {
+                t.printStackTrace();
+                Timber.e("getUserProfile onFailure");
+                Timber.e(t);
+            }
+        });
 
         binding.esmIcon.setImageDrawable(
-                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_esm_4, getActivity().getTheme()));
+                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_esm_4, requireActivity().getTheme()));
         binding.eoiIcon.setImageDrawable(
-                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_eye_3, getActivity().getTheme()));
+                ResourcesCompat.getDrawable(getResources(), R.drawable.ic_eye_3, requireActivity().getTheme()));
 
         // Inflate the layout for this fragment
         return binding.getRoot();
@@ -116,7 +141,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateProfile();
+//        updateProfile(currentUser);
     }
 
     void init() {
@@ -152,7 +177,7 @@ public class ProfileFragment extends Fragment {
         savedVideosAdapter.setIsLoggedInUser(false);
         binding.saveList.setAdapter(savedVideosAdapter);
 
-        List<Fragment> profileFragments = new Vector<Fragment>();
+        List<Fragment> profileFragments = new Vector<>();
         profileFragments.add(ProfileVideosFragment.newInstance(currentUser));
         profileFragments.add(ProfileStatsFragment.newInstance(currentUser));
 
@@ -186,9 +211,9 @@ public class ProfileFragment extends Fragment {
             }
 
             binding.clipSelected.setBackground(
-                    ResourcesCompat.getDrawable(getResources(), R.color.md_grey_600, getActivity().getTheme()));
+                    ResourcesCompat.getDrawable(getResources(), R.color.md_grey_600, requireActivity().getTheme()));
             binding.statSelected.setBackground(
-                    ResourcesCompat.getDrawable(getResources(), R.color.transparent, getActivity().getTheme()));
+                    ResourcesCompat.getDrawable(getResources(), R.color.transparent, requireActivity().getTheme()));
         });
         binding.statsTab.setOnClickListener(view -> {
             currentTab = TAB_SAVED_VIDEOS;
@@ -203,89 +228,53 @@ public class ProfileFragment extends Fragment {
             }
 
             binding.statSelected.setBackground(
-                    ResourcesCompat.getDrawable(getResources(), R.color.md_grey_600, getActivity().getTheme()));
+                    ResourcesCompat.getDrawable(getResources(), R.color.md_grey_600, requireActivity().getTheme()));
             binding.clipSelected.setBackground(
-                    ResourcesCompat.getDrawable(getResources(), R.color.transparent, getActivity().getTheme()));
+                    ResourcesCompat.getDrawable(getResources(), R.color.transparent, requireActivity().getTheme()));
         });
     }
 
-    void updateProfile() {
-        if (currentUser.getUuid().equals(userDataProvider.getCurrentUser().getUuid())) {
-            currentUser = userDataProvider.getCurrentUser();
-
-            binding.profileActionButton
-                    .setBackgroundColor(getResources().getColor(R.color.md_grey_100, getContext().getTheme()));
-            binding.profileActionButton
-                    .setStrokeColorResource(R.color.md_grey_500);
-            binding.profileActionButton
-                    .setText(R.string.edit_profile);
-            binding.profileActionButton
-                    .setTextColor(getResources().getColor(R.color.dark, getContext().getTheme()));
-            binding.profileActionButton.setStrokeWidth(4);
-            binding.profileActionButton.setOnClickListener(view -> {
-                Intent editProfile = new Intent(getActivity(), EditProfileActivity.class);
-                startActivity(editProfile);
-            });
-        } else {
-            binding.profileActionButton
-                    .setVisibility(View.GONE);
-            binding.statsTab.setVisibility(View.GONE);
-        }
-
-
+    void updateProfile(User userProfile, boolean isLoading) {
         binding.saveList.setVisibility(View.GONE);
         binding.noExamples.setVisibility(View.GONE);
 
-        mUserInterface.getUserProfile(currentUser.getUuid()).enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(final @NotNull Call<User> call, final @NotNull Response<User> response) {
-                if (response.isSuccessful()) {
-                    mExampleList.clear();
-                    mExampleList.addAll(response.body().getVideos());
-                    profileVideosAdapter.notifyDataSetChanged();
+        if (isLoading) {
+            setButtonActionActive(false);
+            binding.profileActionButton.setText("Loading");
+        } else {
+            updateActionButton(userProfile);
+        }
 
-                    if (parentActivity != null && isAdded())
-                        Glide.with(requireActivity())
-                                .load(response.body().getCoverPhoto())
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .placeholder(R.color.md_grey_200)
-                                .transition(withCrossFade(factory))
-                                .into(binding.coverImage);
-                    exampleLoaded = true;
+        mExampleList.clear();
+        mExampleList.addAll(userProfile.getVideos());
+        profileVideosAdapter.notifyDataSetChanged();
 
-                    if (mExampleList.size() == 0 && currentTab == TAB_USER_VIDEOS) {
-                        binding.noExamples.setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    try {
-                        Timber.e(response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+        if (parentActivity != null && isAdded())
+            Glide.with(requireActivity())
+                    .load(userProfile.getCoverPhoto())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.color.md_grey_200)
+                    .transition(withCrossFade(factory))
+                    .into(binding.coverImage);
+        exampleLoaded = true;
 
-            @Override
-            public void onFailure(final @NotNull Call<User> call, final @NotNull Throwable t) {
-                t.printStackTrace();
-                Timber.e("getUserProfile onFailure");
-                Timber.e(t.getMessage());
-            }
-        });
+        if (mExampleList.size() == 0 && currentTab == TAB_USER_VIDEOS) {
+            binding.noExamples.setVisibility(View.VISIBLE);
+        }
 
-        binding.name.setText(currentUser.getFirstName());
-        binding.bio.setText(currentUser.getBio());
+        binding.name.setText(userProfile.getFirstName());
+        binding.bio.setText(userProfile.getBio());
 
         if (parentActivity != null && isAdded()) {
             Glide.with(requireActivity())
-                    .load(currentUser.getProfilePhoto())
+                    .load(userProfile.getProfilePhoto())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.ic_user)
                     .transition(withCrossFade(factory))
                     .into(binding.profileImage);
 
             Glide.with(requireActivity())
-                    .load(currentUser.getCoverPhoto())
+                    .load(userProfile.getCoverPhoto())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.color.md_grey_200)
                     .transition(withCrossFade(factory))
@@ -295,6 +284,120 @@ public class ProfileFragment extends Fragment {
         updateVideos();
     }
 
+    void updateActionButton(User userProfile) {
+
+        // profile is of logged in user
+        if (userProfile.getUuid().equals(userDataProvider.getCurrentUser().getUuid())) {
+            currentUser = userDataProvider.getCurrentUser();
+
+            setButtonActionActive(false);
+            binding.profileActionButton
+                    .setText(R.string.edit_profile);
+
+            binding.profileActionButton.setOnClickListener(view -> {
+                Intent editProfile = new Intent(getActivity(), EditProfileActivity.class);
+                startActivity(editProfile);
+            });
+        }
+
+        // profile is of other user
+        else {
+            // if current user is following this user
+            if (userProfile.isFollowing()) {
+                setButtonActionActive(false);
+                binding.profileActionButton
+                        .setText(R.string.following);
+
+                // UnFollow the user
+                binding.profileActionButton.setOnClickListener(view -> unFollowUser(userProfile));
+            }
+            // this user is following current user
+            else if (userProfile.isFollowedBy()) {
+                setButtonActionActive(true);
+                binding.profileActionButton
+                        .setText(R.string.follow_back);
+
+                // Follow the user
+                binding.profileActionButton.setOnClickListener(view -> followUser(userProfile));
+            }
+            // Nothing. Ask the current user to follow this user
+            else {
+                binding.profileActionButton
+                        .setText(R.string.follow);
+                setButtonActionActive(true);
+
+                // Follow the user
+                binding.profileActionButton.setOnClickListener(view -> followUser(userProfile));
+            }
+            binding.statsTab.setVisibility(View.GONE);
+        }
+    }
+
+    void setButtonActionActive(boolean isActive) {
+        if (isActive) {
+            binding.profileActionButton
+                    .setBackgroundColor(getResources().getColor(R.color.colorPrimary, requireContext().getTheme()));
+            binding.profileActionButton
+                    .setTextColor(getResources().getColor(R.color.white, requireContext().getTheme()));
+            binding.profileActionButton.setStrokeWidth(0);
+        } else {
+            binding.profileActionButton
+                    .setBackgroundColor(getResources().getColor(R.color.md_grey_100, requireContext().getTheme()));
+            binding.profileActionButton
+                    .setStrokeColorResource(R.color.md_grey_500);
+            binding.profileActionButton
+                    .setText(R.string.edit_profile);
+            binding.profileActionButton
+                    .setTextColor(getResources().getColor(R.color.dark, requireContext().getTheme()));
+            binding.profileActionButton.setStrokeWidth(4);
+        }
+    }
+
+    void unFollowUser(User userProfile) {
+        currentUser.setFollowing(false);
+        updateActionButton(currentUser);
+        mUserInterface.unFollowUser(userProfile.getUuid())
+                .enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(@NotNull Call<User> call, @NotNull Response<User> response) {
+                        if (!response.isSuccessful()) {
+                            currentUser.setFollowing(true);
+                            updateActionButton(currentUser);
+                            Toast.makeText(requireContext(), "Couldn't unfollow " + userProfile.getFirstName(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull Call<User> call, @NotNull Throwable t) {
+                        currentUser.setFollowing(true);
+                        updateActionButton(currentUser);
+                        Toast.makeText(requireContext(), "Couldn't unfollow " + userProfile.getFirstName(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    void followUser(User userProfile) {
+        currentUser.setFollowing(true);
+        updateActionButton(currentUser);
+        mUserInterface.followUser(userProfile.getUuid())
+                .enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(@NotNull Call<User> call, @NotNull Response<User> response) {
+                        if (!response.isSuccessful()) {
+                            currentUser.setFollowing(false);
+                            updateActionButton(currentUser);
+                            Toast.makeText(requireContext(), "Couldn't follow " + userProfile.getFirstName(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull Call<User> call, @NotNull Throwable t) {
+                        currentUser.setFollowing(true);
+                        updateActionButton(currentUser);
+                        Toast.makeText(requireContext(), "Couldn't follow " + userProfile.getFirstName(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
 
     void updateVideos() {
         mUserInterface.getBookmarks().enqueue(new Callback<ArrayList<Video>>() {
@@ -316,7 +419,7 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onFailure(final Call<ArrayList<Video>> call, final Throwable t) {
-                Log.e("PROFILE", "FAIL");
+                Timber.e("FAIL");
             }
         });
     }

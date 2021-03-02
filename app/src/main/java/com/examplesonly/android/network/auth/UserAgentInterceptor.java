@@ -29,8 +29,6 @@ public class UserAgentInterceptor implements Interceptor {
             e.printStackTrace();
         }
 
-        Timber.e("EO-Agent %s", eoAgent.toString());
-
         Request authenticatedRequest = chain.request()
                 .newBuilder()
                 .addHeader("User-Agent", System.getProperty("http.agent"))

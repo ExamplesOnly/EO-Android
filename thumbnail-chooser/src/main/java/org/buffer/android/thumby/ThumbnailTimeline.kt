@@ -87,8 +87,11 @@ class ThumbnailTimeline @JvmOverloads constructor(
         val metaDataSource = MediaMetadataRetriever()
         metaDataSource.setDataSource(context, uri)
 
-        val videoLength = (metaDataSource.extractMetadata(
-                MediaMetadataRetriever.METADATA_KEY_DURATION).toInt() * 1000).toLong()
+        val videoLength = (
+                (metaDataSource.extractMetadata(
+                        MediaMetadataRetriever.METADATA_KEY_DURATION)?.toInt() ?: 0)
+
+                        * 1000).toLong()
 
         val thumbnailCount = 7
 
@@ -96,7 +99,7 @@ class ThumbnailTimeline @JvmOverloads constructor(
 
         for (i in 0 until thumbnailCount - 1) {
             val frameTime = i * interval
-            var bitmap = metaDataSource.getFrameAtTime(frameTime, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
+            var bitmap = metaDataSource.getFrameAtTime(frameTime, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)!!
             try {
                 val targetWidth: Int
                 val targetHeight: Int

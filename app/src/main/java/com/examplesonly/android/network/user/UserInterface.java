@@ -4,8 +4,10 @@ import com.examplesonly.android.model.Category;
 import com.examplesonly.android.model.Demand;
 import com.examplesonly.android.model.User;
 import com.examplesonly.android.model.Video;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -16,6 +18,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface UserInterface {
 
@@ -54,5 +57,23 @@ public interface UserInterface {
 
     @GET("v1/user/getProfile/{uuid}")
     Call<User> getUserProfile(@Path("uuid") String uuid);
+
+    @FormUrlEncoded
+    @POST("v1/user/follow")
+    Call<User> followUser(@Field("uuid") String uuid);
+
+    @FormUrlEncoded
+    @POST("v1/user/unfollow")
+    Call<User> unFollowUser(@Field("uuid") String uuid);
+
+    @GET("v1/user/followers/{uuid}")
+    Call<ArrayList<User>> getFollowers(@Path("uuid") String uuid,
+                                           @Query("sort") String sort,
+                                           @Query("offset") Integer offset);
+
+    @GET("v1/user/followings/{uuid}")
+    Call<ArrayList<User>> getFollowings(@Path("uuid") String uuid,
+                                           @Query("sort") String sort,
+                                           @Query("offset") Integer offset);
 
 }

@@ -5,21 +5,27 @@
         android:enabled="true"
         android:icon="@drawable/selector_nav_home"
         android:title="Home" />
+    <!--    <item-->
+    <!--        android:id="@+id/explore"-->
+    <!--        android:enabled="true"-->
+    <!--        android:icon="@drawable/selector_nav_explore"-->
+    <!--        android:title="Explore" />-->
+
     <item
-        android:id="@+id/explore"
+        android:id="@+id/ask_eo"
         android:enabled="true"
-        android:icon="@drawable/selector_nav_explore"
-        android:title="Explore" />
+        android:icon="@drawable/selector_nav_demand"
+        android:title="Ask EO" />
     <item
         android:id="@+id/add"
         android:enabled="true"
         android:icon="@drawable/ic_add_mono"
         android:title="Add" />
     <item
-        android:id="@+id/ask_eo"
+        android:id="@+id/notification"
         android:enabled="true"
-        android:icon="@drawable/selector_nav_demand"
-        android:title="Ask EO" />
+        android:icon="@drawable/selector_nav_notification"
+        android:title="Notification" />
     <item
         android:id="@+id/profile"
         android:enabled="true"

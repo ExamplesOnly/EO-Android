@@ -14,13 +14,13 @@ android {
             keyPassword '123456'
         }
     }
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.examplesonly.android"
         minSdkVersion 23
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 18
         versionName "1.0.13"
 

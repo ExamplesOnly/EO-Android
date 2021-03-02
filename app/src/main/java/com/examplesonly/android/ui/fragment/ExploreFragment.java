@@ -6,15 +6,20 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.fragment.app.Fragment;
+
 import com.examplesonly.android.adapter.ExploreTabAdapter;
 import com.examplesonly.android.databinding.FragmentExploreBinding;
 import com.examplesonly.android.model.Category;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.category.CategoryInterface;
+
 import java.io.IOException;
 import java.util.ArrayList;
+
 import org.jetbrains.annotations.NotNull;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,7 +42,7 @@ public class ExploreFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         binding = FragmentExploreBinding.inflate(inflater, container, false);
 
         binding.noInternet.setVisibility(View.GONE);
@@ -46,7 +51,7 @@ public class ExploreFragment extends Fragment {
         mExploreTabAdapter = new ExploreTabAdapter(getChildFragmentManager(), BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT,
                 categoryList);
         binding.viewpager.setAdapter(mExploreTabAdapter);
-        binding.tab.setupWithViewPager(binding.viewpager);
+        binding.tab.setViewPager(binding.viewpager);
 
         updateList();
 
@@ -63,7 +68,7 @@ public class ExploreFragment extends Fragment {
         mCategoryInterface.getCategories().enqueue(new Callback<ArrayList<Category>>() {
             @Override
             public void onResponse(final @NotNull Call<ArrayList<Category>> call,
-                    final @NotNull Response<ArrayList<Category>> response) {
+                                   final @NotNull Response<ArrayList<Category>> response) {
 
                 binding.tab.setVisibility(View.VISIBLE);
                 binding.viewpager.setVisibility(View.VISIBLE);

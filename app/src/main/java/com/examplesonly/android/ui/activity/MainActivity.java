@@ -40,6 +40,7 @@ import com.examplesonly.android.ui.fragment.DemandDetailsFragment;
 import com.examplesonly.android.ui.fragment.DemandFragment;
 import com.examplesonly.android.ui.fragment.ExploreFragment;
 import com.examplesonly.android.ui.fragment.HomeFragment;
+import com.examplesonly.android.ui.fragment.NotificationFragment;
 import com.examplesonly.android.ui.fragment.ProfileFragment;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -66,10 +67,11 @@ public class MainActivity extends AppCompatActivity
         implements VideoClickListener, RootFragmentListener, BottomSheetOptionChooseListener, FragmentChangeListener,
         FragNavController.TransactionListener {
 
-    private final int UPDATE_REQUEST_CODE = 1010;
-    private final int INDEX_HOME = 0;
-    private final int INDEX_EXPLORE = 1;
-    private final int INDEX_EOD = 2;
+    private static final int UPDATE_REQUEST_CODE = 1010;
+    private static final int INDEX_HOME = 0;
+    //  private static final int INDEX_EXPLORE = 1;
+    private static final int INDEX_EOD = 1;
+    public static final int INDEX_NOTIFICATION = 2;
     public static final int INDEX_PROFILE = 3;
     public static final int INDEX_DEMAND_DETAILS = 4;
 
@@ -113,8 +115,12 @@ public class MainActivity extends AppCompatActivity
             int itemId = item.getItemId();
             if (itemId == R.id.home) {
                 fragNavController.switchTab(INDEX_HOME);
-            } else if (itemId == R.id.explore) {
-                fragNavController.switchTab(INDEX_EXPLORE);
+            }
+//            else if (itemId == R.id.explore) {
+//                fragNavController.switchTab(INDEX_EXPLORE);
+//            }
+            else if (itemId == R.id.ask_eo) {
+                fragNavController.switchTab(INDEX_EOD);
             } else if (itemId == R.id.add) {
                 ArrayList<BottomSheetOption> optionList = new ArrayList<>();
                 optionList.add(new BottomSheetOption(OPTION_CHOOSE_VIDEO, "Upload from device",
@@ -125,8 +131,8 @@ public class MainActivity extends AppCompatActivity
                         ContextCompat.getDrawable(this, R.drawable.ic_video_question_mono)));
                 BottomSheetOptionsDialog bottomSheet = new BottomSheetOptionsDialog("Create", optionList);
                 bottomSheet.show(getSupportFragmentManager(), "ModalBottomSheet");
-            } else if (itemId == R.id.ask_eo) {
-                fragNavController.switchTab(INDEX_EOD);
+            } else if (itemId == R.id.notification) {
+                fragNavController.switchTab(INDEX_NOTIFICATION);
             } else if (itemId == R.id.profile) {
                 fragNavController.switchTab(INDEX_PROFILE);
             }
@@ -198,10 +204,12 @@ public class MainActivity extends AppCompatActivity
         switch (i) {
             case INDEX_HOME:
                 return new HomeFragment();
-            case INDEX_EXPLORE:
-                return new ExploreFragment();
+//            case INDEX_EXPLORE:
+//                return new ExploreFragment();
             case INDEX_EOD:
                 return new DemandFragment();
+            case INDEX_NOTIFICATION:
+                return new NotificationFragment();
             case INDEX_PROFILE:
                 return ProfileFragment.newInstance(userDataProvider.getCurrentUser());
         }
@@ -319,8 +327,9 @@ public class MainActivity extends AppCompatActivity
 
     private void setupFragments() {
         fragments.add(new HomeFragment());
-        fragments.add(new ExploreFragment());
+//        fragments.add(new ExploreFragment());
         fragments.add(new DemandFragment());
+        fragments.add(new NotificationFragment());
         fragments.add(ProfileFragment.newInstance(userDataProvider.getCurrentUser()));
 
         fragNavController.setRootFragments(fragments);

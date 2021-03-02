@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
-            android:text="Follow"
+            android:text="@string/follow"
             android:textAllCaps="false"
             app:cornerRadius="20dp"
             app:layout_constraintBottom_toTopOf="@+id/personal_details_container"
@@ -105,10 +105,9 @@
                 android:id="@+id/bio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:text="User Bio"
                 android:fontFamily="@font/poppins"
-                android:textColor="@color/md_grey_900"
+                android:textColor="@color/md_grey_600"
                 android:textSize="14sp" />
         </LinearLayout>
 

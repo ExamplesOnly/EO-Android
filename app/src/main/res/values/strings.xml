@@ -56,4 +56,7 @@
     <string name="refresh">Refresh</string>
     <string name="pattern_capital_letter">^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$</string>
     <string name="something_went_wrong">Something went wrong. Please try again.</string>
+    <string name="follow">Follow</string>
+    <string name="following">Following</string>
+    <string name="follow_back">Follow Back</string>
 </resources>

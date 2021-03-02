@@ -15,7 +15,7 @@ object ThumbyUtils {
             frameTime: Long,
             width: Int,
             height: Int
-    ): Bitmap {
+    ): Bitmap? {
         val mediaMetadataRetriever = MediaMetadataRetriever()
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
             mediaMetadataRetriever.setDataSource(uri.path)
@@ -27,7 +27,7 @@ object ThumbyUtils {
 
         if (width > 0 && height > 0) {
             try {
-                bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false)
+                bitmap = Bitmap.createScaledBitmap(bitmap!!, width, height, false)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

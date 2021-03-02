@@ -2,8 +2,11 @@ package com.examplesonly.android.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
+
 public class User implements Parcelable {
 
     @SerializedName("uuid")
@@ -45,6 +48,15 @@ public class User implements Parcelable {
     @SerializedName("profileVerified")
     boolean profileVerified = false;
 
+    @SerializedName("blocked")
+    boolean blocked = false;
+
+    @SerializedName("isFollowing")
+    boolean isFollowing;
+
+    @SerializedName("isFollowedBy")
+    boolean isFollowedBy;
+
     @SerializedName("Categories")
     ArrayList<Category> categories = new ArrayList<>();
 
@@ -65,8 +77,10 @@ public class User implements Parcelable {
         dob = in.readString();
         password = in.readString();
         profilePhoto = in.readString();
-        int tmpVerified = in.readInt();
-        emailVerified = tmpVerified != 0;
+        emailVerified = in.readBoolean();
+        blocked = in.readBoolean();
+        isFollowedBy = in.readBoolean();
+        isFollowing = in.readBoolean();
 
         categories = in.readArrayList(Category.class.getClassLoader());
         videos = in.readArrayList(Video.class.getClassLoader());
@@ -101,7 +115,10 @@ public class User implements Parcelable {
         parcel.writeString(dob);
         parcel.writeString(password);
         parcel.writeString(profilePhoto);
-        parcel.writeInt(emailVerified ? 1 : 0);
+        parcel.writeBoolean(emailVerified);
+        parcel.writeBoolean(blocked);
+        parcel.writeBoolean(isFollowedBy);
+        parcel.writeBoolean(isFollowing);
         parcel.writeList(categories);
         parcel.writeList(videos);
     }
@@ -223,6 +240,30 @@ public class User implements Parcelable {
         return this;
     }
 
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    public boolean isFollowing() {
+        return isFollowing;
+    }
+
+    public void setFollowing(boolean following) {
+        isFollowing = following;
+    }
+
+    public boolean isFollowedBy() {
+        return isFollowedBy;
+    }
+
+    public void setFollowedBy(boolean followedBy) {
+        isFollowedBy = followedBy;
+    }
+
     public ArrayList<Category> getCategories() {
         return categories;
     }
@@ -257,6 +298,9 @@ public class User implements Parcelable {
                 ", coverPhoto='" + coverPhoto + '\'' +
                 ", emailVerified=" + emailVerified +
                 ", profileVerified=" + profileVerified +
+                ", blocked=" + blocked +
+                ", isFollowing=" + isFollowing +
+                ", isFollowedBy=" + isFollowedBy +
                 ", categories=" + categories +
                 ", videos=" + videos +
                 '}';
