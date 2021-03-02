@@ -81,7 +81,7 @@ public class VideoUploadService extends JobIntentService {
 
         int compress = FFmpeg.execute(
                 "-y -i \"" + videoData.getVideoFilePath() + "\" -c:v libx264 -crf 23 "
-                        + "-vf scale=\"480:-2\" "
+                        + "-vf scale=\"-2:720\" "
                         + "-preset ultrafast "
                         + "-x264-params opencl=true "
 //                        + "-hwaccel auto "
