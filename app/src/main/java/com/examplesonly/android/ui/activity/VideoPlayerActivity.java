@@ -98,6 +98,7 @@ import timber.log.Timber;
 public class VideoPlayerActivity extends AppCompatActivity implements VideoClickListener {
 
     public static final String VIDEO_DATA = "video_data";
+    public static final String VIDEO_DATA_TYPE = "video_data_type";
     public static final int OPTION_REPORT = 1;
     public static final int OPTION_COPY_LINK = 2;
     public static final int OPTION_SHARE = 3;
@@ -143,6 +144,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
         flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         window.getDecorView().setSystemUiVisibility(flags);
         window.setStatusBarColor(Color.BLACK);
+
+//        if(getIntent().getEx(VIDEO_DATA))
 
         Video newVideo = getIntent().getParcelableExtra(VIDEO_DATA);
 
@@ -549,7 +552,11 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoClick
             getSupportActionBar().hide();
         }
 
-        setRequestedOrientation(Integer.parseInt(currentVideo.getHeight()) < Integer.parseInt(currentVideo.getWidth())
+//        setRequestedOrientation(Integer.parseInt(currentVideo.getHeight()) < Integer.parseInt(currentVideo.getWidth())
+//                ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+
+        setRequestedOrientation(currentVideo.getHeight() < currentVideo.getWidth()
                 ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ConstraintSet landscapeConstrains = new ConstraintSet();

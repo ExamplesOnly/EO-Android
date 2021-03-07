@@ -10,9 +10,11 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.3.5'
 
-        classpath 'com.google.firebase:perf-plugin:1.3.4'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
+        classpath 'com.google.firebase:perf-plugin:1.3.5'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.1'
         classpath 'com.google.android.gms:oss-licenses-plugin:0.10.2'
+        classpath 'com.apollographql.apollo:apollo-gradle-plugin:2.5.4'
+        classpath 'com.apollographql.apollo:apollo-gradle-plugin:2.5.4'
     }
 }
 
@@ -26,4 +28,9 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+tasks.register("downloadSchema", com.apollographql.apollo.gradle.internal.ApolloDownloadSchemaTask) {
+    endpoint = "https://dev-api.examplesonly.com/graphql"
+    schemaRelativeToProject = "src/main/graphql/com/examplesonly/android/schema.json"
 }

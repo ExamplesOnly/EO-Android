@@ -6,10 +6,12 @@ import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_CAMERA
 import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_CHOOSE_VIDEO;
 import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_NEW_DEMAND;
 import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_DATA;
+import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_DATA_TYPE;
 
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,11 +24,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.examplesonly.android.BuildConfig;
+import com.examplesonly.android.FeedQuery;
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
 import com.examplesonly.android.component.BottomSheetOptionsDialog;
 import com.examplesonly.android.component.BottomSheetOptionsDialog.BottomSheetOptionChooseListener;
 import com.examplesonly.android.databinding.ActivityMainBinding;
+import com.examplesonly.android.handler.FeedClickListener;
 import com.examplesonly.android.handler.FragmentChangeListener;
 import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.BottomSheetOption;
@@ -64,7 +68,7 @@ import org.jetbrains.annotations.Nullable;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
-        implements VideoClickListener, RootFragmentListener, BottomSheetOptionChooseListener, FragmentChangeListener,
+        implements VideoClickListener, FeedClickListener, RootFragmentListener, BottomSheetOptionChooseListener, FragmentChangeListener,
         FragNavController.TransactionListener {
 
     private static final int UPDATE_REQUEST_CODE = 1010;
@@ -254,14 +258,35 @@ public class MainActivity extends AppCompatActivity
         Intent videoPlayer = new Intent(MainActivity.this, VideoPlayerActivity.class);
 //        Intent videoPlayer = new Intent(MainActivity.this, VideoSwipeActivity.class);
         videoPlayer.putExtra(VIDEO_DATA, video);
+        startActivity(videoPlayer);
+    }
 
-//        Pair<View, String> p1 = Pair.create(findViewById(R.id.thumbnail), "thumbnail");
-//        Pair<View, String> p2 = Pair.create(vPalette, "palette");
-//        Pair<View, String> p3 = Pair.create((View) tvName, "text");
-//        ActivityOptionsCompat options = ActivityOptionsCompat.
-//                makeSceneTransitionAnimation(this, p1);
-//        startActivity(videoPlayer, options.toBundle());
+    @Override
+    public void onVideoClicked(FeedQuery.Feed video) {
+        Video newVideo = new Video();
+        newVideo.setVideoId(video.videoId());
+        newVideo.setSize(video.size());
+        newVideo.setDuration(video.duration());
+        newVideo.setTitle(video.title());
+        newVideo.setDescription(video.description());
+        newVideo.setUrl(video.url());
+        newVideo.setThumbUrl(video.thumbUrl());
+        newVideo.setBow(video.bow() != null ? video.bow() : 0);
+        newVideo.setViewCount(video.view() != null ? video.view() : 0);
+        newVideo.setUserBowed(video.userBowed() != null && video.userBowed() ? 1 : 0);
+        newVideo.setUserBookmarked(video.userBookmarked() != null && video.userBookmarked() ? 1 : 0);
+        newVideo.setUser(new User()
+                .setUuid(video.publisher().uuid())
+                .setEmail(video.publisher().email())
+                .setFirstName(video.publisher().firstName())
+                .setMiddleName(video.publisher().middleName())
+                .setLastName(video.publisher().lastName())
+                .setProfilePhoto(video.publisher().profileImage())
+                .setCoverPhoto(video.publisher().coverImage())
+        );
 
+        Intent videoPlayer = new Intent(MainActivity.this, VideoPlayerActivity.class);
+        videoPlayer.putExtra(VIDEO_DATA, newVideo);
         startActivity(videoPlayer);
     }
 

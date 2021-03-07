@@ -90,14 +90,18 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
             if (video != null) {
                 Glide.with(context).load(video.getThumbUrl()).into(mItemOneBinding.thumbnail);
                 mItemOneBinding.title.setText(video.getTitle());
-                mItemOneBinding.duration.setText(new DateUtil().millisToTime(Long.parseLong(video.getDuration())));
+//                mItemOneBinding.duration.setText(new DateUtil().millisToTime(Long.parseLong(video.getDuration())));
+                mItemOneBinding.duration.setText(new DateUtil().millisToTime(video.getDuration()));
 
                 ConstraintLayout thumbnailConstraintLayout = mItemOneBinding.thumbConstrains;
                 ConstraintSet constraintSet = new ConstraintSet();
                 constraintSet.clone(thumbnailConstraintLayout);
 
+//                if (MediaUtil
+//                        .isVideoLarger(Integer.parseInt(video.getHeight()), Integer.parseInt(video.getWidth()))) {
+
                 if (MediaUtil
-                        .isVideoLarger(Integer.parseInt(video.getHeight()), Integer.parseInt(video.getWidth()))) {
+                        .isVideoLarger(video.getHeight(), video.getWidth())) {
                     constraintSet.setDimensionRatio(mItemOneBinding.thumbnail.getId(), "9:11");
                 } else {
                     constraintSet.setDimensionRatio(mItemOneBinding.thumbnail.getId(),

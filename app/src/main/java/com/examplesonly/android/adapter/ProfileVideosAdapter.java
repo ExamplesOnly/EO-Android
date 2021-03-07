@@ -93,8 +93,11 @@ public class ProfileVideosAdapter extends Adapter<ProfileVideosAdapter.VIewHolde
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone(thumbnailConstraintLayout);
 
+//            if (!MediaUtil
+//                    .isVideoLarger(Integer.parseInt(video.getHeight()), Integer.parseInt(video.getWidth()))) {
+
             if (!MediaUtil
-                    .isVideoLarger(Integer.parseInt(video.getHeight()), Integer.parseInt(video.getWidth()))) {
+                    .isVideoLarger(video.getHeight(), video.getWidth())) {
 
                 constraintSet.setDimensionRatio(mChooseCategoryBinding.thumbnail.getId(),
                         video.getWidth() + ":" + video.getHeight());

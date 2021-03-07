@@ -1,0 +1,25 @@
+query Feed($limit: Int!, $offset: Int!) {
+    Feed(limit: $limit, offset: $offset) {
+        videoId
+        size
+        duration
+        title
+        description
+        url
+        thumbUrl
+        bow
+        view
+        userBowed
+        userBookmarked
+        publisher {
+            uuid
+            email
+            firstName
+            middleName
+            lastName
+            profileImage
+            coverImage
+        }
+    }
+}
+

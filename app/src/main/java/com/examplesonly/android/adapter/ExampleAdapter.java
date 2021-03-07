@@ -6,10 +6,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
@@ -21,12 +23,14 @@ import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.android.util.MediaUtil;
 import com.examplesonly.gallerypicker.utils.DateUtil;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import timber.log.Timber;
 
 public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -102,7 +106,7 @@ public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public class ExampleItemFourViewHolder extends RecyclerView.ViewHolder {
 
         public ExampleItemFourViewHolder(@NonNull final ViewExampleItemFourBinding itemView,
-                @NonNull Context context) {
+                                         @NonNull Context context) {
             super(itemView.getRoot());
 
         }
@@ -116,7 +120,7 @@ public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 new DrawableCrossFadeFactory.Builder().setCrossFadeEnabled(true).build();
 
         public ExampleItemThreeViewHolder(@NonNull final ViewExampleItemThreeBinding itemView,
-                @NonNull Context context) {
+                                          @NonNull Context context) {
             super(itemView.getRoot());
             binding = itemView;
             this.context = context;
@@ -134,8 +138,14 @@ public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     binding.title.setText(video.getTitle());
                 }
 
+//                binding.metaData.setText(
+//                        String.format("%s • %s", new DateUtil().millisToTime(Long.parseLong(video.getDuration())),
+//                                new DateUtil()
+//                                        .getPrettyDateString(StringToDate(video.getCreatedAt()).getTime()))
+//                );
+
                 binding.metaData.setText(
-                        String.format("%s • %s", new DateUtil().millisToTime(Long.parseLong(video.getDuration())),
+                        String.format("%s • %s", new DateUtil().millisToTime(video.getDuration()),
                                 new DateUtil()
                                         .getPrettyDateString(StringToDate(video.getCreatedAt()).getTime()))
                 );
@@ -184,14 +194,17 @@ public class ExampleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 } else {
                     mItemOneBinding.title.setText(video.getTitle());
                 }
-                mItemOneBinding.duration.setText(new DateUtil().millisToTime(Long.parseLong(video.getDuration())));
+//                mItemOneBinding.duration.setText(new DateUtil().millisToTime(Long.parseLong(video.getDuration())));
+                mItemOneBinding.duration.setText(new DateUtil().millisToTime(video.getDuration()));
 
                 ConstraintLayout thumbnailConstraintLayout = mItemOneBinding.thumbConstrains;
                 ConstraintSet constraintSet = new ConstraintSet();
                 constraintSet.clone(thumbnailConstraintLayout);
 
+//                if (MediaUtil
+//                        .isVideoLarger(Integer.parseInt(video.getHeight()), Integer.parseInt(video.getWidth()))) {
                 if (MediaUtil
-                        .isVideoLarger(Integer.parseInt(video.getHeight()), Integer.parseInt(video.getWidth()))) {
+                        .isVideoLarger(video.getHeight(), video.getWidth())) {
                     constraintSet.setDimensionRatio(mItemOneBinding.thumbnail.getId(), "9:11");
                 } else {
                     constraintSet.setDimensionRatio(mItemOneBinding.thumbnail.getId(),

@@ -9,9 +9,9 @@ public class Video implements Parcelable {
 
     String videoId;
     int size;
-    String duration;
-    String height;
-    String width;
+    int duration;
+    int height;
+    int width;
     String title;
     String description;
     String blurHash;
@@ -48,9 +48,9 @@ public class Video implements Parcelable {
     protected Video(Parcel in) {
         videoId = in.readString();
         size = in.readInt();
-        duration = in.readString();
-        height = in.readString();
-        width = in.readString();
+        duration = in.readInt();
+        height = in.readInt();
+        width = in.readInt();
         title = in.readString();
         description = in.readString();
         blurHash = in.readString();
@@ -87,9 +87,9 @@ public class Video implements Parcelable {
     public void writeToParcel(final Parcel parcel, final int i) {
         parcel.writeString(videoId);
         parcel.writeInt(size);
-        parcel.writeString(duration);
-        parcel.writeString(height);
-        parcel.writeString(width);
+        parcel.writeInt(duration);
+        parcel.writeInt(height);
+        parcel.writeInt(width);
         parcel.writeString(title);
         parcel.writeString(description);
         parcel.writeString(blurHash);
@@ -123,29 +123,29 @@ public class Video implements Parcelable {
         return this;
     }
 
-    public String getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public Video setDuration(final String duration) {
+    public Video setDuration(final int duration) {
         this.duration = duration;
         return this;
     }
 
-    public String getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public Video setHeight(final String height) {
+    public Video setHeight(final int height) {
         this.height = height;
         return this;
     }
 
-    public String getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public Video setWidth(final String width) {
+    public Video setWidth(final int width) {
         this.width = width;
         return this;
     }

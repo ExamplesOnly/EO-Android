@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.examplesonly.android.R;
 import com.examplesonly.android.handler.UserAccountHandler;
@@ -17,8 +18,11 @@ import com.google.android.gms.common.api.Scope;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -144,6 +148,23 @@ public class UserDataProvider {
 
     public boolean isAuthorized() {
         return (!TextUtils.isEmpty(getAccessToken()) && !TextUtils.isEmpty(getRefreshToken()));
+    }
+
+    public boolean isAuthenticated() {
+        if (!isAuthorized())
+            return false;
+
+        try {
+            DecodedJWT jwt = JWT.decode(getAccessToken());
+
+            // Get current time on UTC
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            return jwt.getExpiresAt().after(cal.getTime());
+        } catch (JWTDecodeException exception) {
+            return false;
+        }
     }
 
     public boolean isVerified() {

@@ -33,6 +33,7 @@ public class TokenInterceptor implements Interceptor {
     public Response intercept(final Chain chain) throws IOException {
         if (userDataProvider.isAuthorized()) {
             String token = userDataProvider.getAccessToken();
+            Timber.e("TokenInterceptor intercept");
 
             Request authenticatedRequest = chain.request()
                     .newBuilder()

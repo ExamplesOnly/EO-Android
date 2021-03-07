@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: 'com.google.android.gms.oss-licenses-plugin'
+apply plugin: 'com.apollographql.apollo'
 
 android {
     signingConfigs {
@@ -36,7 +37,7 @@ android {
             buildConfigField "String", "API_URL", "\"https://api.examplesonly.com/\""
         }
         debug {
-            buildConfigField "String", "API_URL", "\"https://api.examplesonly.com/\""
+            buildConfigField "String", "API_URL", "\"https://dev-api.examplesonly.com/\""
         }
     }
     buildFeatures {
@@ -96,10 +97,17 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation 'com.apollographql.apollo:apollo-runtime:2.5.4'
+    implementation 'com.apollographql.apollo:apollo-android-support:2.5.4'
 
     implementation 'androidx.work:work-runtime:2.4.0'
 
     implementation 'com.auth0:java-jwt:3.11.0'
+    api 'io.jsonwebtoken:jjwt-api:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.2') {
+        exclude group: 'org.json', module: 'json'
+    }
 
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation 'javax.inject:javax.inject:1'

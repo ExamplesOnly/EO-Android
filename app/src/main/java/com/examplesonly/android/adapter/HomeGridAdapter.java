@@ -19,10 +19,13 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
+import com.examplesonly.android.FeedQuery;
 import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ViewExampleItemFourBinding;
+import com.examplesonly.android.handler.FeedClickListener;
 import com.examplesonly.android.handler.FragmentChangeListener;
 import com.examplesonly.android.handler.VideoClickListener;
+import com.examplesonly.android.model.User;
 import com.examplesonly.android.model.Video;
 import com.examplesonly.gallerypicker.utils.DateUtil;
 
@@ -37,12 +40,12 @@ import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHolder> {
 
-    private final ArrayList<Video> videoList;
+    private final ArrayList<FeedQuery.Feed> videoList;
     private final Activity activity;
     LayoutInflater inflater;
-    private final VideoClickListener clickListener;
+    private final FeedClickListener clickListener;
 
-    public HomeGridAdapter(ArrayList<Video> videoList, Activity activity, VideoClickListener clickListener) {
+    public HomeGridAdapter(ArrayList<FeedQuery.Feed> videoList, Activity activity, FeedClickListener clickListener) {
         this.videoList = videoList;
         this.activity = activity;
         this.clickListener = clickListener;
@@ -81,45 +84,34 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
             this.context = context;
         }
 
-        void bind(Video video) {
-            if (video.getUser() != null) {
-                Glide.with(context)
-                        .load(video.getUser().getProfilePhoto())
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .placeholder(R.drawable.ic_user)
-                        .transition(withCrossFade(factory))
-                        .into(binding.profileImage);
-            }
+        void bind(FeedQuery.Feed video) {
+            Glide.with(context)
+                    .load(video.publisher().profileImage())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.ic_user)
+                    .transition(withCrossFade(factory))
+                    .into(binding.profileImage);
             RequestManager loadImage = Glide.with(context);
 
-//            if (Math.random() < 0.5) {
-//                binding.underReview.setVisibility(View.VISIBLE);
-//                binding.overlay.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.bg_example_grid_fill, context.getTheme()));
-//                loadImage.load(video.getThumbUrl()).apply(RequestOptions.bitmapTransform(new BlurTransformation(25, 3)))
-//                        .placeholder(R.color.md_grey_100)
-//                        .transition(withCrossFade(factory))
-//                        .into(binding.thumbnail);
-//            } else {
             binding.underReview.setVisibility(View.GONE);
             binding.overlay.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.bg_example_grid, context.getTheme()));
-            loadImage.load(video.getThumbUrl())
+            loadImage.load(video.thumbUrl())
                     .placeholder(R.color.md_grey_100)
                     .transition(withCrossFade(factory))
                     .into(binding.thumbnail);
+
+            binding.duration.setText(new DateUtil().millisToTime(video.duration()));
+
+//            if (video.getDemand() != null) {
+//                binding.answerTag.setVisibility(View.VISIBLE);
+//                binding.title.setText(video.getDemand().getTitle());
+//            } else {
+//                binding.answerTag.setVisibility(View.GONE);
+            binding.title.setText(video.title());
 //            }
 
-            binding.duration.setText(new DateUtil().millisToTime(Long.parseLong(video.getDuration())));
-
-            if (video.getDemand() != null) {
-                binding.answerTag.setVisibility(View.VISIBLE);
-                binding.title.setText(video.getDemand().getTitle());
-            } else {
-                binding.answerTag.setVisibility(View.GONE);
-                binding.title.setText(video.getTitle());
-            }
-
-            binding.viewCount.setText(String.valueOf(video.getViewCount()));
-            binding.bowCount.setText(String.valueOf(video.getBow()));
+            binding.viewCount.setText(String.valueOf(video.view()));
+            binding.bowCount.setText(String.valueOf(video.bow()));
 
             binding.exampleCard.setOnClickListener(v -> {
                 clickListener.onVideoClicked(video);
@@ -128,7 +120,17 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
             binding.profileCard.setOnClickListener(v -> {
                 if (activity instanceof FragmentChangeListener) {
                     FragmentChangeListener fragmentChangeListener = (FragmentChangeListener) activity;
-                    fragmentChangeListener.switchFragment(INDEX_PROFILE, video.getUser());
+
+                    User currUser = new User()
+                            .setUuid(video.publisher().uuid())
+                            .setEmail(video.publisher().email())
+                            .setFirstName(video.publisher().firstName())
+                            .setMiddleName(video.publisher().middleName())
+                            .setLastName(video.publisher().lastName())
+                            .setProfilePhoto(video.publisher().profileImage())
+                            .setCoverPhoto(video.publisher().coverImage());
+
+                    fragmentChangeListener.switchFragment(INDEX_PROFILE, currUser);
                 }
             });
         }
