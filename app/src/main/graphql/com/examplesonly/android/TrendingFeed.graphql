@@ -1,0 +1,25 @@
+query TrendingFeed($limit: Int!, $offset: Int!) {
+    TrendingFeed(limit: $limit, offset: $offset) {
+        videoId
+        size
+        duration
+        title
+        description
+        url
+        thumbUrl
+        bow
+        view
+        userBowed
+        userBookmarked
+        publisher {
+            uuid
+            email
+            firstName
+            middleName
+            lastName
+            profileImage
+            coverImage
+        }
+    }
+}
+

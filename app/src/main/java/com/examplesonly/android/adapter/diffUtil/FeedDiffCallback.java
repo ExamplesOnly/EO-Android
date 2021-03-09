@@ -1,4 +1,4 @@
-package com.examplesonly.android.model;
+package com.examplesonly.android.adapter.diffUtil;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;

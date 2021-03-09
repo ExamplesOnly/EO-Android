@@ -1,32 +1,29 @@
 package com.examplesonly.android.adapter;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-import static com.examplesonly.android.ui.activity.MainActivity.INDEX_PROFILE;
-
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.paging.PagedList;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.examplesonly.android.FeedQuery;
 import com.examplesonly.android.R;
 import com.examplesonly.android.databinding.ViewExampleItemFourBinding;
 import com.examplesonly.android.handler.FeedClickListener;
 import com.examplesonly.android.handler.FragmentChangeListener;
-import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.User;
-import com.examplesonly.android.model.Video;
 import com.examplesonly.gallerypicker.utils.DateUtil;
 
 import java.text.ParseException;
@@ -36,17 +33,19 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import jp.wasabeef.glide.transformations.BlurTransformation;
+import timber.log.Timber;
 
-public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHolder> {
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+import static com.examplesonly.android.ui.activity.MainActivity.INDEX_PROFILE;
 
-    private final ArrayList<FeedQuery.Feed> videoList;
+public class FeedPagedAdapter extends PagedListAdapter<FeedQuery.Feed, FeedPagedAdapter.ViewHolder> {
+
     private final Activity activity;
     LayoutInflater inflater;
     private final FeedClickListener clickListener;
 
-    public HomeGridAdapter(ArrayList<FeedQuery.Feed> videoList, Activity activity, FeedClickListener clickListener) {
-        this.videoList = videoList;
+    public FeedPagedAdapter(Activity activity, FeedClickListener clickListener) {
+        super(FeedPagedAdapter.CALLBACK);
         this.activity = activity;
         this.clickListener = clickListener;
 
@@ -62,12 +61,10 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        holder.bind(videoList.get(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return videoList.size();
+        Timber.e("FeedPagedList onBindViewHolder %s", position);
+        if (getItem(position) != null) {
+            holder.bind(getItem(position));
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -146,4 +143,16 @@ public class HomeGridAdapter extends RecyclerView.Adapter<HomeGridAdapter.ViewHo
             return null;
         }
     }
+
+    public static final DiffUtil.ItemCallback<FeedQuery.Feed> CALLBACK = new DiffUtil.ItemCallback<FeedQuery.Feed>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull FeedQuery.Feed oldItem, @NonNull FeedQuery.Feed newItem) {
+            return oldItem.videoId().equals(newItem.videoId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull FeedQuery.Feed oldItem, @NonNull FeedQuery.Feed newItem) {
+            return true;
+        }
+    };
 }
