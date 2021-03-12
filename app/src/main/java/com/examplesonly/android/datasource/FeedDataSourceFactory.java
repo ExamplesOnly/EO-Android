@@ -30,7 +30,9 @@ public class FeedDataSourceFactory extends DataSource.Factory<Integer, FeedQuery
         Timber.e("FeedDataSourceFactory create Start");
         feedDataSource = new FeedDataSource(context);
         feedLiveData.postValue(feedDataSource);
-        return feedDataSource;
+//        return feedDataSource;
+        // TODO("Not yet implemented")
+        return null;
     }
 
     public MutableLiveData<FeedDataSource> getFeedLiveData() {

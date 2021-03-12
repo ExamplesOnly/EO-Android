@@ -49,7 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/md_grey_100"
-                    android:src="@drawable/ic_user"/>
+                    android:src="@drawable/ic_user" />
             </androidx.cardview.widget.CardView>
 
         </androidx.cardview.widget.CardView>
@@ -105,8 +105,8 @@
                 android:id="@+id/bio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="User Bio"
                 android:fontFamily="@font/poppins"
+                android:text="User Bio"
                 android:textColor="@color/md_grey_600"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -126,6 +126,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="16dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dev_one">
@@ -142,7 +143,7 @@
                     android:layout_width="48sp"
                     android:layout_height="48sp"
                     android:src="@drawable/ic_eoi_3"
-                    app:tint="@color/colorPrimary"  />
+                    app:tint="@color/colorPrimary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -341,6 +342,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="5dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/params_containera" />
@@ -350,6 +352,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:orientation="horizontal"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/devider_two">
 
             <com.google.android.material.card.MaterialCardView
@@ -500,10 +503,10 @@
             android:id="@+id/no_examples"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No Examples Here!"
-            android:visibility="gone"
             android:fontFamily="@font/poppins_bold"
+            android:text="No Examples Here!"
             android:textColor="@color/dark"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

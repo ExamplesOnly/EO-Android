@@ -43,6 +43,7 @@ import com.examplesonly.android.network.video.VideoInterface;
 import com.examplesonly.android.ui.fragment.DemandDetailsFragment;
 import com.examplesonly.android.ui.fragment.DemandFragment;
 import com.examplesonly.android.ui.fragment.ExploreFragment;
+import com.examplesonly.android.ui.fragment.FeedFragment;
 import com.examplesonly.android.ui.fragment.HomeFragment;
 import com.examplesonly.android.ui.fragment.NotificationFragment;
 import com.examplesonly.android.ui.fragment.ProfileFragment;
@@ -68,7 +69,7 @@ import org.jetbrains.annotations.Nullable;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity
-        implements VideoClickListener, FeedClickListener, RootFragmentListener, BottomSheetOptionChooseListener, FragmentChangeListener,
+        implements VideoClickListener, RootFragmentListener, BottomSheetOptionChooseListener, FragmentChangeListener,
         FragNavController.TransactionListener {
 
     private static final int UPDATE_REQUEST_CODE = 1010;
@@ -262,35 +263,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onVideoClicked(FeedQuery.Feed video) {
-        Video newVideo = new Video();
-        newVideo.setVideoId(video.videoId());
-        newVideo.setSize(video.size());
-        newVideo.setDuration(video.duration());
-        newVideo.setTitle(video.title());
-        newVideo.setDescription(video.description());
-        newVideo.setUrl(video.url());
-        newVideo.setThumbUrl(video.thumbUrl());
-        newVideo.setBow(video.bow() != null ? video.bow() : 0);
-        newVideo.setViewCount(video.view() != null ? video.view() : 0);
-        newVideo.setUserBowed(video.userBowed() != null && video.userBowed() ? 1 : 0);
-        newVideo.setUserBookmarked(video.userBookmarked() != null && video.userBookmarked() ? 1 : 0);
-        newVideo.setUser(new User()
-                .setUuid(video.publisher().uuid())
-                .setEmail(video.publisher().email())
-                .setFirstName(video.publisher().firstName())
-                .setMiddleName(video.publisher().middleName())
-                .setLastName(video.publisher().lastName())
-                .setProfilePhoto(video.publisher().profileImage())
-                .setCoverPhoto(video.publisher().coverImage())
-        );
-
-        Intent videoPlayer = new Intent(MainActivity.this, VideoPlayerActivity.class);
-        videoPlayer.putExtra(VIDEO_DATA, newVideo);
-        startActivity(videoPlayer);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.home_menu, menu);
 
@@ -302,7 +274,7 @@ public class MainActivity extends AppCompatActivity
             notificationMenu.setVisible(false);
         } else {
             settingsMenu.setVisible(false);
-            notificationMenu.setVisible(true);
+            notificationMenu.setVisible(false);
         }
 
         return true;

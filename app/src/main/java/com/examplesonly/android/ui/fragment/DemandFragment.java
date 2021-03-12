@@ -52,8 +52,7 @@ public class DemandFragment extends Fragment {
 
         fragmentPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
         fragmentPagerAdapter.addFrag(new DemandListFragment(), "For you");
-        fragmentPagerAdapter.addFrag(new DemandRequestsFragment(), "Questions");
-//        fragmentPagerAdapter.addFrag(new DemandBookmarkFragment(), "Bookmark");
+        fragmentPagerAdapter.addFrag(new DemandRequestsFragment(), "My Questions");
         binding.viewpager.setAdapter(fragmentPagerAdapter);
 
         return binding.getRoot();

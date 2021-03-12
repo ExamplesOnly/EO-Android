@@ -298,6 +298,7 @@ public class ProfileFragment extends Fragment {
                 Intent editProfile = new Intent(getActivity(), EditProfileActivity.class);
                 startActivity(editProfile);
             });
+            binding.tabContainer.setVisibility(View.VISIBLE);
         }
 
         // profile is of other user
@@ -329,7 +330,6 @@ public class ProfileFragment extends Fragment {
                 // Follow the user
                 binding.profileActionButton.setOnClickListener(view -> followUser(userProfile));
             }
-            binding.statsTab.setVisibility(View.GONE);
         }
     }
 

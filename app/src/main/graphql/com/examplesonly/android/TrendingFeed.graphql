@@ -11,6 +11,7 @@ query TrendingFeed($limit: Int!, $offset: Int!) {
         view
         userBowed
         userBookmarked
+        isDemand
         publisher {
             uuid
             email

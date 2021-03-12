@@ -7,10 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.paging.PagedList;
-import androidx.paging.PagedListAdapter;
+import androidx.paging.PagingDataAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,32 +18,32 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.examplesonly.android.FeedQuery;
 import com.examplesonly.android.R;
+import com.examplesonly.android.TrendingFeedQuery;
 import com.examplesonly.android.databinding.ViewExampleItemFourBinding;
 import com.examplesonly.android.handler.FeedClickListener;
 import com.examplesonly.android.handler.FragmentChangeListener;
+import com.examplesonly.android.handler.VideoClickListener;
 import com.examplesonly.android.model.User;
+import com.examplesonly.android.model.Video;
 import com.examplesonly.gallerypicker.utils.DateUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import timber.log.Timber;
-
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static com.examplesonly.android.ui.activity.MainActivity.INDEX_PROFILE;
 
-public class FeedPagedAdapter extends PagedListAdapter<FeedQuery.Feed, FeedPagedAdapter.ViewHolder> {
+public class FeedTrendingPagingAdapter extends PagingDataAdapter<TrendingFeedQuery.TrendingFeed, FeedTrendingPagingAdapter.ViewHolder> {
 
     private final Activity activity;
     LayoutInflater inflater;
-    private final FeedClickListener clickListener;
+    private final VideoClickListener clickListener;
 
-    public FeedPagedAdapter(Activity activity, FeedClickListener clickListener) {
-        super(FeedPagedAdapter.CALLBACK);
+    public FeedTrendingPagingAdapter(Activity activity, VideoClickListener clickListener) {
+        super(CALLBACK);
         this.activity = activity;
         this.clickListener = clickListener;
 
@@ -61,7 +59,6 @@ public class FeedPagedAdapter extends PagedListAdapter<FeedQuery.Feed, FeedPaged
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        Timber.e("FeedPagedList onBindViewHolder %s", position);
         if (getItem(position) != null) {
             holder.bind(getItem(position));
         }
@@ -81,7 +78,7 @@ public class FeedPagedAdapter extends PagedListAdapter<FeedQuery.Feed, FeedPaged
             this.context = context;
         }
 
-        void bind(FeedQuery.Feed video) {
+        void bind(TrendingFeedQuery.TrendingFeed video) {
             Glide.with(context)
                     .load(video.publisher().profileImage())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -99,19 +96,39 @@ public class FeedPagedAdapter extends PagedListAdapter<FeedQuery.Feed, FeedPaged
 
             binding.duration.setText(new DateUtil().millisToTime(video.duration()));
 
-//            if (video.getDemand() != null) {
-//                binding.answerTag.setVisibility(View.VISIBLE);
-//                binding.title.setText(video.getDemand().getTitle());
-//            } else {
-//                binding.answerTag.setVisibility(View.GONE);
+            // Hide onDemand tag if it is not a demand
+            if (!video.isDemand()) {
+                binding.answerTag.setVisibility(View.GONE);
+            }
+
             binding.title.setText(video.title());
-//            }
 
             binding.viewCount.setText(String.valueOf(video.view()));
             binding.bowCount.setText(String.valueOf(video.bow()));
 
             binding.exampleCard.setOnClickListener(v -> {
-                clickListener.onVideoClicked(video);
+                Video newVideo = new Video();
+                newVideo.setVideoId(video.videoId());
+                newVideo.setSize(video.size());
+                newVideo.setDuration(video.duration());
+                newVideo.setTitle(video.title());
+                newVideo.setDescription(video.description());
+                newVideo.setUrl(video.url());
+                newVideo.setThumbUrl(video.thumbUrl());
+                newVideo.setBow(video.bow() != null ? video.bow() : 0);
+                newVideo.setViewCount(video.view() != null ? video.view() : 0);
+                newVideo.setUserBowed(video.userBowed() != null && video.userBowed() ? 1 : 0);
+                newVideo.setUserBookmarked(video.userBookmarked() != null && video.userBookmarked() ? 1 : 0);
+                newVideo.setUser(new User()
+                        .setUuid(video.publisher().uuid())
+                        .setEmail(video.publisher().email())
+                        .setFirstName(video.publisher().firstName())
+                        .setMiddleName(video.publisher().middleName())
+                        .setLastName(video.publisher().lastName())
+                        .setProfilePhoto(video.publisher().profileImage())
+                        .setCoverPhoto(video.publisher().coverImage())
+                );
+                clickListener.onVideoClicked(newVideo);
             });
 
             binding.profileCard.setOnClickListener(v -> {
@@ -133,25 +150,14 @@ public class FeedPagedAdapter extends PagedListAdapter<FeedQuery.Feed, FeedPaged
         }
     }
 
-    public Date StringToDate(String dateString) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS'Z'", Locale.getDefault());
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        try {
-            return format.parse(dateString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static final DiffUtil.ItemCallback<FeedQuery.Feed> CALLBACK = new DiffUtil.ItemCallback<FeedQuery.Feed>() {
+    public static final DiffUtil.ItemCallback<TrendingFeedQuery.TrendingFeed> CALLBACK = new DiffUtil.ItemCallback<TrendingFeedQuery.TrendingFeed>() {
         @Override
-        public boolean areItemsTheSame(@NonNull FeedQuery.Feed oldItem, @NonNull FeedQuery.Feed newItem) {
+        public boolean areItemsTheSame(@NonNull TrendingFeedQuery.TrendingFeed oldItem, @NonNull TrendingFeedQuery.TrendingFeed newItem) {
             return oldItem.videoId().equals(newItem.videoId());
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull FeedQuery.Feed oldItem, @NonNull FeedQuery.Feed newItem) {
+        public boolean areContentsTheSame(@NonNull TrendingFeedQuery.TrendingFeed oldItem, @NonNull TrendingFeedQuery.TrendingFeed newItem) {
             return true;
         }
     };

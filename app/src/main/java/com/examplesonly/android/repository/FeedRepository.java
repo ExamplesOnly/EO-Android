@@ -16,8 +16,6 @@ public class FeedRepository {
     private static FeedRepository instance;
     private Context context;
 
-    private ArrayList<FeedQuery.Feed> feedList;
-    private ApolloClient gqlClient;
 
     private FeedRepository(Context context) {
         this.context = context;
@@ -30,11 +28,6 @@ public class FeedRepository {
         return instance;
     }
 
-    public MutableLiveData<List<FeedQuery.Feed>> getFeed() {
-
-        gqlClient = new GqlClient(context).getClient();
-        return null;
-    }
 
 
 }

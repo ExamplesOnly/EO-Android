@@ -11,6 +11,7 @@ query Feed($limit: Int!, $offset: Int!) {
         view
         userBowed
         userBookmarked
+        isDemand
         publisher {
             uuid
             email
