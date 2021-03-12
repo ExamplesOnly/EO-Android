@@ -22,6 +22,7 @@ import com.google.android.exoplayer2.util.MimeTypes;
 
 import java.io.File;
 
+import id.zelory.compressor.Compressor;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import io.reactivex.rxjava3.core.Flowable;
@@ -55,7 +56,10 @@ public class VideoUploadService extends JobIntentService {
     private static final int JOB_ID = 1020;
     NotificationHelper mNotificationHelper;
     NotificationCompat.Builder progressNotification;
+
     VideoUploadData videoData;
+    File compressedThumbnail;
+
     long mLastClickTime = 0;
 
     @Override
@@ -73,6 +77,17 @@ public class VideoUploadService extends JobIntentService {
             this.onErrors(null);
             Timber.e("onHandleWork: Invalid video data");
             return;
+        }
+
+        try {
+            File thumbnail = new File(videoData.getThumbFilePath());
+            if (thumbnail.exists()) {
+                compressedThumbnail = new Compressor(this).compressToFile(thumbnail);
+            } else {
+                this.onErrors(null);
+            }
+        } catch (Exception e) {
+            this.onErrors(null);
         }
 
         videoInterface = new Api(getApplication()).getClient().create(VideoInterface.class);

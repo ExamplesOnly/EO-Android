@@ -41,12 +41,15 @@ import com.examplesonly.android.ui.activity.MainActivity;
 import com.examplesonly.android.ui.activity.NewEoActivity.ThumbnailChooseListener;
 import com.examplesonly.android.util.MediaUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
+import id.zelory.compressor.Compressor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -179,9 +182,9 @@ public class PostVideoFragment extends Fragment implements ThumbnailChooseListen
 
     @Override
     public void onThumbnailChosen(final long thumbPosition) {
-        Bitmap bitmap = ThumbyUtils
+
+        thumbnail = ThumbyUtils
                 .getBitmapAtFrame(getContext(), Uri.fromFile(new File(video)), thumbPosition, -1, -1);
-        thumbnail = bitmap;
         binding.thumbnail.setImageBitmap(thumbnail);
     }
 
