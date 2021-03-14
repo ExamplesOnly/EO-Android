@@ -111,7 +111,8 @@ public class ProfileFragment extends Fragment {
             public void onResponse(final @NotNull Call<User> call, final @NotNull Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     currentUser = response.body();
-                    updateProfile(currentUser, false);
+                    if (isAdded())
+                        updateProfile(currentUser, false);
                 } else {
                     try {
                         Timber.e(response.errorBody().string());
@@ -242,6 +243,7 @@ public class ProfileFragment extends Fragment {
             setButtonActionActive(false);
             binding.profileActionButton.setText("Loading");
         } else {
+            exampleLoaded = true;
             updateActionButton(userProfile);
         }
 
@@ -256,9 +258,8 @@ public class ProfileFragment extends Fragment {
                     .placeholder(R.color.md_grey_200)
                     .transition(withCrossFade(factory))
                     .into(binding.coverImage);
-        exampleLoaded = true;
 
-        if (mExampleList.size() == 0 && currentTab == TAB_USER_VIDEOS) {
+        if (mExampleList.size() == 0 && currentTab == TAB_USER_VIDEOS && !isLoading) {
             binding.noExamples.setVisibility(View.VISIBLE);
         }
 
