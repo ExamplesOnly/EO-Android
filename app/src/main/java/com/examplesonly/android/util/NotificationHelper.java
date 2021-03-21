@@ -6,12 +6,19 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.examplesonly.android.R;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class NotificationHelper extends ContextWrapper {
     private NotificationManager manager;
@@ -124,5 +131,19 @@ public class NotificationHelper extends ContextWrapper {
 
     public void cancelNotification(int notificationId) {
         getManager().cancel(notificationId);
+    }
+
+    public Bitmap getBitmapFromURL(String strURL) {
+        try {
+            URL url = new URL(strURL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            return BitmapFactory.decodeStream(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

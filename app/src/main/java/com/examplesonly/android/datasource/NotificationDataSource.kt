@@ -7,33 +7,32 @@ import com.apollographql.apollo.ApolloCall
 import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.examplesonly.android.FeedQuery
+import com.examplesonly.android.NotificationsQuery
 import com.examplesonly.android.network.graphql.GqlClient
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class FeedDataSourceKt(var context: Context) : PagingSource<Int, FeedQuery.Feed>() {
-
+class NotificationDataSource(var context: Context) : PagingSource<Int, NotificationsQuery.Notification>() {
 
     private val gqlClient = GqlClient(context).client
 
-    override fun getRefreshKey(state: PagingState<Int, FeedQuery.Feed>): Int? {
-        Timber.e("FeedDataSourceKt getRefreshKey")
+    override fun getRefreshKey(state: PagingState<Int, NotificationsQuery.Notification>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
             anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FeedQuery.Feed> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, NotificationsQuery.Notification> {
+
         return try {
 
-            // Start refresh at page 1 if undefined.
             val nextPageNumber = params.key ?: 1
             val offset = params.loadSize * (nextPageNumber - 1)
 
-            val response = gqlClient.query(FeedQuery(params.loadSize, offset)).execute()
+            val response = gqlClient.query(NotificationsQuery(params.loadSize, offset)).execute()
 
             if (response.hasErrors()) {
                 return LoadResult.Error(Exception("Could not load result"))
@@ -41,21 +40,19 @@ class FeedDataSourceKt(var context: Context) : PagingSource<Int, FeedQuery.Feed>
                 Timber.e("Could not load result")
             }
 
-
-            val nextPage = if (response.data?.Feed()?.size ?: 0 < params.loadSize) null else nextPageNumber + 1
+            val nextPage = if (response.data?.Notifications()?.size ?: 0 < params.loadSize) null else nextPageNumber + 1
 
             LoadResult.Page(
-                    data = response.data?.Feed().orEmpty(),
+                    data = response.data?.Notifications().orEmpty(),
                     prevKey = null,
                     nextKey = nextPage
             )
         } catch (e: Exception) {
             e.printStackTrace()
-            Timber.e("FeedDataSourceKt load LoadResult.Error %s", e.message)
             LoadResult.Error(e)
         }
-    }
 
+    }
 
     private suspend fun <T> ApolloCall<T>.execute() = suspendCoroutine<Response<T>> { cont ->
         enqueue(object : ApolloCall.Callback<T>() {

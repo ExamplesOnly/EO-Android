@@ -59,4 +59,8 @@
     <string name="follow">Follow</string>
     <string name="following">Following</string>
     <string name="follow_back">Follow Back</string>
+
+    <string name="notification_channel_account_id">channel_account</string>
+    <string name="notification_channel_account_name">Account</string>
+    <string name="notification_channel_account_description">User account related notifications</string>
 </resources>

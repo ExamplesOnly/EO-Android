@@ -13,6 +13,7 @@ import android.content.IntentSender;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.examplesonly.android.BuildConfig;
-import com.examplesonly.android.FeedQuery;
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
 import com.examplesonly.android.component.BottomSheetOptionsDialog;
@@ -47,6 +47,8 @@ import com.examplesonly.android.ui.fragment.FeedFragment;
 import com.examplesonly.android.ui.fragment.HomeFragment;
 import com.examplesonly.android.ui.fragment.NotificationFragment;
 import com.examplesonly.android.ui.fragment.ProfileFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
@@ -57,6 +59,7 @@ import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.android.play.core.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavController.RootFragmentListener;
 import com.ncapdevi.fragnav.tabhistory.UniqueTabHistoryStrategy;
@@ -87,9 +90,7 @@ public class MainActivity extends AppCompatActivity
     public static final int OPTION_RECORD_VIDEO_EOD = 105;
 
     private ActivityMainBinding binding;
-    private FragmentManager fm = getSupportFragmentManager();
-    private UserInterface userInterface;
-    private VideoInterface videoInterface;
+    private final FragmentManager fm = getSupportFragmentManager();
     private UserDataProvider userDataProvider;
     private FragNavController fragNavController;
     private final ArrayList<Fragment> fragments = new ArrayList<>();
@@ -111,6 +112,20 @@ public class MainActivity extends AppCompatActivity
                 super.onBackPressed();
             }
         });
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Timber.e(task.getException(), "Fetching FCM registration token failed");
+                        return;
+                    }
+
+                    // Get new FCM registration token
+                    String token = task.getResult();
+
+
+                    Timber.e("FCM TOKEN %s", token);
+                }).addOnFailureListener(e -> Timber.e("FCM FAIL %s", e.getMessage()));
 
         init();
         setupFragments();
@@ -311,8 +326,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void init() {
-        userInterface = new Api(this).getClient().create(UserInterface.class);
-        videoInterface = new Api(this).getClient().create(VideoInterface.class);
         userDataProvider = UserDataProvider.getInstance(this);
         appUpdateManager = AppUpdateManagerFactory.create(this);
 

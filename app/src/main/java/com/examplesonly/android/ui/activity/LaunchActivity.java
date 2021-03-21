@@ -19,6 +19,11 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import timber.log.Timber;
 
+import static com.examplesonly.android.util.Constant.NOTIFICATION_DESTINATION;
+import static com.examplesonly.android.util.Constant.NOTIFICATION_DESTINATION_ID;
+import static com.examplesonly.android.util.Constant.NOTIFICATION_DESTINATION_VIDEO;
+import static com.examplesonly.android.util.Constant.NOTIFICATION_LAUNCH;
+
 public class LaunchActivity extends AppCompatActivity {
 
     // Remote Config keys
@@ -47,7 +52,25 @@ public class LaunchActivity extends AppCompatActivity {
         verify = new Intent(this, VerificationActivity.class);
         main = new Intent(this, MainActivity.class);
 
-        Timber.e(mUserDataProvider.toString());
+        Intent intent = getIntent();
+        boolean isNotificationLaunch = intent.getBooleanExtra(NOTIFICATION_LAUNCH, false);
+
+        Timber.e("LaunchActivity: %s %s %s",
+                isNotificationLaunch,
+                intent.getStringExtra(NOTIFICATION_DESTINATION),
+                intent.getStringExtra(NOTIFICATION_DESTINATION_ID));
+
+        if (isNotificationLaunch) {
+            String notificationDestination = intent.getStringExtra(NOTIFICATION_DESTINATION);
+            switch (notificationDestination) {
+                case NOTIFICATION_DESTINATION_VIDEO:
+                    main.putExtra(NOTIFICATION_LAUNCH, true);
+                    main.putExtra(NOTIFICATION_DESTINATION, NOTIFICATION_DESTINATION_VIDEO);
+                    main.putExtra(NOTIFICATION_DESTINATION_ID, intent.getStringExtra(NOTIFICATION_DESTINATION_ID));
+                    break;
+            }
+        }
+
         launch();
     }
 

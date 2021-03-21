@@ -1,0 +1,15 @@
+{
+  "name": "GraphQL Schema",
+  "schemaPath": "schema.json",
+  "extensions": {
+    "endpoints": {
+      "Local GraphQL Endpoint": {
+        "url": "http://localhost:4040/graphql",
+        "headers": {
+          "authorization": "Bearer "
+        },
+        "introspect": false
+      }
+    }
+  }
+}

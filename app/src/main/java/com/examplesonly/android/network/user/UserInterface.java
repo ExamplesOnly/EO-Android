@@ -68,12 +68,16 @@ public interface UserInterface {
 
     @GET("v1/user/followers/{uuid}")
     Call<ArrayList<User>> getFollowers(@Path("uuid") String uuid,
-                                           @Query("sort") String sort,
-                                           @Query("offset") Integer offset);
+                                       @Query("sort") String sort,
+                                       @Query("offset") Integer offset);
 
     @GET("v1/user/followings/{uuid}")
     Call<ArrayList<User>> getFollowings(@Path("uuid") String uuid,
-                                           @Query("sort") String sort,
-                                           @Query("offset") Integer offset);
+                                        @Query("sort") String sort,
+                                        @Query("offset") Integer offset);
 
+
+    @FormUrlEncoded
+    @POST("v1/user/updateFcmToken")
+    Call<HashMap<String, String>> updateFcmToken(@Field("refreshToken") String refreshToken, @Field("fcmToken") String fcmToken);
 }

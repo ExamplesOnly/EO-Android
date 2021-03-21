@@ -1,0 +1,12 @@
+query Notifications($limit: Int!, $offset: Int!) {
+    Notifications(limit: $limit, offset: $offset) {
+        uuid
+        text
+        type
+        thumb
+        actionId
+        actionType
+        createdAt
+    }
+}
+
