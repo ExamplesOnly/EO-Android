@@ -35,9 +35,10 @@ class NotificationDataSource(var context: Context) : PagingSource<Int, Notificat
             val response = gqlClient.query(NotificationsQuery(params.loadSize, offset)).execute()
 
             if (response.hasErrors()) {
+                Timber.e("Could not load result: %s", response.errors)
                 return LoadResult.Error(Exception("Could not load result"))
             } else {
-                Timber.e("Could not load result")
+                Timber.e("Notifications count: %s", response.data?.Notifications()?.size)
             }
 
             val nextPage = if (response.data?.Notifications()?.size ?: 0 < params.loadSize) null else nextPageNumber + 1

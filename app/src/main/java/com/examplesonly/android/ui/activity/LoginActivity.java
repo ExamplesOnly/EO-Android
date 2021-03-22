@@ -5,10 +5,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import com.examplesonly.android.R;
 import com.examplesonly.android.account.UserDataProvider;
@@ -21,6 +28,7 @@ import com.examplesonly.android.network.user.UserInterface;
 import com.examplesonly.android.ui.auth.AuthFragment;
 import com.examplesonly.android.ui.auth.ForgotPassFragment;
 import com.examplesonly.android.ui.auth.SetPasswordFragment;
+import com.examplesonly.android.worker.FcmTokenUpdater;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -31,9 +39,11 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -101,6 +111,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
+    public void publishFcmToken() {
+        WorkRequest fcmTokenUpdater =
+                new OneTimeWorkRequest.Builder(FcmTokenUpdater.class)
+                        .setConstraints(new Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build())
+                        .build();
+        WorkManager
+                .getInstance(LoginActivity.this)
+                .enqueue(fcmTokenUpdater);
+    }
+
+
     public void googleSignIn() {
         Intent signInIntent = userDataProvider.getGoogleSignInClient().getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -130,6 +153,11 @@ public class LoginActivity extends AppCompatActivity {
                                 if (response.isSuccessful() && response.body() != null) {
                                     loadingDialog.dismiss();
                                     userDataProvider.saveUserData(response.body());
+
+                                    // Start FCM token publishing process
+                                    publishFcmToken();
+
+                                    // Handle password generation process if it is a new account
                                     if (authResponse.body().containsKey("newAccount")) {
                                         launchSetPass();
                                     } else {

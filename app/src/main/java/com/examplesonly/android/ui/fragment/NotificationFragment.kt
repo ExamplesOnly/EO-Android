@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_notification.view.swipe_refresh
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class NotificationFragment : Fragment() {
 

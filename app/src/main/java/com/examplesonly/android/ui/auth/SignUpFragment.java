@@ -245,6 +245,10 @@ public class SignUpFragment extends Fragment {
                         public void onResponse(final Call<User> call, final Response<User> response) {
                             if (response.isSuccessful()) {
                                 mUserDataProvider.saveUserData(response.body());
+
+                                // Start FCM token publishing process
+                                ((LoginActivity) requireActivity()).publishFcmToken();
+
                                 Timber.e(response.body().toString());
 
                             } else {

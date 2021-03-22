@@ -81,7 +81,7 @@ public class NotificationPagingAdapter extends PagingDataAdapter<NotificationsQu
             Glide.with(context)
                     .load(notification.thumb())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.ic_user)
+                    .placeholder(R.drawable.ic_user_circle)
                     .transition(withCrossFade(factory))
                     .into(binding.thumbImage);
 

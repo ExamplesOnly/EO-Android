@@ -25,6 +25,7 @@ import com.examplesonly.android.model.User;
 import com.examplesonly.android.network.Api;
 import com.examplesonly.android.network.auth.AuthInterface;
 import com.examplesonly.android.network.user.UserInterface;
+import com.examplesonly.android.ui.activity.LoginActivity;
 import com.examplesonly.android.ui.activity.MainActivity;
 
 import java.io.IOException;
@@ -134,6 +135,8 @@ public class LoginFragment extends Fragment {
                                 }
                             }
 
+                            // Start FCM token publishing process
+                            ((LoginActivity) requireActivity()).publishFcmToken();
                             Intent main = new Intent(getContext(), MainActivity.class);
                             startActivity(main);
                             getActivity().finish();
