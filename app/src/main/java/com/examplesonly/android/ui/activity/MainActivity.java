@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity
             int itemId = item.getItemId();
             if (itemId == R.id.home) {
                 fragNavController.switchTab(INDEX_HOME);
+
             }
 //            else if (itemId == R.id.explore) {
 //                fragNavController.switchTab(INDEX_EXPLORE);
@@ -362,7 +363,20 @@ public class MainActivity extends AppCompatActivity
     private void updateToolBar() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(!fragNavController.isRootFragment());
         if (fragNavController.isRootFragment()) {
-            binding.eoTitle.setVisibility(View.VISIBLE);
+
+            if (fragNavController.getCurrentFrag() instanceof HomeFragment) {
+                binding.eoTitle.setVisibility(View.VISIBLE);
+                binding.pageTitle.setText("");
+            } else if (fragNavController.getCurrentFrag() instanceof DemandFragment) {
+                binding.eoTitle.setVisibility(View.GONE);
+                binding.pageTitle.setText("Questions");
+            } else if (fragNavController.getCurrentFrag() instanceof NotificationFragment) {
+                binding.eoTitle.setVisibility(View.GONE);
+                binding.pageTitle.setText("Notifications");
+            } else {
+                binding.eoTitle.setVisibility(View.VISIBLE);
+                binding.pageTitle.setText("");
+            }
         } else {
             binding.eoTitle.setVisibility(View.GONE);
         }
