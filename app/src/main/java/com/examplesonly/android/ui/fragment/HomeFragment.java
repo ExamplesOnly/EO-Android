@@ -43,7 +43,7 @@ public class HomeFragment extends Fragment {
         binding.tab.setupWithViewPager(binding.viewpager);
         fragmentPagerAdapter = new ViewPagerAdapter(getChildFragmentManager());
         fragmentPagerAdapter.addFrag(FeedFragment.newInstance(FEED_TYPE_RECENT), "For You");
-        fragmentPagerAdapter.addFrag(FeedFragment.newInstance(FEED_TYPE_TRENDING), "Hot");
+        fragmentPagerAdapter.addFrag(FeedFragment.newInstance(FEED_TYPE_TRENDING), "Trending");
         binding.viewpager.setAdapter(fragmentPagerAdapter);
 
         // Inflate the layout for this fragment

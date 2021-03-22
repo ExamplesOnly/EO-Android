@@ -62,7 +62,7 @@ class NotificationFragment : Fragment() {
     }
 
     private fun initRecyclerView() {
-        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         view.notificationList.layoutManager = layoutManager
 
