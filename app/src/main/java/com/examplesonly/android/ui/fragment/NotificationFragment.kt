@@ -1,5 +1,6 @@
 package com.examplesonly.android.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,22 +13,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.examplesonly.android.adapter.FeedRecentPagingAdapter
 import com.examplesonly.android.adapter.NotificationPagingAdapter
 import com.examplesonly.android.databinding.FragmentNotificationBinding
-import com.examplesonly.android.ui.view.ProfileGridDecoration
-import com.examplesonly.android.viewmodel.FeedViewModelKt
+import com.examplesonly.android.handler.VideoClickListener
+import com.examplesonly.android.model.Video
+import com.examplesonly.android.ui.activity.VideoPlayerActivity
 import com.examplesonly.android.viewmodel.NotificationViewModel
 import com.examplesonly.android.viewmodel.ViewModelInjection
 import kotlinx.android.synthetic.main.fragment_notification.view.*
-import kotlinx.android.synthetic.main.fragment_notification.view.loading_shimmer
-import kotlinx.android.synthetic.main.fragment_notification.view.swipe_refresh
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
-class NotificationFragment : Fragment() {
+class NotificationFragment : Fragment(), VideoClickListener {
 
     private lateinit var binding: FragmentNotificationBinding
     private lateinit var notificationViewModel: NotificationViewModel
@@ -67,7 +65,7 @@ class NotificationFragment : Fragment() {
 
         view.notificationList.layoutManager = layoutManager
 
-        notificationAdapter = NotificationPagingAdapter(activity)
+        notificationAdapter = NotificationPagingAdapter(activity, this)
         view.notificationList.adapter = notificationAdapter
 
         view.swipe_refresh.setOnRefreshListener {
@@ -85,12 +83,18 @@ class NotificationFragment : Fragment() {
     }
 
     private fun updateViewState(loadState: CombinedLoadStates) {
-        // Only show the list if refresh succeeds. // 36466 - 10k
+        // Only show the list if refresh succeeds.
         view.notificationList.isVisible = loadState.source.refresh is LoadState.NotLoading && loadState.source.refresh !is LoadState.Error
         view.loading_shimmer.isVisible = loadState.source.refresh is LoadState.Loading && loadState.source.refresh !is LoadState.Error
         // Show loading spinner during initial load or refresh.
 //            view.progressBar.isVisible = loadState.source.refresh is LoadState.Loading
         // Show the retry state if initial load or refresh fails.
         view.no_internet.isOffline(loadState.source.refresh is LoadState.Error)
+    }
+
+    override fun onVideoClicked(video: Video) {
+        val videoPlayer = Intent(context, VideoPlayerActivity::class.java)
+        videoPlayer.putExtra(VideoPlayerActivity.VIDEO_DATA, video)
+        startActivity(videoPlayer)
     }
 }

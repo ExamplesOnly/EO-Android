@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
@@ -17,8 +18,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/thumbImage"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
             android:layout_marginEnd="10dp" />
 
         <LinearLayout
@@ -33,7 +34,7 @@
                 android:fontFamily="@font/poppins"
                 android:maxLines="3"
                 android:textColor="@color/md_grey_900"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/time"
@@ -42,7 +43,7 @@
                 android:fontFamily="@font/poppins"
                 android:maxLines="1"
                 android:textColor="@color/md_grey_500"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
 
         </LinearLayout>

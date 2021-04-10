@@ -42,11 +42,13 @@ public class NotificationPagingAdapter extends PagingDataAdapter<NotificationsQu
 
     private final Activity activity;
     LayoutInflater inflater;
+    VideoClickListener listener;
 
-    public NotificationPagingAdapter(Activity activity) {
+    public NotificationPagingAdapter(Activity activity, VideoClickListener listener) {
         super(CALLBACK);
         this.activity = activity;
         inflater = LayoutInflater.from(activity);
+        this.listener = listener;
     }
 
     @NonNull
@@ -94,6 +96,8 @@ public class NotificationPagingAdapter extends PagingDataAdapter<NotificationsQu
             PrettyTime prettyTime = new PrettyTime(Locale.getDefault());
             String ago = prettyTime.format(new Date(Long.parseLong(notification.createdAt())));
             binding.time.setText(ago);
+
+            binding.card.setOnClickListener(v -> listener.onVideoClicked(new Video().setVideoId(notification.actionId())));
         }
     }
 
