@@ -8,8 +8,11 @@ import static com.examplesonly.android.ui.activity.NewEoActivity.FRAGMENT_NEW_DE
 import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_DATA;
 import static com.examplesonly.android.ui.activity.VideoPlayerActivity.VIDEO_DATA_TYPE;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
@@ -19,8 +22,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -47,6 +53,7 @@ import com.examplesonly.android.ui.fragment.FeedFragment;
 import com.examplesonly.android.ui.fragment.HomeFragment;
 import com.examplesonly.android.ui.fragment.NotificationFragment;
 import com.examplesonly.android.ui.fragment.ProfileFragment;
+import com.examplesonly.android.ui.fragment.SearchFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
@@ -65,6 +72,7 @@ import com.ncapdevi.fragnav.FragNavController.RootFragmentListener;
 import com.ncapdevi.fragnav.tabhistory.UniqueTabHistoryStrategy;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,9 +98,9 @@ public class MainActivity extends AppCompatActivity
     public static final int OPTION_RECORD_VIDEO_EOD = 105;
 
     private ActivityMainBinding binding;
-    private final FragmentManager fm = getSupportFragmentManager();
     private UserDataProvider userDataProvider;
     private FragNavController fragNavController;
+    private final FragmentManager fm = getSupportFragmentManager();
     private final ArrayList<Fragment> fragments = new ArrayList<>();
 
     InstallStateUpdatedListener updateListener;
@@ -106,7 +114,9 @@ public class MainActivity extends AppCompatActivity
         setContentView(view);
 
         setSupportActionBar(binding.topAppBar);
-        getSupportActionBar().setTitle("");
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("");
+        }
         binding.topAppBar.setNavigationOnClickListener(view1 -> {
             if (!fragNavController.popFragment()) {
                 super.onBackPressed();
@@ -242,6 +252,7 @@ public class MainActivity extends AppCompatActivity
     public void onFragmentTransaction(@Nullable final Fragment fragment,
                                       @NotNull final FragNavController.TransactionType transactionType) {
         updateToolBar();
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -282,31 +293,42 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.home_menu, menu);
 
+        MenuItem searchMenu = menu.findItem(R.id.search);
         MenuItem settingsMenu = menu.findItem(R.id.settings);
         MenuItem notificationMenu = menu.findItem(R.id.notification);
 
         if (fragNavController.getCurrentFrag() instanceof ProfileFragment) {
+            searchMenu.setVisible(false);
             settingsMenu.setVisible(true);
-            notificationMenu.setVisible(false);
-        } else {
+        } else if (fragNavController.getCurrentFrag() instanceof SearchFragment) {
+            searchMenu.setVisible(false);
             settingsMenu.setVisible(false);
-            notificationMenu.setVisible(false);
+            searchView(true);
+        } else {
+            searchMenu.setVisible(true);
+            settingsMenu.setVisible(false);
+            searchView(false);
         }
 
+        notificationMenu.setVisible(false);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
         int itemId = item.getItemId();
+
         if (itemId == R.id.notification) {
-            Intent notification = new Intent(MainActivity.this, NotificationActivity.class);
-            startActivity(notification);
+            startActivity(new Intent(MainActivity.this, NotificationActivity.class));
         } else if (itemId == R.id.settings) {
-            Intent notification = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(notification);
+            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+        } else if (itemId == R.id.search) {
+            fragNavController.pushFragment(new SearchFragment());
+            invalidateOptionsMenu();
         }
+
         return super.onOptionsItemSelected(item);
+
     }
 
     @Override
@@ -361,7 +383,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateToolBar() {
-        getSupportActionBar().setDisplayHomeAsUpEnabled(!fragNavController.isRootFragment());
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(!fragNavController.isRootFragment());
         if (fragNavController.isRootFragment()) {
 
             if (fragNavController.getCurrentFrag() instanceof HomeFragment) {
@@ -424,36 +447,6 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-//    private void validateToken() {
-//        String token = userDataProvider.getToken();
-//        try {
-//            DecodedJWT jwt = JWT.decode(token);
-//            if (jwt.getExpiresAt().before(new Date())) {
-//                EoAlertDialog logoutDialog = new EoAlertDialog(MainActivity.this)
-//                        .setDialogIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sign_in_alt, getTheme()))
-//                        .setIconTint(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()))
-//                        .setTitle("Session Expired")
-//                        .setDescription("Your login session has expired. Please login again to keep enjoying the excitement!")
-//                        .setPositiveText("Login")
-//                        .setPositiveClickListener(dialog -> {
-//                            dialog.dismiss();
-//                            userDataProvider.clearUserData();
-//                            Intent reLaunch = new Intent(MainActivity.this, LaunchActivity.class);
-//                            startActivity(reLaunch);
-//                            this.finish();
-//
-//                        });
-//
-//                logoutDialog.setCancelable(false);
-//                logoutDialog.show();
-//            }
-//        } catch (Exception exception) {
-//
-////            if(exception instanceof JWTDecodeException)
-//            //Invalid token
-//        }
-//    }
-
     void popupSnackbarForCompleteUpdate() {
         Snackbar updateSnackBar = Snackbar.make(binding.getRoot(),
                 "A new update of ExamplesOnly is downloaded.", BaseTransientBottomBar.LENGTH_INDEFINITE)
@@ -462,5 +455,17 @@ public class MainActivity extends AppCompatActivity
         updateSnackBar.setAnchorView(binding.bottomNavigation);
 
         updateSnackBar.show();
+    }
+
+    void searchView(boolean isOpen) {
+        if (isOpen) {
+//            binding.topAppBar.setBackgroundColor(getResources().getColor(R.color.md_grey_100, getTheme()));
+            binding.eoTitle.setVisibility(View.GONE);
+            binding.pageTitle.setText("");
+            binding.searchText.setVisibility(View.VISIBLE);
+        } else {
+            binding.searchText.setVisibility(View.GONE);
+            updateToolBar();
+        }
     }
 }

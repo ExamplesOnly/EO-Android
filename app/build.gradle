@@ -8,7 +8,7 @@ apply plugin: 'com.apollographql.apollo'
 
 def lifecycle_version = "2.3.1"
 def arch_version = "2.1.0"
-def paging_version = "3.0.0-beta02"
+def paging_version = "3.0.0-beta03"
 
 android {
     signingConfigs {
