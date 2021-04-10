@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.android.jwt.JWT;
 import com.examplesonly.android.R;
 import com.examplesonly.android.handler.UserAccountHandler;
 import com.examplesonly.android.model.User;
@@ -155,14 +153,14 @@ public class UserDataProvider {
             return false;
 
         try {
-            DecodedJWT jwt = JWT.decode(getAccessToken());
+            JWT jwt = new JWT(getAccessToken());
 
             // Get current time on UTC
             Calendar cal = Calendar.getInstance();
             cal.setTimeZone(TimeZone.getTimeZone("UTC"));
 
             return jwt.getExpiresAt().after(cal.getTime());
-        } catch (JWTDecodeException exception) {
+        } catch (Exception exception) {
             return false;
         }
     }
@@ -244,20 +242,16 @@ public class UserDataProvider {
                 .putBoolean(USER_VERIFICATION_KEY, false).apply();
     }
 
-    private boolean validateToken() {
-        Timber.e("UserDataProvider: validateToken");
-        String token = userDataProvider.getAccessToken();
-        try {
-            DecodedJWT jwt = JWT.decode(token);
-            if (jwt.getExpiresAt().before(new Date())) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (Exception exception) {
-            return false;
-        }
-    }
+//    private boolean validateToken() {
+//        Timber.e("UserDataProvider: validateToken");
+//        String token = userDataProvider.getAccessToken();
+//        try {
+//            JWT jwt = new JWT(getAccessToken());
+//            return !jwt.getExpiresAt().before(new Date());
+//        } catch (Exception exception) {
+//            return false;
+//        }
+//    }
 
     public void logout(AuthInterface authInterface, UserAccountHandler accountHandler) {
         String sessionToken = getRefreshToken();

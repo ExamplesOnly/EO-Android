@@ -118,7 +118,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
 
-    implementation 'com.auth0:java-jwt:3.11.0'
+    implementation 'com.auth0.android:jwtdecode:2.0.0'
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.4.Final'
 
     implementation 'androidx.work:work-runtime:2.5.0'
